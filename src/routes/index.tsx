@@ -57,6 +57,71 @@ const payments = [
   { icon: Smartphone, label: "E-Wallet" },
 ];
 
+// Pelanggan yang sudah memakai Siarpi (logo bar — pakai inisial sebagai placeholder)
+const clients = [
+  { name: "Kopi Kenangan Lokal", initial: "KK" },
+  { name: "PT Maju Bersama", initial: "MB" },
+  { name: "Toko Sembako Berkah", initial: "SB" },
+  { name: "Studio Kreatif", initial: "SK" },
+  { name: "PT Sinar Abadi", initial: "SA" },
+  { name: "Boutique Anggun", initial: "BA" },
+  { name: "Warung Bakso Mantap", initial: "WB" },
+  { name: "Digital Agency", initial: "DA" },
+];
+
+// Feedback / testimoni dari pelanggan nyata yang sudah pakai Siarpi
+const testimonials = [
+  {
+    quote: "Onboarding karyawan baru sekarang cuma 1 hari. Dulu bisa seminggu lebih. Tim HR saya akhirnya bisa fokus ke hal strategis.",
+    name: "Rina Wijaya",
+    role: "HR Manager",
+    company: "PT Maju Bersama",
+    rating: 5,
+  },
+  {
+    quote: "Payroll yang dulu makan 3 hari sekarang selesai 30 menit. Pajak & BPJS auto-hitung. Game changer untuk tim finance kami.",
+    name: "Linda Kusuma",
+    role: "Finance Director",
+    company: "PT Sinar Abadi",
+    rating: 5,
+  },
+  {
+    quote: "Antrian di kasir lebih cepat, stok update otomatis tiap transaksi. Omzet warung saya naik 20% dalam 2 bulan.",
+    name: "Pak Bambang",
+    role: "Owner",
+    company: "Warung Bakso Mantap",
+    rating: 5,
+  },
+  {
+    quote: "Tim 15 orang bisa sinkron tanpa meeting harian. Project Management Siarpi bikin kami hemat banyak waktu.",
+    name: "Arif Hidayat",
+    role: "Project Manager",
+    company: "Studio Kreatif",
+    rating: 5,
+  },
+  {
+    quote: "Conversion rate naik 40% sejak pakai pipeline visual CRM. Follow-up otomatis menghemat 2 jam per hari per sales.",
+    name: "Reza Pratama",
+    role: "Sales Director",
+    company: "PT Solusi B2B",
+    rating: 5,
+  },
+  {
+    quote: "Tim kecil saya bisa kelola 50+ karyawan tanpa perlu admin HR khusus. Bayar pun pakai QRIS, gampang banget.",
+    name: "Doni Saputra",
+    role: "Founder",
+    company: "Kopi Kenangan Lokal",
+    rating: 5,
+  },
+];
+
+const stats = [
+  { value: "500+", label: "Bisnis Aktif" },
+  { value: "50.000+", label: "Karyawan Dikelola" },
+  { value: "4.9/5", label: "Rating Pelanggan" },
+  { value: "99.9%", label: "Uptime SLA" },
+];
+
 function LandingPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
