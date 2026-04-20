@@ -8,7 +8,8 @@ import { Footer } from "@/components/site/Footer";
 import { modules, formatIDR } from "@/lib/modules";
 import {
   Sparkles, Check, Star, ArrowRight, Zap, Layers,
-  RefreshCw, GraduationCap, CreditCard, Building2, Smartphone, QrCode
+  RefreshCw, GraduationCap, CreditCard, Building2, Smartphone, QrCode,
+  Palette, Puzzle
 } from "lucide-react";
 import dashboardImg from "@/assets/dashboard-preview.jpg";
 
@@ -64,51 +65,122 @@ function LandingPage() {
       {/* HERO */}
       <section className="relative overflow-hidden bg-gradient-subtle">
         <div className="absolute inset-0 bg-gradient-hero" />
-        <div className="container relative mx-auto px-4 pt-16 pb-20 md:px-6 md:pt-24 md:pb-32">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="mx-auto max-w-3xl text-center"
-          >
-            <Badge variant="secondary" className="mb-6 rounded-full border border-primary/20 bg-accent/50 px-4 py-1.5 text-xs font-medium text-accent-foreground">
-              <Sparkles className="mr-1.5 h-3 w-3" />
-              All-in-One Management System
-            </Badge>
-            <h1 className="font-display text-4xl font-bold tracking-tight md:text-6xl lg:text-7xl">
-              Kelola Bisnis <span className="text-gradient-primary">Tanpa Ribet</span> dengan Siarpi
-            </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-base text-muted-foreground md:text-lg">
-              Satu platform untuk HR, Payroll, Finance, Inventory dan lainnya.
-              Mudah dipakai, hampir tanpa training — tim Anda bisa langsung produktif hari ini.
-            </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Button size="lg" asChild className="bg-gradient-primary text-primary-foreground shadow-elegant hover:shadow-glow">
-                <Link to="/onboarding">
-                  Mulai Sekarang <ArrowRight className="ml-1 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild>
-                <Link to="/onboarding">Lihat Demo</Link>
-              </Button>
-            </div>
-          </motion.div>
+        <div className="container relative mx-auto px-4 pt-12 pb-20 md:px-6 md:pt-20 md:pb-28">
+          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-10">
+            {/* LEFT — copy */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <Badge
+                variant="secondary"
+                className="mb-6 rounded-full border border-primary/20 bg-accent/60 px-4 py-1.5 text-xs font-medium text-accent-foreground"
+              >
+                <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-primary" />
+                All-in-One Management System
+              </Badge>
 
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative mx-auto mt-16 max-w-5xl"
-          >
-            <div className="absolute -inset-4 bg-gradient-primary opacity-20 blur-3xl" />
-            <img
-              src={dashboardImg}
-              alt="Dashboard preview Siarpi"
-              width={1600}
-              height={1024}
-              className="relative rounded-2xl border border-border shadow-elegant"
-            />
-          </motion.div>
+              <h1 className="font-display text-5xl font-bold leading-[1.05] tracking-tight md:text-6xl lg:text-7xl">
+                Kelola Bisnis
+                <br />
+                <span className="text-gradient-primary">Tanpa Ribet</span>
+                <br />
+                dengan Siarpi
+              </h1>
+
+              <p className="mt-6 max-w-xl text-base text-muted-foreground md:text-lg">
+                Desain rapih, profesional, dan mudah dimengerti — crew Anda bisa langsung pakai dengan{" "}
+                <span className="font-semibold text-foreground">hampir nol training</span>. Beli modul sesuai kebutuhan, tambahkan kapan saja.
+              </p>
+
+              {/* Feature bullets */}
+              <ul className="mt-8 space-y-4">
+                {[
+                  { icon: Palette, color: "amber", text: "Desain profesional & intuitif — mudah dimengerti siapa saja" },
+                  { icon: GraduationCap, color: "emerald", text: "Hampir nol training — crew langsung bisa pakai" },
+                  { icon: Puzzle, color: "blue", text: "Beli ketengan — pilih modul sesuai kebutuhan bisnis Anda" },
+                ].map((b) => (
+                  <li key={b.text} className="flex items-center gap-3">
+                    <span
+                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
+                        b.color === "amber"
+                          ? "bg-primary/15 text-primary"
+                          : b.color === "emerald"
+                            ? "bg-emerald-500/15 text-emerald-600"
+                            : "bg-blue-500/15 text-blue-600"
+                      }`}
+                    >
+                      <b.icon className="h-4 w-4" />
+                    </span>
+                    <span className="text-sm text-foreground/80 md:text-base">{b.text}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-10 flex flex-col items-start gap-3 sm:flex-row">
+                <Button
+                  size="lg"
+                  asChild
+                  className="bg-gradient-primary text-primary-foreground shadow-elegant hover:shadow-glow"
+                >
+                  <Link to="/onboarding">
+                    Mulai Sekarang <ArrowRight className="ml-1 h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button size="lg" variant="outline" asChild>
+                  <Link to="/onboarding">Lihat Demo</Link>
+                </Button>
+              </div>
+            </motion.div>
+
+            {/* RIGHT — dashboard with floating cards */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.15 }}
+              className="relative"
+            >
+              <div className="absolute -inset-6 bg-gradient-primary opacity-25 blur-3xl" />
+
+              <img
+                src={dashboardImg}
+                alt="Dashboard preview Siarpi"
+                width={1600}
+                height={1024}
+                className="relative rounded-2xl border border-border shadow-elegant"
+              />
+
+              {/* Floating: Beli Ketengan (top-right) */}
+              <motion.div
+                initial={{ opacity: 0, x: 20, y: -10 }}
+                animate={{ opacity: 1, x: 0, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.6 }}
+                className="absolute -top-4 -right-2 hidden rounded-2xl border border-border bg-background/95 px-4 py-2.5 shadow-elegant backdrop-blur sm:flex sm:items-center sm:gap-2"
+              >
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/15 text-primary">
+                  <Puzzle className="h-3.5 w-3.5" />
+                </span>
+                <span className="text-sm font-semibold">Beli Ketengan</span>
+              </motion.div>
+
+              {/* Floating: Zero Training (bottom-left) */}
+              <motion.div
+                initial={{ opacity: 0, x: -20, y: 10 }}
+                animate={{ opacity: 1, x: 0, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.75 }}
+                className="absolute -bottom-5 left-2 flex items-center gap-3 rounded-2xl border border-border bg-background/95 px-4 py-3 shadow-elegant backdrop-blur sm:left-6"
+              >
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600">
+                  <Check className="h-4 w-4" strokeWidth={3} />
+                </span>
+                <div>
+                  <div className="text-sm font-semibold leading-tight">Zero Training</div>
+                  <div className="text-xs text-muted-foreground">Langsung bisa dipakai</div>
+                </div>
+              </motion.div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
