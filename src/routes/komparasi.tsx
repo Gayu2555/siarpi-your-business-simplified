@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Check, X, TrendingDown, Sparkles, Zap, Shield, ArrowRight, Minus } from "lucide-react";
@@ -99,7 +100,7 @@ const DynamicsLogo = ({ className }: LogoProps) => (
 type Cell = boolean | "partial" | string;
 type Competitor = {
   key: string;
-  Logo: (p: LogoProps) => JSX.Element;
+  Logo: (p: LogoProps) => ReactElement;
   setup: string;
   monthly: string;
   monthlyValue: number;
