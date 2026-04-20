@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as ModularRouteImport } from './routes/modular'
+import { Route as KomparasiRouteImport } from './routes/komparasi'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ModulesModuleIdRouteImport } from './routes/modules.$moduleId'
 
@@ -30,6 +31,11 @@ const ModularRoute = ModularRouteImport.update({
   path: '/modular',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KomparasiRoute = KomparasiRouteImport.update({
+  id: '/komparasi',
+  path: '/komparasi',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -43,6 +49,7 @@ const ModulesModuleIdRoute = ModulesModuleIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/komparasi': typeof KomparasiRoute
   '/modular': typeof ModularRoute
   '/onboarding': typeof OnboardingRoute
   '/roadmap': typeof RoadmapRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/komparasi': typeof KomparasiRoute
   '/modular': typeof ModularRoute
   '/onboarding': typeof OnboardingRoute
   '/roadmap': typeof RoadmapRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/komparasi': typeof KomparasiRoute
   '/modular': typeof ModularRoute
   '/onboarding': typeof OnboardingRoute
   '/roadmap': typeof RoadmapRoute
@@ -67,15 +76,23 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/komparasi'
     | '/modular'
     | '/onboarding'
     | '/roadmap'
     | '/modules/$moduleId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/modular' | '/onboarding' | '/roadmap' | '/modules/$moduleId'
+  to:
+    | '/'
+    | '/komparasi'
+    | '/modular'
+    | '/onboarding'
+    | '/roadmap'
+    | '/modules/$moduleId'
   id:
     | '__root__'
     | '/'
+    | '/komparasi'
     | '/modular'
     | '/onboarding'
     | '/roadmap'
@@ -84,6 +101,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  KomparasiRoute: typeof KomparasiRoute
   ModularRoute: typeof ModularRoute
   OnboardingRoute: typeof OnboardingRoute
   RoadmapRoute: typeof RoadmapRoute
@@ -113,6 +131,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ModularRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/komparasi': {
+      id: '/komparasi'
+      path: '/komparasi'
+      fullPath: '/komparasi'
+      preLoaderRoute: typeof KomparasiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -132,6 +157,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  KomparasiRoute: KomparasiRoute,
   ModularRoute: ModularRoute,
   OnboardingRoute: OnboardingRoute,
   RoadmapRoute: RoadmapRoute,
@@ -140,3 +166,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
