@@ -133,7 +133,7 @@ function LandingPage() {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.04 }}
             >
-              <Link to="/modular">
+              <Link to="/modules/$moduleId" params={{ moduleId: m.id }}>
                 <Card className="group flex h-full cursor-pointer flex-col items-center gap-3 rounded-2xl border-border p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-soft">
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent text-accent-foreground transition-transform duration-300 group-hover:scale-110">
                     <m.icon className="h-6 w-6" />
