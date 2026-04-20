@@ -9,6 +9,7 @@ export function Header() {
   const navLinks = [
     { to: "/", label: "Beranda" },
     { to: "/modular", label: "Beli Ketengan" },
+    { to: "/komparasi", label: "Komparasi" },
     { to: "/roadmap", label: "Roadmap" },
     { to: "/onboarding", label: "Mulai" },
   ] as const;
