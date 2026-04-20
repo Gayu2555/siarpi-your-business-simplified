@@ -8,7 +8,8 @@ import { Footer } from "@/components/site/Footer";
 import { modules, formatIDR } from "@/lib/modules";
 import {
   Sparkles, Check, Star, ArrowRight, Zap, Layers,
-  RefreshCw, GraduationCap, CreditCard, Building2, Smartphone, QrCode
+  RefreshCw, GraduationCap, CreditCard, Building2, Smartphone, QrCode,
+  Palette, Puzzle
 } from "lucide-react";
 import dashboardImg from "@/assets/dashboard-preview.jpg";
 
