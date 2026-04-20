@@ -9,7 +9,7 @@ import { modules, formatIDR } from "@/lib/modules";
 import {
   Sparkles, Check, Star, ArrowRight, Zap, Layers,
   RefreshCw, GraduationCap, CreditCard, Building2, Smartphone, QrCode,
-  Palette, Puzzle
+  Palette, Puzzle, Quote, Users
 } from "lucide-react";
 import dashboardImg from "@/assets/dashboard-preview.jpg";
 
