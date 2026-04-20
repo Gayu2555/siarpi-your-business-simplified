@@ -13,6 +13,7 @@ import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as ModularRouteImport } from './routes/modular'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ModulesModuleIdRouteImport } from './routes/modules.$moduleId'
 
 const RoadmapRoute = RoadmapRouteImport.update({
   id: '/roadmap',
@@ -34,18 +35,25 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ModulesModuleIdRoute = ModulesModuleIdRouteImport.update({
+  id: '/modules/$moduleId',
+  path: '/modules/$moduleId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/modular': typeof ModularRoute
   '/onboarding': typeof OnboardingRoute
   '/roadmap': typeof RoadmapRoute
+  '/modules/$moduleId': typeof ModulesModuleIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/modular': typeof ModularRoute
   '/onboarding': typeof OnboardingRoute
   '/roadmap': typeof RoadmapRoute
+  '/modules/$moduleId': typeof ModulesModuleIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,25 @@ export interface FileRoutesById {
   '/modular': typeof ModularRoute
   '/onboarding': typeof OnboardingRoute
   '/roadmap': typeof RoadmapRoute
+  '/modules/$moduleId': typeof ModulesModuleIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/modular' | '/onboarding' | '/roadmap'
+  fullPaths:
+    | '/'
+    | '/modular'
+    | '/onboarding'
+    | '/roadmap'
+    | '/modules/$moduleId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/modular' | '/onboarding' | '/roadmap'
-  id: '__root__' | '/' | '/modular' | '/onboarding' | '/roadmap'
+  to: '/' | '/modular' | '/onboarding' | '/roadmap' | '/modules/$moduleId'
+  id:
+    | '__root__'
+    | '/'
+    | '/modular'
+    | '/onboarding'
+    | '/roadmap'
+    | '/modules/$moduleId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +87,7 @@ export interface RootRouteChildren {
   ModularRoute: typeof ModularRoute
   OnboardingRoute: typeof OnboardingRoute
   RoadmapRoute: typeof RoadmapRoute
+  ModulesModuleIdRoute: typeof ModulesModuleIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,6 +120,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/modules/$moduleId': {
+      id: '/modules/$moduleId'
+      path: '/modules/$moduleId'
+      fullPath: '/modules/$moduleId'
+      preLoaderRoute: typeof ModulesModuleIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +135,7 @@ const rootRouteChildren: RootRouteChildren = {
   ModularRoute: ModularRoute,
   OnboardingRoute: OnboardingRoute,
   RoadmapRoute: RoadmapRoute,
+  ModulesModuleIdRoute: ModulesModuleIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
