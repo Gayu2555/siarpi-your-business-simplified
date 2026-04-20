@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { modules, formatIDR } from "@/lib/modules";
-import { moduleDetails } from "@/lib/module-details";
+import { moduleDetails, type Feature, type Testimonial, type ScreenshotBlock } from "@/lib/module-details";
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
@@ -141,7 +141,7 @@ function ModulePage() {
                     </div>
 
                     <div className="grid grid-cols-3 gap-3">
-                      {d.mockup.stats.map((s) => (
+                      {d.mockup.stats.map((s: ScreenshotBlock) => (
                         <div
                           key={s.label}
                           className={`rounded-xl p-3 ${
@@ -159,7 +159,7 @@ function ModulePage() {
                     </div>
 
                     <div className="space-y-2">
-                      {d.mockup.rows.map((r) => (
+                      {d.mockup.rows.map((r: { label: string; sub: string; value: string }) => (
                         <div
                           key={r.label}
                           className="flex items-center justify-between rounded-lg border border-border bg-background/50 px-3 py-2.5"
@@ -189,7 +189,7 @@ function ModulePage() {
           </div>
 
           <div className="mt-12 grid gap-6 md:grid-cols-2">
-            {d.features.map((f, i) => (
+            {d.features.map((f: Feature, i: number) => (
               <motion.div
                 key={f.title}
                 initial={{ opacity: 0, y: 16 }}
@@ -222,7 +222,7 @@ function ModulePage() {
             </div>
 
             <div className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-2">
-              {d.testimonials.map((t, i) => (
+              {d.testimonials.map((t: Testimonial, i: number) => (
                 <motion.div
                   key={t.name}
                   initial={{ opacity: 0, y: 16 }}
@@ -266,7 +266,7 @@ function ModulePage() {
               </h2>
             </div>
             <Accordion type="single" collapsible className="mt-10">
-              {d.faq.map((item, i) => (
+              {d.faq.map((item: { q: string; a: string }, i: number) => (
                 <AccordionItem key={i} value={`item-${i}`}>
                   <AccordionTrigger className="text-left font-medium">{item.q}</AccordionTrigger>
                   <AccordionContent className="text-muted-foreground">{item.a}</AccordionContent>
