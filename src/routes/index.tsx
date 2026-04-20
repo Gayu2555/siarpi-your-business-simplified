@@ -382,6 +382,92 @@ function LandingPage() {
         </div>
       </section>
 
+      {/* TRUSTED BY — logo bar pelanggan */}
+      <section className="border-y border-border bg-background py-14">
+        <div className="container mx-auto px-4 md:px-6">
+          <p className="text-center text-sm font-medium uppercase tracking-wider text-muted-foreground">
+            Dipercaya oleh 500+ bisnis di Indonesia
+          </p>
+          <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-8">
+            {clients.map((c, i) => (
+              <motion.div
+                key={c.name}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.3, delay: i * 0.04 }}
+                className="flex flex-col items-center gap-2 opacity-70 transition-opacity hover:opacity-100"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-muted/40 font-display text-sm font-bold text-foreground/70">
+                  {c.initial}
+                </div>
+                <span className="text-center text-[11px] text-muted-foreground line-clamp-1">{c.name}</span>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Stats bar */}
+          <div className="mx-auto mt-12 grid max-w-4xl grid-cols-2 gap-6 rounded-2xl border border-border bg-muted/30 p-6 md:grid-cols-4 md:p-8">
+            {stats.map((s) => (
+              <div key={s.label} className="text-center">
+                <div className="font-display text-2xl font-bold text-gradient-primary md:text-3xl">{s.value}</div>
+                <div className="mt-1 text-xs text-muted-foreground md:text-sm">{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* TESTIMONIALS — feedback pelanggan */}
+      <section className="container mx-auto px-4 py-20 md:px-6 md:py-28">
+        <div className="mx-auto max-w-2xl text-center">
+          <Badge variant="outline" className="mb-4 rounded-full">
+            <Users className="mr-1 h-3 w-3" /> Feedback Pelanggan
+          </Badge>
+          <h2 className="font-display text-3xl font-bold md:text-5xl">
+            Apa kata mereka <span className="text-gradient-primary">tentang Siarpi</span>
+          </h2>
+          <p className="mt-4 text-muted-foreground">
+            Cerita nyata dari pemilik bisnis & manajer yang sudah merasakan dampaknya.
+          </p>
+        </div>
+
+        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {testimonials.map((t, i) => (
+            <motion.div
+              key={t.name}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: i * 0.08 }}
+            >
+              <Card className="flex h-full flex-col rounded-2xl border-border p-6 transition-shadow hover:shadow-card">
+                <Quote className="h-7 w-7 text-primary/40" />
+                <div className="mt-3 flex gap-0.5">
+                  {Array.from({ length: t.rating }).map((_, idx) => (
+                    <Star key={idx} className="h-4 w-4 fill-primary text-primary" />
+                  ))}
+                </div>
+                <p className="mt-4 flex-1 text-sm leading-relaxed text-foreground/85">
+                  &ldquo;{t.quote}&rdquo;
+                </p>
+                <div className="mt-6 flex items-center gap-3 border-t border-border pt-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-primary font-display text-sm font-bold text-primary-foreground">
+                    {t.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold">{t.name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {t.role} · {t.company}
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
       {/* PAYMENTS */}
       <section className="bg-muted/30 py-20">
         <div className="container mx-auto px-4 md:px-6">
