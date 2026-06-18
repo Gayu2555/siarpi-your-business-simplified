@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
-import { CheckCircle2, Clock, Sparkles, Circle } from "lucide-react";
+import { CheckCircle2, Clock, Sparkles, Circle, type LucideIcon } from "lucide-react";
 
 export const Route = createFileRoute("/roadmap")({
   head: () => ({
@@ -37,11 +37,20 @@ const items: Record<Status, { title: string; desc: string; progress?: number }[]
   ],
 };
 
-const tabs: { id: Status; label: string; icon: typeof Clock; color: string }[] = [
-  { id: "now", label: "Now", icon: Clock, color: "bg-gradient-primary text-primary-foreground" },
-  { id: "next", label: "Next", icon: Sparkles, color: "bg-accent text-accent-foreground" },
-  { id: "future", label: "Future", icon: Circle, color: "bg-muted text-muted-foreground" },
+// Data tab hanya berisi string (iconName), bukan komponen langsung — supaya
+// aman dipakai di mana pun (termasuk kalau suatu saat lewat loader/SSR).
+const tabs: { id: Status; label: string; iconName: string; color: string }[] = [
+  { id: "now", label: "Now", iconName: "Clock", color: "bg-gradient-primary text-primary-foreground" },
+  { id: "next", label: "Next", iconName: "Sparkles", color: "bg-accent text-accent-foreground" },
+  { id: "future", label: "Future", iconName: "Circle", color: "bg-muted text-muted-foreground" },
 ];
+
+// Resolve iconName (string) -> komponen Lucide. Dipanggil hanya saat render.
+const TAB_ICON_MAP: Record<string, LucideIcon> = {
+  Clock,
+  Sparkles,
+  Circle,
+};
 
 function RoadmapPage() {
   const [active, setActive] = useState<Status>("now");
@@ -64,18 +73,21 @@ function RoadmapPage() {
 
         {/* Tabs */}
         <div className="mx-auto mt-10 flex max-w-md justify-center gap-2 rounded-full border border-border bg-muted/30 p-1.5">
-          {tabs.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setActive(t.id)}
-              className={`flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                active === t.id ? t.color + " shadow-soft" : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <t.icon className="h-4 w-4" />
-              {t.label}
-            </button>
-          ))}
+          {tabs.map((t) => {
+            const TabIcon = TAB_ICON_MAP[t.iconName] ?? Circle;
+            return (
+              <button
+                key={t.id}
+                onClick={() => setActive(t.id)}
+                className={`flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                  active === t.id ? t.color + " shadow-soft" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <TabIcon className="h-4 w-4" />
+                {t.label}
+              </button>
+            );
+          })}
         </div>
 
         {/* Timeline */}

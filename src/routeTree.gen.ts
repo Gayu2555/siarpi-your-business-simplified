@@ -9,13 +9,21 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as ModularRouteImport } from './routes/modular'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as KomparasiRouteImport } from './routes/komparasi'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ModulesModuleIdRouteImport } from './routes/modules.$moduleId'
 
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RoadmapRoute = RoadmapRouteImport.update({
   id: '/roadmap',
   path: '/roadmap',
@@ -31,9 +39,19 @@ const ModularRoute = ModularRouteImport.update({
   path: '/modular',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const KomparasiRoute = KomparasiRouteImport.update({
   id: '/komparasi',
   path: '/komparasi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -49,67 +67,95 @@ const ModulesModuleIdRoute = ModulesModuleIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
   '/komparasi': typeof KomparasiRoute
+  '/login': typeof LoginRoute
   '/modular': typeof ModularRoute
   '/onboarding': typeof OnboardingRoute
   '/roadmap': typeof RoadmapRoute
+  '/settings': typeof SettingsRoute
   '/modules/$moduleId': typeof ModulesModuleIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
   '/komparasi': typeof KomparasiRoute
+  '/login': typeof LoginRoute
   '/modular': typeof ModularRoute
   '/onboarding': typeof OnboardingRoute
   '/roadmap': typeof RoadmapRoute
+  '/settings': typeof SettingsRoute
   '/modules/$moduleId': typeof ModulesModuleIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
   '/komparasi': typeof KomparasiRoute
+  '/login': typeof LoginRoute
   '/modular': typeof ModularRoute
   '/onboarding': typeof OnboardingRoute
   '/roadmap': typeof RoadmapRoute
+  '/settings': typeof SettingsRoute
   '/modules/$moduleId': typeof ModulesModuleIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/dashboard'
     | '/komparasi'
+    | '/login'
     | '/modular'
     | '/onboarding'
     | '/roadmap'
+    | '/settings'
     | '/modules/$moduleId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/dashboard'
     | '/komparasi'
+    | '/login'
     | '/modular'
     | '/onboarding'
     | '/roadmap'
+    | '/settings'
     | '/modules/$moduleId'
   id:
     | '__root__'
     | '/'
+    | '/dashboard'
     | '/komparasi'
+    | '/login'
     | '/modular'
     | '/onboarding'
     | '/roadmap'
+    | '/settings'
     | '/modules/$moduleId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DashboardRoute: typeof DashboardRoute
   KomparasiRoute: typeof KomparasiRoute
+  LoginRoute: typeof LoginRoute
   ModularRoute: typeof ModularRoute
   OnboardingRoute: typeof OnboardingRoute
   RoadmapRoute: typeof RoadmapRoute
+  SettingsRoute: typeof SettingsRoute
   ModulesModuleIdRoute: typeof ModulesModuleIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/roadmap': {
       id: '/roadmap'
       path: '/roadmap'
@@ -131,11 +177,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ModularRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/komparasi': {
       id: '/komparasi'
       path: '/komparasi'
       fullPath: '/komparasi'
       preLoaderRoute: typeof KomparasiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -157,12 +217,24 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DashboardRoute: DashboardRoute,
   KomparasiRoute: KomparasiRoute,
+  LoginRoute: LoginRoute,
   ModularRoute: ModularRoute,
   OnboardingRoute: OnboardingRoute,
   RoadmapRoute: RoadmapRoute,
+  SettingsRoute: SettingsRoute,
   ModulesModuleIdRoute: ModulesModuleIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

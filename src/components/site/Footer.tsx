@@ -39,8 +39,8 @@ export function Footer() {
           <div>
             <h4 className="font-display text-sm font-semibold">Kontak</h4>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-              <li>halo@siarpi.id</li>
-              <li>+62 21 1234 5678</li>
+              <li>contacts@siarpi.com</li>
+              <li>+62 813-8789-5911</li>
               <li>Jakarta, Indonesia</li>
             </ul>
             <div className="mt-4 flex gap-3">

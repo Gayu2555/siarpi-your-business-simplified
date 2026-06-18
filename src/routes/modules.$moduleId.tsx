@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
-import { modules, formatIDR } from "@/lib/modules";
+import { modules, formatIDR, getModuleIcon } from "@/lib/modules";
 import { moduleDetails, type Feature, type Testimonial, type ScreenshotBlock } from "@/lib/module-details";
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
@@ -32,7 +32,22 @@ export const Route = createFileRoute("/modules/$moduleId")({
     const m = modules.find((x) => x.id === params.moduleId);
     const d = moduleDetails[params.moduleId];
     if (!m || !d) throw notFound();
-    return { module: m, detail: d };
+
+    // PENTING: loader hanya boleh return plain data yang bisa di-serialize
+    // (Seroval/TanStack Start SSR dehydration). `m` dari lib/modules berisi
+    // field `iconName` (string) — itu aman. Jangan PERNAH return komponen
+    // React (function/forward_ref) dari loader, termasuk tidak sengaja lewat
+    // spread/destructure objek yang masih punya field komponen di dalamnya.
+    return {
+      module: {
+        id: m.id,
+        name: m.name,
+        iconName: m.iconName,
+        description: m.description,
+        price: m.price,
+      },
+      detail: d,
+    };
   },
   notFoundComponent: () => (
     <div className="flex min-h-screen flex-col bg-background">
@@ -57,9 +72,13 @@ export const Route = createFileRoute("/modules/$moduleId")({
 
 function ModulePage() {
   const { module: m, detail: d } = Route.useLoaderData();
-  const Icon = m.icon;
+  // Resolve iconName (string) -> komponen Lucide HANYA di sini (client render),
+  // tidak pernah di loader.
+  const Icon = getModuleIcon(m.iconName);
 
-  // Recommend other modules (first 4 excluding current)
+  // Recommend other modules (first 4 excluding current) — pakai `modules`
+  // module-level (bukan loader data), jadi aman tetap akses .icon di sini
+  // karena ini render langsung, tidak ikut proses dehydration loader.
   const related = modules.filter((x) => x.id !== m.id).slice(0, 4);
 
   return (
@@ -237,7 +256,7 @@ function ModulePage() {
                         <Star key={idx} className="h-4 w-4 fill-primary text-primary" />
                       ))}
                     </div>
-                    <p className="mt-4 text-base italic text-foreground/90">“{t.quote}”</p>
+                    <p className="mt-4 text-base italic text-foreground/90">"{t.quote}"</p>
                     <div className="mt-6 flex items-center gap-3">
                       <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-primary font-display font-bold text-primary-foreground">
                         {t.name.charAt(0)}
@@ -287,7 +306,7 @@ function ModulePage() {
             </div>
             <div className="mx-auto mt-10 grid max-w-4xl grid-cols-2 gap-4 md:grid-cols-4">
               {related.map((r) => {
-                const RIcon = r.icon;
+                const RIcon = getModuleIcon(r.iconName);
                 return (
                   <Link key={r.id} to="/modules/$moduleId" params={{ moduleId: r.id }}>
                     <Card className="group flex h-full flex-col items-center gap-3 rounded-2xl border-border p-5 text-center transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-soft">
