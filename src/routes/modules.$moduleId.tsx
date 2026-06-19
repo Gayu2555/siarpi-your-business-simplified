@@ -71,7 +71,7 @@ export const Route = createFileRoute("/modules/$moduleId")({
 });
 
 function ModulePage() {
-  const { module: m, detail: d } = Route.useLoaderData();
+  const { module: m, detail: d } = Route.useLoaderData() as any;
   // Resolve iconName (string) -> komponen Lucide HANYA di sini (client render),
   // tidak pernah di loader.
   const Icon = getModuleIcon(m.iconName);

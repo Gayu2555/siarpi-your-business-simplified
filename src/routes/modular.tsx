@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
-import { modules, formatIDR } from "@/lib/modules";
+import { modules, formatIDR, getModuleIcon } from "@/lib/modules";
 import { Plus, Check, ShoppingCart, Trash2, ArrowRight, X } from "lucide-react";
 
 export const Route = createFileRoute("/modular")({
@@ -50,6 +50,7 @@ function ModularPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             {modules.map((m, i) => {
               const inCart = cart.includes(m.id);
+              const Icon = getModuleIcon(m.iconName);
               return (
                 <motion.div
                   key={m.id}
@@ -62,7 +63,7 @@ function ModularPage() {
                   }`}>
                     <div className="flex items-start justify-between">
                       <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground shadow-soft">
-                        <m.icon className="h-6 w-6" />
+                        <Icon className="h-6 w-6" />
                       </div>
                       {inCart && (
                         <Badge className="bg-primary text-primary-foreground">
@@ -109,10 +110,11 @@ function ModularPage() {
                   cart.map((id) => {
                     const m = modules.find((x) => x.id === id);
                     if (!m) return null;
+                    const Icon = getModuleIcon(m.iconName);
                     return (
                       <div key={id} className="flex items-center gap-3 rounded-xl bg-muted/40 p-3">
                         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-background">
-                          <m.icon className="h-4 w-4" />
+                          <Icon className="h-4 w-4" />
                         </div>
                         <div className="flex-1">
                           <div className="text-sm font-medium">{m.name}</div>
@@ -184,9 +186,10 @@ function ModularPage() {
                 ) : cart.map((id) => {
                   const m = modules.find((x) => x.id === id);
                   if (!m) return null;
+                  const Icon = getModuleIcon(m.iconName);
                   return (
                     <div key={id} className="flex items-center gap-3 rounded-xl bg-muted/40 p-3">
-                      <m.icon className="h-5 w-5" />
+                      <Icon className="h-5 w-5" />
                       <div className="flex-1">
                         <div className="text-sm font-medium">{m.name}</div>
                         <div className="text-xs text-muted-foreground">{formatIDR(m.price)}/bln</div>
