@@ -78,3 +78,24 @@ export async function fetchSuites(): Promise<SuiteWithPlans[]> {
 
 // ── Format helpers ────────────────────────────────────────────────────────────
 export const formatIDR = (n: number) => `Rp ${n.toLocaleString("id-ID")}`;
+
+export interface ModuleWithStatus extends ApiModule {
+  status: string; // "active" | "available" | "pending_payment"
+  included_in_plan: boolean;
+}
+
+export interface CompanyModulesResponse {
+  hasActiveDashboard: boolean;
+  ownedModules: ModuleWithStatus[];
+  availableModules: ModuleWithStatus[];
+  pendingModuleKeys: string[];
+}
+
+/** GET /company/modules — ambil modul yang dimiliki company dan modul yang tersedia */
+export async function fetchCompanyModules(): Promise<CompanyModulesResponse | null> {
+  const { ok, data } = await apiFetch<{ success: boolean; data: CompanyModulesResponse }>(
+    "/company/modules"
+  );
+  if (!ok || !data?.success) return null;
+  return data.data;
+}

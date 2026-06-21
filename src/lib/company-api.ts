@@ -30,7 +30,10 @@ export interface Company {
   updated_at: string;
 }
 
-// CreateCompanyRequest mirror untuk backend company/company.go
+// Field di sini harus sinkron dengan company.CreateCompanyRequest di backend
+// (lihat migration_add_onboarding_columns.sql untuk business_type/
+// employee_count/industry — sudah punya kolom permanen, tidak perlu lagi
+// disimpan hanya di localStorage).
 export interface CreateCompanyRequest {
   user_id: string;
   code: string;
@@ -50,7 +53,6 @@ export interface CreateCompanyRequest {
   business_type?: string;
   employee_count?: number;
   industry?: string;
-  selected_modules?: string[];
 }
 
 export interface CompanyResponse {
@@ -71,11 +73,11 @@ export async function createCompany(
   return { ok: ok && !!data?.success, data };
 }
 
-// ── Onboarding metadata (belum ada kolom DB-nya) ─────────────────────────────
-// bizType, employees, industry dikumpulkan di form onboarding tapi backend
-// belum punya tempat menyimpannya. Disimpan sementara di localStorage supaya
-// datanya tidak hilang, dan mudah dipindah ke API call lain begitu kolomnya
-// tersedia di backend (atau dipakai di halaman company profile/settings).
+// ── Onboarding metadata cadangan (opsional) ──────────────────────────────────
+// Sejak business_type/employee_count/industry sudah punya kolom permanen di
+// backend, helper ini sekarang murni cadangan sisi-client (misal untuk
+// prefill form kalau onboarding sempat gagal di tengah jalan), bukan
+// satu-satunya tempat penyimpanan lagi.
 const ONBOARDING_META_KEY = "siarpi_onboarding_meta";
 
 export interface OnboardingMeta {
@@ -108,4 +110,19 @@ export function generateCompanyCode(name: string): string {
     .slice(0, 8) || "COMPANY";
   const suffix = Math.random().toString(36).slice(2, 6).toUpperCase();
   return `${base}${suffix}`;
+}
+
+export interface OnboardingStatus {
+  success: boolean;
+  has_company: boolean;
+  has_active_modules: boolean;
+  has_pending_checkout: boolean;
+  pending_checkout_id: string;
+  company_id?: string;
+}
+
+/** GET /onboarding-status — cek status onboarding user saat ini */
+export async function getOnboardingStatus(): Promise<{ ok: boolean; data: OnboardingStatus | null }> {
+  const { ok, data } = await apiFetch<OnboardingStatus>("/onboarding-status");
+  return { ok: ok && !!data?.success, data };
 }

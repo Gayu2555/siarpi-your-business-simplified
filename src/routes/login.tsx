@@ -97,7 +97,14 @@ function LoginPage() {
       setAuthToken(data.token);
       if (data.user) setStoredUser(data.user as SiarpiUser);
 
-      navigate({ to: (redirect as string) ?? "/dashboard" });
+      // User dengan company_id sudah ada -> langsung dashboard.
+      // User baru (belum pernah onboarding, company_id kosong) -> lanjutkan
+      // ke onboarding dulu, kecuali ada `redirect` eksplisit dari query param
+      // (misal user diarahkan ke /login dari halaman protected tertentu).
+      const hasCompany = !!(data.user as SiarpiUser | undefined)?.company_id;
+      const fallback = hasCompany ? "/dashboard" : "/onboarding";
+
+      navigate({ to: (redirect as string) ?? fallback });
     } catch (err) {
       setError("Tidak bisa terhubung ke server. Cek koneksi Anda.");
     } finally {
@@ -156,7 +163,7 @@ function LoginPage() {
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Password</Label>
                   <Link
-                    to="/login"
+                    to="/forgot-password"
                     className="text-xs font-medium text-primary hover:underline"
                   >
                     Lupa password?
@@ -238,6 +245,14 @@ function LoginPage() {
                 </button>
               ))}
             </div>
+
+            {/* Register link */}
+            <p className="mt-6 text-center text-sm text-muted-foreground">
+              Belum punya akun?{" "}
+              <Link to="/register" className="font-medium text-primary hover:underline">
+                Daftar gratis
+              </Link>
+            </p>
           </Card>
 
           {/* Footer note */}

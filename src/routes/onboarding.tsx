@@ -14,27 +14,26 @@ import {
   createCompany,
   generateCompanyCode,
   saveOnboardingMeta,
+  getOnboardingStatus,
   type CreateCompanyRequest,
 } from "@/lib/company-api";
+import { useEffect } from "react";
+import { createCheckout } from "@/lib/checkout-api";
 import {
   Building2, Rocket, Briefcase, Check, ArrowRight, ArrowLeft,
-  CreditCard, QrCode, Smartphone, Sparkles, Loader2,
+  Sparkles, Loader2,
 } from "lucide-react";
 
+import { guardOnboardingRoute } from "@/lib/onboarding-guard";
+
 export const Route = createFileRoute("/onboarding")({
-  beforeLoad: () => {
-    if (!isAuthenticated()) {
-      throw redirect({ to: "/login", search: { redirect: "/onboarding" } });
-    }
-    const user = getStoredUser();
-    if (user && user.company_id) {
-      throw redirect({ to: "/dashboard" });
-    }
+  beforeLoad: async () => {
+    await guardOnboardingRoute("/onboarding");
   },
   head: () => ({
     meta: [
       { title: "Onboarding — Siarpi" },
-      { name: "description", content: "Setup akun Siarpi dalam 5 langkah cepat." },
+      { name: "description", content: "Setup akun Siarpi dalam beberapa langkah cepat." },
     ],
   }),
   component: OnboardingPage,
@@ -48,25 +47,18 @@ const businessTypes = [
   { id: "perusahaan", name: "Perusahaan", icon: Building2, desc: "Skala menengah-besar" },
 ];
 
-const paymentMethods = [
-  { id: "bank", name: "Transfer Bank", icon: Building2 },
-  { id: "va", name: "Virtual Account", icon: CreditCard },
-  { id: "qris", name: "QRIS", icon: QrCode },
-  { id: "ewallet", name: "E-Wallet", icon: Smartphone },
-];
-
 // Plain data — tidak menyimpan React components agar aman untuk SSR serialization
 const modules = [
-  { id: "hr",        name: "HR",        description: "Manajemen karyawan & rekrutmen", icon: "i-ph-users-fill",       price: 49000 },
-  { id: "payroll",   name: "Payroll",   description: "Gaji otomatis & pajak",           icon: "i-ph-money-fill",       price: 79000 },
-  { id: "finance",   name: "Finance",   description: "Akuntansi & laporan keuangan",    icon: "i-ph-chart-bar-fill",   price: 99000 },
-  { id: "inventory", name: "Inventory", description: "Stok barang real-time",           icon: "i-ph-cube-fill",        price: 69000 },
-  { id: "project",   name: "Project",   description: "Manajemen proyek tim",            icon: "i-ph-columns-fill",     price: 59000 },
-  { id: "crm",       name: "CRM",       description: "Kelola pelanggan & leads",        icon: "i-ph-megaphone-fill",   price: 69000 },
-  { id: "absensi",   name: "Absensi",   description: "Kehadiran & shift",               icon: "i-ph-fingerprint-fill", price: 39000 },
-  { id: "invoice",   name: "Invoice",   description: "Tagihan & pembayaran",            icon: "i-ph-receipt-fill",     price: 49000 },
-  { id: "pos",       name: "POS",       description: "Point of sale toko",              icon: "i-ph-storefront-fill",  price: 79000 },
-  { id: "analytics", name: "Analytics", description: "Dashboard & insight",             icon: "i-ph-chart-line-fill",  price: 89000 },
+  { id: "hr", name: "HR", description: "Manajemen karyawan & rekrutmen", icon: "i-ph-users-fill", price: 49000 },
+  { id: "payroll", name: "Payroll", description: "Gaji otomatis & pajak", icon: "i-ph-money-fill", price: 79000 },
+  { id: "finance", name: "Finance", description: "Akuntansi & laporan keuangan", icon: "i-ph-chart-bar-fill", price: 99000 },
+  { id: "inventory", name: "Inventory", description: "Stok barang real-time", icon: "i-ph-cube-fill", price: 69000 },
+  { id: "project", name: "Project", description: "Manajemen proyek tim", icon: "i-ph-columns-fill", price: 59000 },
+  { id: "crm", name: "CRM", description: "Kelola pelanggan & leads", icon: "i-ph-megaphone-fill", price: 69000 },
+  { id: "absensi", name: "Absensi", description: "Kehadiran & shift", icon: "i-ph-fingerprint-fill", price: 39000 },
+  { id: "invoice", name: "Invoice", description: "Tagihan & pembayaran", icon: "i-ph-receipt-fill", price: 49000 },
+  { id: "pos", name: "POS", description: "Point of sale toko", icon: "i-ph-storefront-fill", price: 79000 },
+  { id: "analytics", name: "Analytics", description: "Dashboard & insight", icon: "i-ph-chart-line-fill", price: 89000 },
 ];
 
 const industries = [
@@ -76,28 +68,60 @@ const industries = [
 ];
 
 // ── Component ─────────────────────────────────────────────────────────────────
+// Catatan alur: onboarding HANYA mengumpulkan profil perusahaan + pilihan
+// modul, lalu membuat company + checkout. Pemilihan metode bayar dan proses
+// charge dipindah ke halaman /checkout dan /payment terpisah (lihat
+// routes/checkout.tsx dan routes/payment.tsx).
 
 function OnboardingPage() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
+  const [loadingStatus, setLoadingStatus] = useState(true);
+  const [existingCompanyId, setExistingCompanyId] = useState<string | null>(null);
 
-  // Step 1 — profil perusahaan (sesuai kolom tabel `companies` + metadata tambahan)
+  // Step 1 — profil perusahaan
   const [companyName, setCompanyName] = useState("");
   const [bizType, setBizType] = useState<string>("");
   const [employees, setEmployees] = useState("");
   const [industry, setIndustry] = useState("");
 
   // Step 2 — pilih modul
-  const [selectedModules, setSelectedModules] = useState<string[]>([]);
-
-  // Step 4 — payment
-  const [payment, setPayment] = useState<string>("");
+  const [selectedModules, setSelectedModules] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem("siarpi_cart");
+      if (saved) {
+        localStorage.removeItem("siarpi_cart");
+        return JSON.parse(saved);
+      }
+    } catch (e) {
+      // ignore
+    }
+    return [];
+  });
 
   // Submit state
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const totalSteps = 4;
+  useEffect(() => {
+    getOnboardingStatus()
+      .then(({ ok, data }) => {
+        if (ok && data) {
+          if (data.has_company && data.company_id) {
+            setExistingCompanyId(data.company_id);
+            setStep(2); // Langsung lompat ke step 2 jika sudah ada perusahaan
+          }
+        }
+      })
+      .catch((err) => {
+        console.error("Gagal mengambil status onboarding:", err);
+      })
+      .finally(() => {
+        setLoadingStatus(false);
+      });
+  }, []);
+
+  const totalSteps = 3;
   const progress = (step / totalSteps) * 100;
 
   const totalPrice = selectedModules.reduce((sum, id) => {
@@ -120,8 +144,7 @@ function OnboardingPage() {
   const canNext =
     (step === 1 && companyName.trim() && bizType && employees && industry) ||
     (step === 2 && selectedModules.length > 0) ||
-    step === 3 ||
-    (step === 4 && payment);
+    step === 3;
 
   async function handleActivate() {
     setSubmitError(null);
@@ -135,47 +158,71 @@ function OnboardingPage() {
         return;
       }
 
-      // Simpan di localStorage sebagai fallback / cadangan di sisi client
-      saveOnboardingMeta({ bizType, employees, industry });
+      let activeCompanyId = existingCompanyId;
 
-      const payload: CreateCompanyRequest = {
+      if (!activeCompanyId) {
+        // Simpan di localStorage sebagai cadangan sisi client
+        saveOnboardingMeta({ bizType, employees, industry });
+
+        // 1. Buat company baru
+        const companyPayload: CreateCompanyRequest = {
+          user_id: user.id,
+          code: generateCompanyCode(companyName),
+          name: companyName.trim(),
+          country: "Indonesia",
+          currency_code: "IDR",
+          timezone: "Asia/Jakarta",
+          business_type: bizType,
+          employee_count: parseInt(employees, 10) || 0,
+          industry,
+        };
+
+        const { ok: companyOk, data: companyData } = await createCompany(companyPayload);
+
+        if (!companyOk || !companyData?.company) {
+          setSubmitError(companyData?.message ?? "Gagal membuat perusahaan. Coba lagi.");
+          setSubmitting(false);
+          return;
+        }
+
+        // Token baru dari backend sudah berisi company_id, supaya request
+        // berikutnya (createCheckout) terautentikasi dengan company yang benar.
+        if (companyData.token) {
+          setAuthToken(companyData.token);
+        }
+        setStoredUser({ ...user, company_id: companyData.company.id });
+        activeCompanyId = companyData.company.id;
+      }
+
+      // 2. Buat checkout dari modul yang dipilih.
+      const { ok: checkoutOk, data: checkoutData } = await createCheckout({
+        company_id: activeCompanyId,
         user_id: user.id,
-        code: generateCompanyCode(companyName),
-        name: companyName.trim(),
-        country: "Indonesia",
-        currency_code: "IDR",
-        timezone: "Asia/Jakarta",
-        business_type: bizType,
-        employee_count: parseInt(employees, 10) || 0,
-        industry: industry,
-        selected_modules: selectedModules,
-      };
+        module_keys: selectedModules,
+      });
 
-      const { ok, data } = await createCompany(payload);
-
-      if (!ok || !data?.company) {
-        setSubmitError(data?.message ?? "Gagal membuat perusahaan. Coba lagi.");
+      if (!checkoutOk || !checkoutData?.checkout) {
+        setSubmitError(checkoutData?.message ?? "Gagal membuat checkout. Coba lagi.");
         setSubmitting(false);
         return;
       }
 
-      // Backend mengembalikan token baru yang sudah berisi company_id,
-      // supaya frontend tidak perlu memaksa user login ulang.
-      if (data.token) {
-        setAuthToken(data.token);
-      }
-      if (user && data.company) {
-        setStoredUser({
-          ...user,
-          company_id: data.company.id,
-        });
-      }
-
-      navigate({ to: "/dashboard" });
+      navigate({ to: "/checkout", search: { id: checkoutData.checkout.id } });
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Terjadi kesalahan tidak terduga.");
       setSubmitting(false);
     }
+  }
+
+  if (loadingStatus) {
+    return (
+      <div className="flex min-h-screen flex-col bg-gradient-subtle">
+        <Header />
+        <main className="flex flex-1 items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </main>
+      </div>
+    );
   }
 
   return (
@@ -238,18 +285,16 @@ function OnboardingPage() {
                               key={t.id}
                               type="button"
                               onClick={() => setBizType(t.id)}
-                              className={`group flex flex-col items-start gap-3 rounded-2xl border-2 p-5 text-left transition-all ${
-                                bizType === t.id
+                              className={`group flex flex-col items-start gap-3 rounded-2xl border-2 p-5 text-left transition-all ${bizType === t.id
                                   ? "border-primary bg-accent/50 shadow-soft"
                                   : "border-border hover:border-primary/40"
-                              }`}
+                                }`}
                             >
                               <div
-                                className={`flex h-10 w-10 items-center justify-center rounded-xl ${
-                                  bizType === t.id
+                                className={`flex h-10 w-10 items-center justify-center rounded-xl ${bizType === t.id
                                     ? "bg-gradient-primary text-primary-foreground"
                                     : "bg-muted"
-                                }`}
+                                  }`}
                               >
                                 <t.icon className="h-5 w-5" />
                               </div>
@@ -312,18 +357,16 @@ function OnboardingPage() {
                             key={m.id}
                             type="button"
                             onClick={() => toggleModule(m.id)}
-                            className={`flex items-center gap-3 rounded-xl border-2 p-4 text-left transition-all ${
-                              active
+                            className={`flex items-center gap-3 rounded-xl border-2 p-4 text-left transition-all ${active
                                 ? "border-primary bg-accent/50"
                                 : "border-border hover:border-primary/40"
-                            }`}
+                              }`}
                           >
                             <div
-                              className={`flex h-10 w-10 items-center justify-center rounded-lg ${
-                                active
+                              className={`flex h-10 w-10 items-center justify-center rounded-lg ${active
                                   ? "bg-gradient-primary text-primary-foreground"
                                   : "bg-muted"
-                              }`}
+                                }`}
                             >
                               <Icon weight={weight} className="h-5 w-5" />
                             </div>
@@ -332,9 +375,8 @@ function OnboardingPage() {
                               <div className="text-xs text-muted-foreground">{m.description}</div>
                             </div>
                             <div
-                              className={`flex h-5 w-5 items-center justify-center rounded-md border-2 ${
-                                active ? "border-primary bg-primary" : "border-border"
-                              }`}
+                              className={`flex h-5 w-5 items-center justify-center rounded-md border-2 ${active ? "border-primary bg-primary" : "border-border"
+                                }`}
                             >
                               {active && (
                                 <Check className="h-3 w-3 text-primary-foreground" />
@@ -347,7 +389,7 @@ function OnboardingPage() {
                   </>
                 )}
 
-                {/* STEP 3 — Rekomendasi paket */}
+                {/* STEP 3 — Rekomendasi & Konfirmasi */}
                 {step === 3 && (
                   <>
                     <div className="flex items-center gap-2">
@@ -400,54 +442,6 @@ function OnboardingPage() {
                         })}
                       </div>
                     </Card>
-                  </>
-                )}
-
-                {/* STEP 4 — Pembayaran & Aktivasi */}
-                {step === 4 && (
-                  <>
-                    <h2 className="font-display text-2xl font-bold md:text-3xl">
-                      Pilih metode pembayaran
-                    </h2>
-                    <p className="mt-2 text-muted-foreground">
-                      Tanpa kartu kredit. Semua metode lokal didukung.
-                    </p>
-                    <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                      {paymentMethods.map((p) => {
-                        const active = payment === p.id;
-                        return (
-                          <button
-                            key={p.id}
-                            type="button"
-                            onClick={() => setPayment(p.id)}
-                            className={`flex items-center gap-3 rounded-xl border-2 p-4 text-left transition-all ${
-                              active
-                                ? "border-primary bg-accent/50"
-                                : "border-border hover:border-primary/40"
-                            }`}
-                          >
-                            <div
-                              className={`flex h-10 w-10 items-center justify-center rounded-lg ${
-                                active
-                                  ? "bg-gradient-primary text-primary-foreground"
-                                  : "bg-muted"
-                              }`}
-                            >
-                              <p.icon className="h-5 w-5" />
-                            </div>
-                            <span className="font-medium">{p.name}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                    <div className="mt-6 rounded-xl bg-muted/50 p-4 text-sm">
-                      <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Total tagihan</span>
-                        <span className="font-display text-xl font-bold">
-                          {formatIDR(totalPrice)}/bulan
-                        </span>
-                      </div>
-                    </div>
 
                     {submitError && (
                       <div className="mt-4 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
@@ -461,7 +455,11 @@ function OnboardingPage() {
 
             {/* Nav */}
             <div className="mt-10 flex items-center justify-between">
-              <Button variant="ghost" onClick={back} disabled={step === 1 || submitting}>
+              <Button
+                variant="ghost"
+                onClick={back}
+                disabled={(existingCompanyId ? step <= 2 : step === 1) || submitting}
+              >
                 <ArrowLeft className="mr-1 h-4 w-4" /> Kembali
               </Button>
               {step < totalSteps ? (
@@ -484,7 +482,7 @@ function OnboardingPage() {
                     </>
                   ) : (
                     <>
-                      Aktifkan Sekarang <ArrowRight className="ml-1 h-4 w-4" />
+                      Lanjut ke Checkout <ArrowRight className="ml-1 h-4 w-4" />
                     </>
                   )}
                 </Button>

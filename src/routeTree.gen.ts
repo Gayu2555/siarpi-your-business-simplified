@@ -11,11 +11,15 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as PaymentRouteImport } from './routes/payment'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as ModularRouteImport } from './routes/modular'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as KomparasiRouteImport } from './routes/komparasi'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ModulesModuleIdRouteImport } from './routes/modules.$moduleId'
 
@@ -27,6 +31,16 @@ const SettingsRoute = SettingsRouteImport.update({
 const RoadmapRoute = RoadmapRouteImport.update({
   id: '/roadmap',
   path: '/roadmap',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentRoute = PaymentRouteImport.update({
+  id: '/payment',
+  path: '/payment',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OnboardingRoute = OnboardingRouteImport.update({
@@ -49,9 +63,19 @@ const KomparasiRoute = KomparasiRouteImport.update({
   path: '/komparasi',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -67,22 +91,30 @@ const ModulesModuleIdRoute = ModulesModuleIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/checkout': typeof CheckoutRoute
   '/dashboard': typeof DashboardRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/komparasi': typeof KomparasiRoute
   '/login': typeof LoginRoute
   '/modular': typeof ModularRoute
   '/onboarding': typeof OnboardingRoute
+  '/payment': typeof PaymentRoute
+  '/register': typeof RegisterRoute
   '/roadmap': typeof RoadmapRoute
   '/settings': typeof SettingsRoute
   '/modules/$moduleId': typeof ModulesModuleIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/checkout': typeof CheckoutRoute
   '/dashboard': typeof DashboardRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/komparasi': typeof KomparasiRoute
   '/login': typeof LoginRoute
   '/modular': typeof ModularRoute
   '/onboarding': typeof OnboardingRoute
+  '/payment': typeof PaymentRoute
+  '/register': typeof RegisterRoute
   '/roadmap': typeof RoadmapRoute
   '/settings': typeof SettingsRoute
   '/modules/$moduleId': typeof ModulesModuleIdRoute
@@ -90,11 +122,15 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/checkout': typeof CheckoutRoute
   '/dashboard': typeof DashboardRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/komparasi': typeof KomparasiRoute
   '/login': typeof LoginRoute
   '/modular': typeof ModularRoute
   '/onboarding': typeof OnboardingRoute
+  '/payment': typeof PaymentRoute
+  '/register': typeof RegisterRoute
   '/roadmap': typeof RoadmapRoute
   '/settings': typeof SettingsRoute
   '/modules/$moduleId': typeof ModulesModuleIdRoute
@@ -103,33 +139,45 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/checkout'
     | '/dashboard'
+    | '/forgot-password'
     | '/komparasi'
     | '/login'
     | '/modular'
     | '/onboarding'
+    | '/payment'
+    | '/register'
     | '/roadmap'
     | '/settings'
     | '/modules/$moduleId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/checkout'
     | '/dashboard'
+    | '/forgot-password'
     | '/komparasi'
     | '/login'
     | '/modular'
     | '/onboarding'
+    | '/payment'
+    | '/register'
     | '/roadmap'
     | '/settings'
     | '/modules/$moduleId'
   id:
     | '__root__'
     | '/'
+    | '/checkout'
     | '/dashboard'
+    | '/forgot-password'
     | '/komparasi'
     | '/login'
     | '/modular'
     | '/onboarding'
+    | '/payment'
+    | '/register'
     | '/roadmap'
     | '/settings'
     | '/modules/$moduleId'
@@ -137,11 +185,15 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CheckoutRoute: typeof CheckoutRoute
   DashboardRoute: typeof DashboardRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   KomparasiRoute: typeof KomparasiRoute
   LoginRoute: typeof LoginRoute
   ModularRoute: typeof ModularRoute
   OnboardingRoute: typeof OnboardingRoute
+  PaymentRoute: typeof PaymentRoute
+  RegisterRoute: typeof RegisterRoute
   RoadmapRoute: typeof RoadmapRoute
   SettingsRoute: typeof SettingsRoute
   ModulesModuleIdRoute: typeof ModulesModuleIdRoute
@@ -161,6 +213,20 @@ declare module '@tanstack/react-router' {
       path: '/roadmap'
       fullPath: '/roadmap'
       preLoaderRoute: typeof RoadmapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment': {
+      id: '/payment'
+      path: '/payment'
+      fullPath: '/payment'
+      preLoaderRoute: typeof PaymentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/onboarding': {
@@ -191,11 +257,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KomparasiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -217,11 +297,15 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CheckoutRoute: CheckoutRoute,
   DashboardRoute: DashboardRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   KomparasiRoute: KomparasiRoute,
   LoginRoute: LoginRoute,
   ModularRoute: ModularRoute,
   OnboardingRoute: OnboardingRoute,
+  PaymentRoute: PaymentRoute,
+  RegisterRoute: RegisterRoute,
   RoadmapRoute: RoadmapRoute,
   SettingsRoute: SettingsRoute,
   ModulesModuleIdRoute: ModulesModuleIdRoute,

@@ -26,7 +26,7 @@ const navLinks = [
   { to: "/modular", label: "Beli Ketengan" },
   { to: "/komparasi", label: "Komparasi" },
   { to: "/roadmap", label: "Roadmap" },
-  { to: "/onboarding", label: "Mulai" },
+  { to: "/register", label: "Mulai" },
 ] as const;
 
 export function Header() {
@@ -152,7 +152,7 @@ export function Header() {
                 asChild
                 className="bg-gradient-primary text-primary-foreground shadow-soft hover:shadow-glow"
               >
-                <Link to="/onboarding">Mulai Gratis</Link>
+                <Link to="/register">Mulai Gratis</Link>
               </Button>
             </>
           )}
@@ -232,7 +232,7 @@ export function Header() {
                   Masuk
                 </Link>
                 <Button asChild className="mt-2 bg-gradient-primary text-primary-foreground">
-                  <Link to="/onboarding" onClick={() => setOpen(false)}>
+                  <Link to="/register" onClick={() => setOpen(false)}>
                     Mulai Gratis
                   </Link>
                 </Button>
