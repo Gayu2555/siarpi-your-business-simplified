@@ -139,7 +139,15 @@ function DashboardPage() {
                     </p>
                     <div className="mt-6 flex flex-wrap gap-4">
                       <Button asChild size="default" className="rounded-xl bg-primary text-primary-foreground hover:shadow-glow transition-all duration-300">
-                        <a href="https://app.siarpi.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 font-semibold">
+                        <a 
+                          href={typeof window !== 'undefined' && localStorage.getItem("siarpi_token") 
+                            ? `https://app.siarpi.com/?token=${encodeURIComponent(localStorage.getItem("siarpi_token") || "")}`
+                            : "https://app.siarpi.com"
+                          } 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="flex items-center gap-2 font-semibold"
+                        >
                           Masuk ke Dashboard Utama
                           <ExternalLink className="h-4 w-4" />
                         </a>
