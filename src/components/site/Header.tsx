@@ -83,7 +83,7 @@ export function Header() {
         </nav>
 
         {/* Desktop right side */}
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center justify-end gap-3 min-w-[190px] md:flex">
           {showAccount ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

@@ -316,6 +316,8 @@ function LandingPage() {
                 alt="Dashboard preview Siarpi"
                 width={1600}
                 height={1024}
+                fetchPriority="high"
+                decoding="async"
                 className="relative rounded-2xl border border-border shadow-elegant"
               />
 
