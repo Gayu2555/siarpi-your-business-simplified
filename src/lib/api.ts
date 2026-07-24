@@ -24,6 +24,11 @@ export async function apiFetch<T = any>(
     headers,
   });
 
+  if (res.status === 401 && typeof window !== "undefined") {
+    localStorage.removeItem("siarpi_token");
+    localStorage.removeItem("siarpi_user");
+  }
+
   let data: any = null;
   try {
     data = await res.json();

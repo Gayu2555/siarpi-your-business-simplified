@@ -47,6 +47,7 @@ export const Route = createRootRoute({
         content:
           "siarpi all in one management system, business operating system, software erp indonesia, software akuntansi terbaik, aplikasi hr payroll indonesia, software bisnis terpadu",
       },
+      { name: "msvalidate.01", content: "16C5717F3121D840BD0162D3962EBD7F" },
       { name: "author", content: "Siarpi" },
       { property: "og:title", content: "Siarpi | All in One Management System & Business Operating System" },
       {
@@ -84,6 +85,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
     <html lang="id">
       <head>
         <HeadContent />
+        <meta name="msvalidate.01" content="16C5717F3121D840BD0162D3962EBD7F" />
         {/* Google tag (gtag.js) */}
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-QTJLLW7M7Z"></script>
         <script

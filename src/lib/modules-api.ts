@@ -93,9 +93,12 @@ export interface CompanyModulesResponse {
 
 /** GET /company/modules — ambil modul yang dimiliki company dan modul yang tersedia */
 export async function fetchCompanyModules(): Promise<CompanyModulesResponse | null> {
-  const { ok, data } = await apiFetch<{ success: boolean; data: CompanyModulesResponse }>(
+  const token = typeof window !== "undefined" ? localStorage.getItem("siarpi_token") : null;
+  if (!token) return null;
+
+  const { ok, status, data } = await apiFetch<{ success: boolean; data: CompanyModulesResponse }>(
     "/company/modules"
   );
-  if (!ok || !data?.success) return null;
+  if (!ok || status === 401 || !data?.success) return null;
   return data.data;
 }
