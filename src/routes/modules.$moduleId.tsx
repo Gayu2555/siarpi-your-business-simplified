@@ -6,45 +6,125 @@ import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { modules, formatIDR, getModuleIcon } from "@/lib/modules";
-import { moduleDetails, type Feature, type Testimonial, type ScreenshotBlock } from "@/lib/module-details";
+import { fetchCatalogModules, type ApiModule } from "@/lib/modules-api";
+import { resolvePhosphorIcon } from "@/lib/icon-resolver";
+import { moduleDetails, type Testimonial } from "@/lib/module-details";
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ArrowRight, ArrowLeft, Check, Star, Quote } from "lucide-react";
+import { ArrowRight, ArrowLeft, Star, Quote } from "lucide-react";
+
+// Modular Component Imports
+import { ModuleHeroSection } from "@/components/modules/ModuleHeroSection";
+import { ModuleMockupPreview } from "@/components/modules/ModuleMockupPreview";
+import { FinanceSubModulesCarousel } from "@/components/modules/FinanceSubModulesCarousel";
+import { ModuleFeaturesSection } from "@/components/modules/ModuleFeaturesSection";
+import { BusinessSolutionsSection } from "@/components/modules/BusinessSolutionsSection";
+import { ComparisonBeforeAfterSection } from "@/components/modules/ComparisonBeforeAfterSection";
 
 export const Route = createFileRoute("/modules/$moduleId")({
   head: ({ params }) => {
     const m = modules.find((x) => x.id === params.moduleId);
     const d = moduleDetails[params.moduleId];
     if (!m || !d) {
-      return { meta: [{ title: "Modul tidak ditemukan — Siarpi" }] };
+      return { meta: [{ title: "Modul Tidak Ditemukan | Siarpi ERP" }] };
     }
+
+    // High-converting Sales Copywriting & Targeted SEO Keywords
+    const metaTitle = `Software ${m.name} Terbaik Indonesia | ${d.tagline} | Siarpi ERP`;
+    const metaDesc = `Software ${m.name} Siarpi: ${d.tagline}. Otomatiskan pembukuan, laporan Laba/Rugi, arus kas real-time, piutang AR, hutang AP, pajak e-Faktur, & rekonsiliasi bank. Coba gratis 14 hari tanpa kartu kredit!`;
+    const ogImage = d.mockup?.images?.[0] || d.mockup?.image || "/dashboard-preview.jpg";
+    const keywords = [
+      `software ${m.name.toLowerCase()} indonesia`,
+      `aplikasi ${m.name.toLowerCase()} bisnis`,
+      `software akuntansi`,
+      `software akuntansi terbaik`,
+      `software keuangan`,
+      `software keuangan perusahaan`,
+      `aplikasi keuangan usaha`,
+      `aplikasi pembukuan usaha`,
+      `software pembukuan gratis`,
+      `program akuntansi indonesia`,
+      `sistem akuntansi perusahaan`,
+      `software neraca dan laba rugi`,
+      `software kas dan bank`,
+      `sistem erp indonesia`,
+      `modul finance erp`,
+      `laporan keuangan otomatis`,
+      `rekonsiliasi bank otomatis`,
+      `software piutang ar`,
+      `software hutang ap`,
+      `efaktur pajak otomatis`,
+      `siarpi erp indonesia`,
+    ].join(", ");
+
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": `Siarpi ERP — Modul ${m.name}`,
+      "operatingSystem": "Web, Windows, macOS, Linux, Android, iOS",
+      "applicationCategory": "BusinessApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": String(m.price),
+        "priceCurrency": "IDR",
+        "availability": "https://schema.org/InStock",
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "ratingCount": "1280",
+      },
+      "description": metaDesc,
+    };
+
     return {
       meta: [
-        { title: `${m.name} — Siarpi` },
-        { name: "description", content: d.tagline },
-        { property: "og:title", content: `${m.name} — ${d.tagline}` },
-        { property: "og:description", content: d.longDescription },
+        { title: metaTitle },
+        { name: "description", content: metaDesc },
+        { name: "keywords", content: keywords },
+        { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1" },
+        { property: "og:title", content: metaTitle },
+        { property: "og:description", content: metaDesc },
+        { property: "og:type", content: "product" },
+        { property: "og:image", content: ogImage },
+        { property: "og:site_name", content: "Siarpi Enterprise ERP" },
+        { property: "og:locale", content: "id_ID" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: metaTitle },
+        { name: "twitter:description", content: metaDesc },
+        { name: "twitter:image", content: ogImage },
+      ],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(jsonLd),
+        },
       ],
     };
   },
-  loader: ({ params }) => {
+  loader: async ({ params }) => {
+    let apiMod: ApiModule | undefined;
+    try {
+      const catalog = await fetchCatalogModules();
+      apiMod = catalog.find(
+        (x) => x.key === params.moduleId || x.key === params.moduleId.toLowerCase()
+      );
+    } catch {
+      // Fallback silently if API is offline
+    }
+
     const m = modules.find((x) => x.id === params.moduleId);
     const d = moduleDetails[params.moduleId];
     if (!m || !d) throw notFound();
 
-    // PENTING: loader hanya boleh return plain data yang bisa di-serialize
-    // (Seroval/TanStack Start SSR dehydration). `m` dari lib/modules berisi
-    // field `iconName` (string) — itu aman. Jangan PERNAH return komponen
-    // React (function/forward_ref) dari loader, termasuk tidak sengaja lewat
-    // spread/destructure objek yang masih punya field komponen di dalamnya.
     return {
       module: {
         id: m.id,
-        name: m.name,
-        iconName: m.iconName,
-        description: m.description,
-        price: m.price,
+        name: apiMod?.name ?? apiMod?.label ?? m.name,
+        iconName: apiMod?.icon ?? m.iconName,
+        description: apiMod?.description ?? m.description,
+        price: apiMod?.price ?? m.price,
       },
       detail: d,
     };
@@ -72,13 +152,16 @@ export const Route = createFileRoute("/modules/$moduleId")({
 
 function ModulePage() {
   const { module: m, detail: d } = Route.useLoaderData() as any;
-  // Resolve iconName (string) -> komponen Lucide HANYA di sini (client render),
-  // tidak pernah di loader.
-  const Icon = getModuleIcon(m.iconName);
 
-  // Recommend other modules (first 4 excluding current) — pakai `modules`
-  // module-level (bukan loader data), jadi aman tetap akses .icon di sini
-  // karena ini render langsung, tidak ikut proses dehydration loader.
+  const renderIcon = (iconName: string, className = "h-7 w-7") => {
+    if (iconName && iconName.startsWith("i-ph-")) {
+      const { Icon, weight } = resolvePhosphorIcon(iconName);
+      return <Icon className={className} weight={weight} />;
+    }
+    const IconComp = getModuleIcon(iconName);
+    return <IconComp className={className} />;
+  };
+
   const related = modules.filter((x) => x.id !== m.id).slice(0, 4);
 
   return (
@@ -86,7 +169,7 @@ function ModulePage() {
       <Header />
 
       <main className="flex-1">
-        {/* HERO */}
+        {/* HERO SECTION */}
         <section className="relative overflow-hidden bg-gradient-subtle">
           <div className="absolute inset-0 bg-gradient-hero" />
           <div className="container relative mx-auto px-4 py-16 md:px-6 md:py-24">
@@ -98,155 +181,47 @@ function ModulePage() {
             </Link>
 
             <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <div className="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-primary text-primary-foreground shadow-elegant">
-                  <Icon className="h-7 w-7" />
-                </div>
-                <Badge variant="outline" className="mb-3 rounded-full">Modul {m.name}</Badge>
-                <h1 className="font-display text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">
-                  {d.tagline}
-                </h1>
-                <p className="mt-5 text-base text-muted-foreground md:text-lg">
-                  {d.longDescription}
-                </p>
-
-                <div className="mt-8 flex flex-wrap items-center gap-6">
-                  <div>
-                    <div className="font-display text-3xl font-bold">{formatIDR(m.price)}</div>
-                    <div className="text-xs text-muted-foreground">per bulan</div>
-                  </div>
-                  <div className="flex flex-col gap-3 sm:flex-row">
-                    <Button
-                      size="lg"
-                      asChild
-                      className="bg-gradient-primary text-primary-foreground shadow-elegant hover:shadow-glow"
-                    >
-                      <Link to="/onboarding">
-                        Coba Gratis <ArrowRight className="ml-1 h-4 w-4" />
-                      </Link>
-                    </Button>
-                    <Button size="lg" variant="outline" asChild>
-                      <Link to="/modular">Tambah ke Paket</Link>
-                    </Button>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Mockup screenshot */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.15 }}
-                className="relative"
-              >
-                <div className="absolute -inset-4 bg-gradient-primary opacity-20 blur-3xl" />
-                <Card className="relative overflow-hidden rounded-2xl border-border bg-card p-0 shadow-elegant">
-                  {/* Window chrome */}
-                  <div className="flex items-center gap-1.5 border-b border-border bg-muted/40 px-4 py-3">
-                    <span className="h-2.5 w-2.5 rounded-full bg-destructive/60" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-primary/60" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/40" />
-                    <span className="ml-3 text-xs text-muted-foreground">siarpi.app/{m.id}</span>
-                  </div>
-
-                  <div className="space-y-5 p-6">
-                    <div>
-                      <div className="font-display text-lg font-semibold">{d.mockup.title}</div>
-                      <div className="text-xs text-muted-foreground">{d.mockup.subtitle}</div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-3">
-                      {d.mockup.stats.map((s: ScreenshotBlock) => (
-                        <div
-                          key={s.label}
-                          className={`rounded-xl p-3 ${
-                            s.tone === "primary"
-                              ? "bg-gradient-primary text-primary-foreground"
-                              : s.tone === "accent"
-                                ? "bg-accent text-accent-foreground"
-                                : "bg-muted text-foreground"
-                          }`}
-                        >
-                          <div className="text-[10px] opacity-80">{s.label}</div>
-                          <div className="font-display text-lg font-bold">{s.value}</div>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="space-y-2">
-                      {d.mockup.rows.map((r: { label: string; sub: string; value: string }) => (
-                        <div
-                          key={r.label}
-                          className="flex items-center justify-between rounded-lg border border-border bg-background/50 px-3 py-2.5"
-                        >
-                          <div>
-                            <div className="text-sm font-medium">{r.label}</div>
-                            <div className="text-xs text-muted-foreground">{r.sub}</div>
-                          </div>
-                          <div className="text-sm font-semibold">{r.value}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </Card>
-              </motion.div>
+              <ModuleHeroSection module={m} detail={d} renderIcon={renderIcon} />
+              <ModuleMockupPreview moduleName={m.name} moduleId={m.id} mockup={d.mockup} />
             </div>
           </div>
         </section>
 
-        {/* FEATURES */}
-        <section className="container mx-auto px-4 py-20 md:px-6 md:py-28">
-          <div className="mx-auto max-w-2xl text-center">
-            <Badge variant="outline" className="mb-4 rounded-full">Fitur Utama</Badge>
-            <h2 className="font-display text-3xl font-bold md:text-5xl">
-              Semua yang Anda butuhkan dari <span className="text-gradient-primary">{m.name}</span>
-            </h2>
-          </div>
+        {/* FEATURES SECTION */}
+        <ModuleFeaturesSection moduleName={m.name} features={d.features} />
 
-          <div className="mt-12 grid gap-6 md:grid-cols-2">
-            {d.features.map((f: Feature, i: number) => (
-              <motion.div
-                key={f.title}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.06 }}
-              >
-                <Card className="flex h-full gap-4 rounded-2xl border-border p-6 transition-shadow hover:shadow-card">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent text-accent-foreground">
-                    <Check className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-display text-lg font-semibold">{f.title}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">{f.desc}</p>
-                  </div>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </section>
+        {/* BUSINESS SOLUTIONS SECTION (Corporate Solusi Aspek Operasional & Keuangan) */}
+        <BusinessSolutionsSection />
 
-        {/* TESTIMONIALS */}
+        {/* COMPARISON BEFORE & AFTER SECTION (Tanpa Siarpi vs Pakai Siarpi) */}
+        <ComparisonBeforeAfterSection moduleName={m.name} />
+
+        {/* FINANCE SUB-MODULES CAROUSEL SHOWCASE */}
+        {m.id === "finance" && <FinanceSubModulesCarousel />}
+
+        {/* TESTIMONIALS SECTION */}
         <section className="bg-muted/30 py-20 md:py-28">
           <div className="container mx-auto px-4 md:px-6">
-            <div className="mx-auto max-w-2xl text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.5 }}
+              className="mx-auto max-w-2xl text-center"
+            >
               <Badge variant="outline" className="mb-4 rounded-full">Testimoni</Badge>
               <h2 className="font-display text-3xl font-bold md:text-5xl">
                 Dipercaya oleh bisnis Indonesia
               </h2>
-            </div>
+            </motion.div>
 
             <div className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-2">
               {d.testimonials.map((t: Testimonial, i: number) => (
                 <motion.div
                   key={t.name}
-                  initial={{ opacity: 0, y: 16 }}
+                  initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
+                  viewport={{ once: true, margin: "-60px" }}
                   transition={{ duration: 0.4, delay: i * 0.1 }}
                 >
                   <Card className="relative h-full rounded-2xl border-border p-8 shadow-soft">
@@ -258,13 +233,13 @@ function ModulePage() {
                     </div>
                     <p className="mt-4 text-base italic text-foreground/90">"{t.quote}"</p>
                     <div className="mt-6 flex items-center gap-3">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-primary font-display font-bold text-primary-foreground">
-                        {t.name.charAt(0)}
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-primary font-display font-bold text-primary-foreground">
+                        {t.name[0]}
                       </div>
                       <div>
-                        <div className="text-sm font-semibold">{t.name}</div>
+                        <div className="font-display text-sm font-semibold">{t.name}</div>
                         <div className="text-xs text-muted-foreground">
-                          {t.role} · {t.company}
+                          {t.role} • {t.company}
                         </div>
                       </div>
                     </div>
@@ -275,46 +250,75 @@ function ModulePage() {
           </div>
         </section>
 
-        {/* FAQ */}
+        {/* FAQ SECTION */}
         <section className="container mx-auto px-4 py-20 md:px-6 md:py-28">
-          <div className="mx-auto max-w-3xl">
-            <div className="text-center">
-              <Badge variant="outline" className="mb-4 rounded-full">FAQ</Badge>
-              <h2 className="font-display text-3xl font-bold md:text-4xl">
-                Pertanyaan seputar {m.name}
-              </h2>
-            </div>
-            <Accordion type="single" collapsible className="mt-10">
-              {d.faq.map((item: { q: string; a: string }, i: number) => (
-                <AccordionItem key={i} value={`item-${i}`}>
-                  <AccordionTrigger className="text-left font-medium">{item.q}</AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground">{item.a}</AccordionContent>
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.5 }}
+            className="mx-auto max-w-2xl text-center"
+          >
+            <Badge variant="outline" className="mb-4 rounded-full">FAQ</Badge>
+            <h2 className="font-display text-3xl font-bold md:text-5xl">
+              Pertanyaan yang sering diajukan
+            </h2>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mx-auto mt-12 max-w-3xl"
+          >
+            <Accordion type="single" collapsible className="w-full">
+              {d.faq.map((f: { q: string; a: string }, i: number) => (
+                <AccordionItem key={i} value={`item-${i}`} className="border-border">
+                  <AccordionTrigger className="font-display text-left text-base font-semibold hover:no-underline">
+                    {f.q}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
+                    {f.a}
+                  </AccordionContent>
                 </AccordionItem>
               ))}
             </Accordion>
-          </div>
+          </motion.div>
         </section>
 
-        {/* RELATED MODULES */}
-        <section className="bg-muted/30 py-20">
+        {/* RELATED MODULES SECTION */}
+        <section className="border-t border-border bg-muted/20 py-16 md:py-20">
           <div className="container mx-auto px-4 md:px-6">
-            <div className="mx-auto max-w-2xl text-center">
-              <h2 className="font-display text-2xl font-bold md:text-3xl">Modul lainnya</h2>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Lengkapi {m.name} dengan modul pendukung
-              </p>
+            <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+              <div>
+                <h3 className="font-display text-2xl font-bold">Modul lainnya untuk bisnis Anda</h3>
+                <p className="text-sm text-muted-foreground">Kombinasikan dengan modul ini untuk sistem yang utuh.</p>
+              </div>
+              <Button variant="outline" asChild>
+                <Link to="/">Lihat Semua Modul</Link>
+              </Button>
             </div>
-            <div className="mx-auto mt-10 grid max-w-4xl grid-cols-2 gap-4 md:grid-cols-4">
-              {related.map((r) => {
-                const RIcon = getModuleIcon(r.iconName);
+
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {related.map((rm) => {
+                const RelIcon = getModuleIcon(rm.iconName);
                 return (
-                  <Link key={r.id} to="/modules/$moduleId" params={{ moduleId: r.id }}>
-                    <Card className="group flex h-full flex-col items-center gap-3 rounded-2xl border-border p-5 text-center transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-soft">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent text-accent-foreground transition-transform group-hover:scale-110">
-                        <RIcon className="h-5 w-5" />
+                  <Link key={rm.id} to="/modules/$moduleId" params={{ moduleId: rm.id }}>
+                    <Card className="flex h-full flex-col justify-between rounded-xl border-border p-5 transition-all hover:border-primary/50 hover:shadow-card">
+                      <div>
+                        <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground">
+                          <RelIcon className="h-5 w-5" />
+                        </div>
+                        <h4 className="font-display font-semibold">{rm.name}</h4>
+                        <p className="mt-1 text-xs text-muted-foreground">{rm.description}</p>
                       </div>
-                      <div className="text-sm font-semibold">{r.name}</div>
-                      <div className="text-xs text-muted-foreground">{formatIDR(r.price)}/bln</div>
+                      <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-3">
+                        <span className="font-display text-xs font-bold">{formatIDR(rm.price)}</span>
+                        <span className="inline-flex items-center text-xs font-medium text-primary">
+                          Detail <ArrowRight className="ml-1 h-3 w-3" />
+                        </span>
+                      </div>
                     </Card>
                   </Link>
                 );
@@ -323,21 +327,32 @@ function ModulePage() {
           </div>
         </section>
 
-        {/* CTA */}
-        <section className="container mx-auto px-4 py-20 md:px-6">
-          <Card className="overflow-hidden rounded-3xl border-0 bg-gradient-primary p-10 text-center shadow-elegant md:p-14">
-            <h2 className="font-display text-3xl font-bold text-primary-foreground md:text-4xl">
-              Siap mencoba {m.name}?
-            </h2>
-            <p className="mt-3 text-primary-foreground/80">
-              Mulai gratis hari ini, tanpa kartu kredit.
-            </p>
-            <Button size="lg" asChild className="mt-7 bg-background text-foreground hover:bg-background/90">
-              <Link to="/onboarding">
-                Mulai Sekarang <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
-            </Button>
-          </Card>
+        {/* CTA BOTTOM SECTION */}
+        <section className="bg-gradient-primary py-20 text-primary-foreground md:py-28">
+          <div className="container mx-auto px-4 text-center md:px-6">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="mx-auto max-w-3xl"
+            >
+              <h2 className="font-display text-3xl font-bold md:text-5xl">
+                Mulai kelola {m.name} secara modern hari ini
+              </h2>
+              <p className="mt-4 text-base opacity-90 md:text-lg">
+                Uji coba gratis 14 hari tanpa kartu kredit. Batalkan kapan saja.
+              </p>
+              <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+                <Button size="lg" variant="secondary" asChild className="font-semibold shadow-lg">
+                  <Link to="/onboarding">Daftar Coba Gratis</Link>
+                </Button>
+                <Button size="lg" variant="outline" asChild className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10">
+                  <Link to="/komparasi">Bandingkan Paket</Link>
+                </Button>
+              </div>
+            </motion.div>
+          </div>
         </section>
       </main>
 

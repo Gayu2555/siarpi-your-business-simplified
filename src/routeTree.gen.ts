@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as StudiKasusRouteImport } from './routes/studi-kasus'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as RegisterRouteImport } from './routes/register'
@@ -22,7 +23,14 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ModulesModuleIdRouteImport } from './routes/modules.$moduleId'
+import { Route as FinanceSubSubIdRouteImport } from './routes/finance-sub.$subId'
+import { Route as ArtikelSlugRouteImport } from './routes/artikel.$slug'
 
+const StudiKasusRoute = StudiKasusRouteImport.update({
+  id: '/studi-kasus',
+  path: '/studi-kasus',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -88,6 +96,16 @@ const ModulesModuleIdRoute = ModulesModuleIdRouteImport.update({
   path: '/modules/$moduleId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FinanceSubSubIdRoute = FinanceSubSubIdRouteImport.update({
+  id: '/finance-sub/$subId',
+  path: '/finance-sub/$subId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArtikelSlugRoute = ArtikelSlugRouteImport.update({
+  id: '/artikel/$slug',
+  path: '/artikel/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -102,6 +120,9 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/roadmap': typeof RoadmapRoute
   '/settings': typeof SettingsRoute
+  '/studi-kasus': typeof StudiKasusRoute
+  '/artikel/$slug': typeof ArtikelSlugRoute
+  '/finance-sub/$subId': typeof FinanceSubSubIdRoute
   '/modules/$moduleId': typeof ModulesModuleIdRoute
 }
 export interface FileRoutesByTo {
@@ -117,6 +138,9 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/roadmap': typeof RoadmapRoute
   '/settings': typeof SettingsRoute
+  '/studi-kasus': typeof StudiKasusRoute
+  '/artikel/$slug': typeof ArtikelSlugRoute
+  '/finance-sub/$subId': typeof FinanceSubSubIdRoute
   '/modules/$moduleId': typeof ModulesModuleIdRoute
 }
 export interface FileRoutesById {
@@ -133,6 +157,9 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/roadmap': typeof RoadmapRoute
   '/settings': typeof SettingsRoute
+  '/studi-kasus': typeof StudiKasusRoute
+  '/artikel/$slug': typeof ArtikelSlugRoute
+  '/finance-sub/$subId': typeof FinanceSubSubIdRoute
   '/modules/$moduleId': typeof ModulesModuleIdRoute
 }
 export interface FileRouteTypes {
@@ -150,6 +177,9 @@ export interface FileRouteTypes {
     | '/register'
     | '/roadmap'
     | '/settings'
+    | '/studi-kasus'
+    | '/artikel/$slug'
+    | '/finance-sub/$subId'
     | '/modules/$moduleId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -165,6 +195,9 @@ export interface FileRouteTypes {
     | '/register'
     | '/roadmap'
     | '/settings'
+    | '/studi-kasus'
+    | '/artikel/$slug'
+    | '/finance-sub/$subId'
     | '/modules/$moduleId'
   id:
     | '__root__'
@@ -180,6 +213,9 @@ export interface FileRouteTypes {
     | '/register'
     | '/roadmap'
     | '/settings'
+    | '/studi-kasus'
+    | '/artikel/$slug'
+    | '/finance-sub/$subId'
     | '/modules/$moduleId'
   fileRoutesById: FileRoutesById
 }
@@ -196,11 +232,21 @@ export interface RootRouteChildren {
   RegisterRoute: typeof RegisterRoute
   RoadmapRoute: typeof RoadmapRoute
   SettingsRoute: typeof SettingsRoute
+  StudiKasusRoute: typeof StudiKasusRoute
+  ArtikelSlugRoute: typeof ArtikelSlugRoute
+  FinanceSubSubIdRoute: typeof FinanceSubSubIdRoute
   ModulesModuleIdRoute: typeof ModulesModuleIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/studi-kasus': {
+      id: '/studi-kasus'
+      path: '/studi-kasus'
+      fullPath: '/studi-kasus'
+      preLoaderRoute: typeof StudiKasusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings': {
       id: '/settings'
       path: '/settings'
@@ -292,6 +338,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ModulesModuleIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/finance-sub/$subId': {
+      id: '/finance-sub/$subId'
+      path: '/finance-sub/$subId'
+      fullPath: '/finance-sub/$subId'
+      preLoaderRoute: typeof FinanceSubSubIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/artikel/$slug': {
+      id: '/artikel/$slug'
+      path: '/artikel/$slug'
+      fullPath: '/artikel/$slug'
+      preLoaderRoute: typeof ArtikelSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -308,6 +368,9 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterRoute: RegisterRoute,
   RoadmapRoute: RoadmapRoute,
   SettingsRoute: SettingsRoute,
+  StudiKasusRoute: StudiKasusRoute,
+  ArtikelSlugRoute: ArtikelSlugRoute,
+  FinanceSubSubIdRoute: FinanceSubSubIdRoute,
   ModulesModuleIdRoute: ModulesModuleIdRoute,
 }
 export const routeTree = rootRouteImport

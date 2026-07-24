@@ -36,14 +36,19 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Siarpi — All-in-One Management System" },
+      { title: "Siarpi | All in One Management System & Business Operating System" },
       {
         name: "description",
         content:
-          "Kelola bisnis tanpa ribet dengan Siarpi. HR, Payroll, Finance, Inventory dalam satu platform.",
+          "Siarpi adalah All in One Management System & Business Operating System (BOS) lengkap untuk mengontrol seluruh divisi bisnis Anda: Finance, HR & Payroll, Inventory, CRM, dan Analytics.",
+      },
+      {
+        name: "keywords",
+        content:
+          "siarpi all in one management system, business operating system, software erp indonesia, software akuntansi terbaik, aplikasi hr payroll indonesia, software bisnis terpadu",
       },
       { name: "author", content: "Siarpi" },
-      { property: "og:title", content: "Siarpi — All-in-One Management System" },
+      { property: "og:title", content: "Siarpi | All in One Management System & Business Operating System" },
       {
         property: "og:description",
         content:

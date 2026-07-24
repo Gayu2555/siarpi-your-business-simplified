@@ -30,22 +30,105 @@ const FALLBACK_MODULES: ApiModule[] = [
 ];
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Siarpi — Kelola Bisnis Tanpa Ribet" },
-      { name: "description", content: "All-in-One Management System untuk UMKM, Startup, dan Perusahaan Indonesia. Mulai dari Rp 99.000/bulan." },
-      { property: "og:title", content: "Siarpi — Kelola Bisnis Tanpa Ribet" },
-      { property: "og:description", content: "All-in-One Management System untuk UMKM, Startup, dan Perusahaan Indonesia." },
-    ],
-  }),
+  head: () => {
+    const metaTitle = "Siarpi | All in One Management System & Business Operating System";
+    const metaDesc = "Business Operating System (BOS) lengkap untuk mengontrol seluruh operasional bisnis Anda: Finance, HR & Payroll, Inventory, CRM, dan Analytics. Aktifkan modul yang Anda butuhkan saja mulai Rp 39.000/bulan!";
+    const ogImage = "/dashboard-preview.jpg";
+    const keywords = [
+      "siarpi all in one management system",
+      "business operating system",
+      "software erp indonesia",
+      "software akuntansi terbaik",
+      "software keuangan perusahaan",
+      "aplikasi hr payroll indonesia",
+      "software manajemen stok barang",
+      "siarpi erp",
+      "software bisnis terpadu",
+    ].join(", ");
+
+    const websiteJsonLd = {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Siarpi ERP",
+      "url": "https://siarpi.com",
+      "description": metaDesc,
+    };
+
+    const softwareJsonLd = {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Siarpi Enterprise ERP",
+      "operatingSystem": "Web, Android, iOS, Windows, macOS",
+      "applicationCategory": "BusinessApplication",
+      "offers": {
+        "@type": "AggregateOffer",
+        "priceCurrency": "IDR",
+        "lowPrice": "39000",
+        "highPrice": "99000",
+        "offerCount": "10",
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "ratingCount": "2500",
+      },
+    };
+
+    const organizationJsonLd = {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Siarpi",
+      "url": "https://siarpi.com",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+62-813-8789-5911",
+        "contactType": "customer service",
+        "areaServed": "ID",
+        "availableLanguage": "Indonesian",
+      },
+    };
+
+    return {
+      meta: [
+        { title: metaTitle },
+        { name: "description", content: metaDesc },
+        { name: "keywords", content: keywords },
+        { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1" },
+        { property: "og:title", content: metaTitle },
+        { property: "og:description", content: metaDesc },
+        { property: "og:type", content: "website" },
+        { property: "og:image", content: ogImage },
+        { property: "og:site_name", content: "Siarpi Enterprise ERP" },
+        { property: "og:locale", content: "id_ID" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: metaTitle },
+        { name: "twitter:description", content: metaDesc },
+        { name: "twitter:image", content: ogImage },
+      ],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(websiteJsonLd),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(softwareJsonLd),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(organizationJsonLd),
+        },
+      ],
+    };
+  },
   component: LandingPage,
 });
 
 const benefits = [
-  { iconName: "Layers", title: "All in One", desc: "Semua modul bisnis dalam satu sistem terintegrasi." },
-  { iconName: "Zap", title: "Modular", desc: "Beli per fitur sesuai kebutuhan, hemat biaya." },
-  { iconName: "RefreshCw", title: "Real-time Data", desc: "Sinkronisasi otomatis di semua perangkat." },
-  { iconName: "GraduationCap", title: "Zero Training", desc: "Antarmuka intuitif, tim langsung bisa pakai." },
+  { iconName: "Zap", title: "Bayar yang Dipakai Aja", desc: "Beli modul sesuai kebutuhan bisnis Anda. Mulai dari Rp 39.000/bulan tanpa biaya paketan mahal." },
+  { iconName: "RefreshCw", title: "Bebas Rekap Manual", desc: "Penjualan kasir, stok barang, dan catatan kas terhubung otomatis tanpa perlu salin di Excel." },
+  { iconName: "GraduationCap", title: "Langsung Pakai Tanpa Training", desc: "Tampilan simpel dan ramah pengguna. Staf kasir atau admin Anda bisa langsung mengerti dalam 5 menit." },
+  { iconName: "Smartphone", title: "Pantau dari Mana Saja", desc: "Cek laporan Laba Rugi, sisa stok, dan tagihan pelanggan langsung dari HP atau laptop secara real-time." },
 ];
 
 const payments = [
@@ -160,31 +243,31 @@ function LandingPage() {
             >
               <Badge
                 variant="secondary"
-                className="mb-6 rounded-full border border-primary/20 bg-accent/60 px-4 py-1.5 text-xs font-medium text-accent-foreground"
+                className="mb-6 rounded-full border border-primary/20 bg-accent/60 px-4 py-1.5 text-xs font-semibold text-accent-foreground"
               >
                 <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-primary" />
-                All-in-One Management System
+                All in One Management System & Business Operating System
               </Badge>
 
               <h1 className="font-display text-5xl font-bold leading-[1.05] tracking-tight md:text-6xl lg:text-7xl">
-                Kelola Bisnis
+                Satu Sistem
                 <br />
-                <span className="text-gradient-primary">Tanpa Ribet</span>
+                <span className="text-gradient-primary">Pengendali Bisnis</span>
                 <br />
-                dengan Siarpi
+                Serba Otomatis
               </h1>
 
               <p className="mt-6 max-w-xl text-base text-muted-foreground md:text-lg">
-                Desain rapih, profesional, dan mudah dimengerti — crew Anda bisa langsung pakai dengan{" "}
-                <span className="font-semibold text-foreground">hampir nol training</span>. Beli modul sesuai kebutuhan, tambahkan kapan saja.
+                Business Operating System (BOS) lengkap untuk mengontrol seluruh divisi bisnis Anda: Keuangan, HR & Payroll, Stok Barang, CRM, hingga Analisis Eksekutif.{" "}
+                <span className="font-semibold text-foreground">Aktifkan modul yang Anda butuhkan saja</span>.
               </p>
 
               {/* Feature bullets */}
               <ul className="mt-8 space-y-4">
                 {[
-                  { icon: Palette, color: "amber", text: "Desain profesional & intuitif — mudah dimengerti siapa saja" },
-                  { icon: GraduationCap, color: "emerald", text: "Hampir nol training — crew langsung bisa pakai" },
-                  { icon: Puzzle, color: "blue", text: "Beli ketengan — pilih modul sesuai kebutuhan bisnis Anda" },
+                  { icon: Layers, color: "amber", text: "Business Operating System Terpadu: Kontrol Keuangan, Payroll, HR, Stok, & Proyek dari satu dasbor pusat." },
+                  { icon: RefreshCw, color: "emerald", text: "Otomatisasi Lintas Divisi: Data transaksi, pencatatan kas, dan gaji terhubung real-time." },
+                  { icon: Puzzle, color: "blue", text: "Beli Ketengan Sesuai Kebutuhan: Aktifkan modul yang dibutuhkan saja mulai Rp 39.000/bulan." },
                 ].map((b) => (
                   <li key={b.text} className="flex items-center gap-3">
                     <span

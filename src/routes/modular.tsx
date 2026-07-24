@@ -14,12 +14,29 @@ import { getOnboardingStatus } from "@/lib/company-api";
 import { createCheckout } from "@/lib/checkout-api";
 
 export const Route = createFileRoute("/modular")({
-  head: () => ({
-    meta: [
-      { title: "Beli Ketengan — Siarpi" },
-      { name: "description", content: "Pilih modul satuan sesuai kebutuhan. Tanpa paket wajib." },
-    ],
-  }),
+  head: () => {
+    const title = "Harga Modul Satuan & Beli Ketengan | Siarpi ERP";
+    const description = "Pilih dan beli modul bisnis sesuai kebutuhan usaha Anda mulai Rp 39.000/bulan. Tanpa paketan mahal, tanpa biaya tersembunyi.";
+    const keywords = "harga software akuntansi, aplikasi pembukuan murah, beli modul erp, software kasir murah, harga aplikasi keuangan, siarpi modular";
+    const ogImage = "/dashboard-preview.jpg";
+
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { name: "keywords", content: keywords },
+        { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { property: "og:image", content: ogImage },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        { name: "twitter:image", content: ogImage },
+      ],
+    };
+  },
   component: ModularPage,
 });
 

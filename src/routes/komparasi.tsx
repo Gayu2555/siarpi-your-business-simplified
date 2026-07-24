@@ -9,21 +9,29 @@ import { Card } from "@/components/ui/card";
 import { formatIDR } from "@/lib/modules";
 
 export const Route = createFileRoute("/komparasi")({
-  head: () => ({
-    meta: [
-      { title: "Komparasi — Siarpi vs Odoo, Zoho, SAP, NetSuite" },
-      {
-        name: "description",
-        content:
-          "Bandingkan Siarpi dengan ERP global seperti Odoo, Zoho One, SAP Business One, Oracle NetSuite, dan Microsoft Dynamics 365. Harga, fitur, dan kemudahan pakai.",
-      },
-      { property: "og:title", content: "Komparasi — Siarpi vs ERP Global" },
-      {
-        property: "og:description",
-        content: "Lihat kenapa UKM Indonesia memilih Siarpi dibanding Odoo, Zoho, SAP, dan NetSuite.",
-      },
-    ],
-  }),
+  head: () => {
+    const title = "Komparasi | Siarpi vs Odoo, Zoho, SAP & NetSuite";
+    const description = "Bandingkan Siarpi dengan ERP global seperti Odoo, Zoho One, SAP Business One, dan NetSuite. Pelajari perbandingan harga, kepatuhan pajak Indonesia, dan kemudahan pemakaian.";
+    const keywords = "alternatif odoo indonesia, alternatif zoho indonesia, komparasi erp, erp lokal indonesia, perbandingan software akuntansi, siarpi vs odoo";
+    const ogImage = "/dashboard-preview.jpg";
+
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { name: "keywords", content: keywords },
+        { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { property: "og:image", content: ogImage },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        { name: "twitter:image", content: ogImage },
+      ],
+    };
+  },
   component: KomparasiPage,
 });
 

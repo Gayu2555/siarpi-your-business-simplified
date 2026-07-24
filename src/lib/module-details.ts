@@ -1,3 +1,8 @@
+import dashboardFinanceImg from "@/assets/dashboard-finance.png";
+import dashboardFinanceSidebarImg from "@/assets/dashboard-finance-sidebar.png";
+import financeArImg from "@/assets/finance-ar.png";
+import financeApImg from "@/assets/finance-ap.png";
+
 // Detailed content for each module: features, screenshot mockup, testimonials.
 
 export type Feature = { title: string; desc: string };
@@ -7,12 +12,14 @@ export type ScreenshotBlock = { label: string; value: string; tone: "primary" | 
 export type ModuleDetail = {
   tagline: string;
   longDescription: string;
+  keyBenefits?: string[];
   features: Feature[];
-  // Visual mockup data (rendered as styled cards instead of static images
-  // so it scales with theme tokens and stays crisp on every device).
+  // Visual mockup data (rendered as styled cards or asset images)
   mockup: {
     title: string;
     subtitle: string;
+    image?: string;
+    images?: string[];
     stats: ScreenshotBlock[];
     rows: { label: string; sub: string; value: string }[];
   };
@@ -25,6 +32,11 @@ export const moduleDetails: Record<string, ModuleDetail> = {
     tagline: "Manajemen karyawan modern untuk tim yang berkembang",
     longDescription:
       "Kelola data karyawan, kontrak, cuti, dan rekrutmen dalam satu tempat. Otomatiskan tugas administratif HR dan fokus pada pengembangan tim.",
+    keyBenefits: [
+      "Kelola data karyawan, cuti, dan dokumen dalam satu klik",
+      "Proses rekrutmen & onboarding lebih cepat dan terstruktur",
+      "Evaluasi kinerja tim dengan KPI & 360° feedback"
+    ],
     features: [
       { title: "Database Karyawan", desc: "Profil lengkap, kontrak, dokumen, dan riwayat dalam satu klik." },
       { title: "Manajemen Cuti", desc: "Pengajuan & approval cuti otomatis dengan saldo real-time." },
@@ -46,10 +58,14 @@ export const moduleDetails: Record<string, ModuleDetail> = {
       ],
     },
     testimonials: [
-      { name: "Rina Wijaya", role: "HR Manager", company: "PT Maju Bersama", rating: 5,
-        quote: "Onboarding karyawan baru sekarang cuma 1 hari. Dulu bisa seminggu lebih." },
-      { name: "Doni Saputra", role: "Founder", company: "Kopi Kenangan Lokal", rating: 5,
-        quote: "Tim kecil saya bisa kelola 50+ karyawan tanpa perlu admin HR khusus." },
+      {
+        name: "Rina Wijaya", role: "HR Manager", company: "PT Maju Bersama", rating: 5,
+        quote: "Onboarding karyawan baru sekarang cuma 1 hari. Dulu bisa seminggu lebih."
+      },
+      {
+        name: "Doni Saputra", role: "Founder", company: "Kopi Kenangan Lokal", rating: 5,
+        quote: "Tim kecil saya bisa kelola 50+ karyawan tanpa perlu admin HR khusus."
+      },
     ],
     faq: [
       { q: "Apakah bisa import data karyawan dari Excel?", a: "Ya, mendukung import bulk via CSV/Excel template kami." },
@@ -60,6 +76,11 @@ export const moduleDetails: Record<string, ModuleDetail> = {
     tagline: "Hitung gaji & pajak otomatis, bayar tepat waktu",
     longDescription:
       "Otomatiskan perhitungan gaji, BPJS, PPh 21, dan slip gaji. Transfer langsung ke rekening karyawan dengan satu klik.",
+    keyBenefits: [
+      "Perhitungan gaji, BPJS, & PPh 21 akurat otomatis",
+      "Kirim slip gaji digital langsung ke smartphone karyawan",
+      "Transfer penggajian massal cepat ke seluruh bank lokal"
+    ],
     features: [
       { title: "Perhitungan Otomatis", desc: "Gaji pokok, tunjangan, lembur, potongan—semua otomatis." },
       { title: "Pajak PPh 21 & BPJS", desc: "Update tarif terbaru, hitung sesuai regulasi Indonesia." },
@@ -81,10 +102,14 @@ export const moduleDetails: Record<string, ModuleDetail> = {
       ],
     },
     testimonials: [
-      { name: "Linda Kusuma", role: "Finance Director", company: "PT Sinar Abadi", rating: 5,
-        quote: "Payroll yang dulu makan 3 hari sekarang selesai 30 menit. Game changer." },
-      { name: "Pak Hartono", role: "Owner", company: "UD Berkah Jaya", rating: 5,
-        quote: "Pajak dan BPJS auto-hitung. Saya tidak perlu pusing soal compliance." },
+      {
+        name: "Linda Kusuma", role: "Finance Director", company: "PT Sinar Abadi", rating: 5,
+        quote: "Payroll yang dulu makan 3 hari sekarang selesai 30 menit. Game changer."
+      },
+      {
+        name: "Pak Hartono", role: "Owner", company: "UD Berkah Jaya", rating: 5,
+        quote: "Pajak dan BPJS auto-hitung. Saya tidak perlu pusing soal compliance."
+      },
     ],
     faq: [
       { q: "Apakah mendukung tarif PPh 21 terbaru?", a: "Ya, kami selalu update mengikuti regulasi DJP terbaru." },
@@ -92,44 +117,68 @@ export const moduleDetails: Record<string, ModuleDetail> = {
     ],
   },
   finance: {
-    tagline: "Pembukuan & laporan keuangan tanpa pusing",
+    tagline: "Kelola Keuangan & Pembukuan Bisnis Jadi Lebih Simpel, Bebas Pusing!",
     longDescription:
-      "Catat transaksi, kelola hutang-piutang, dan dapatkan laporan keuangan real-time sesuai standar akuntansi Indonesia.",
+      "Gak perlu paham akuntansi rumit untuk punya laporan keuangan rapi. Semua transaksi, arus kas, pembayaran, hingga neraca dan laba rugi tercatat otomatis secara akurat & siap pakai kapan saja.",
+    keyBenefits: [
+      "Automasi pembukuan dan laporan keuangan real-time",
+      "Kelola arus kas, piutang, dan hutang otomatis tanpa ribet",
+      "Layanan support komprehensif tanpa biaya tambahan"
+    ],
     features: [
-      { title: "Jurnal Otomatis", desc: "Transaksi tercatat otomatis dengan double-entry bookkeeping." },
-      { title: "Laporan Lengkap", desc: "Neraca, laba rugi, cash flow—siap audit kapan saja." },
-      { title: "Multi Cabang", desc: "Konsolidasi keuangan dari semua cabang dalam satu dashboard." },
-      { title: "Pajak Terintegrasi", desc: "PPN, PPh, dan e-Faktur siap setor." },
+      { title: "Pembukuan Serba Otomatis", desc: "Setiap transaksi otomatis tercatat di jurnal & buku besar tanpa perlu input manual berulang." },
+      { title: "Arus Kas & Bank Real-Time", desc: "Pantau saldo kas masuk, keluar, dan transfer antar bank secara langsung dalam satu tampilan." },
+      { title: "Laporan Keuangan Siap Pakai", desc: "Neraca, laba rugi, dan arus kas otomatis tersusun rapi, cocok untuk keputusan bisnis & audit." },
+      { title: "Bebas Pusing Pajak & Valuta", desc: "Hitung PPN/PPh otomatis dan pantau kurs valuta asing BI real-time untuk transaksi internasional." },
     ],
     mockup: {
-      title: "Laporan Keuangan",
-      subtitle: "Quarter 2 — 2026",
+      title: "Tampilan Dashboard Finance Siarpi",
+      subtitle: "Tampilan visual intuitif & siap pakai",
+      image: dashboardFinanceImg,
+      images: [
+        dashboardFinanceImg,
+        dashboardFinanceSidebarImg,
+        financeArImg,
+        financeApImg,
+      ],
       stats: [
-        { label: "Revenue", value: "Rp 4.8M", tone: "primary" },
-        { label: "Profit", value: "Rp 1.2M", tone: "accent" },
-        { label: "Margin", value: "25%", tone: "muted" },
+        { label: "Omset Q2", value: "Rp 4.8M", tone: "primary" },
+        { label: "Laba Bersih", value: "Rp 1.2M", tone: "accent" },
+        { label: "Valuta BI", value: "15+ Valuta", tone: "muted" },
       ],
       rows: [
-        { label: "Penjualan Produk", sub: "Pendapatan", value: "+ Rp 3.200.000.000" },
-        { label: "Beban Operasional", sub: "Biaya", value: "− Rp 1.100.000.000" },
-        { label: "Pajak", sub: "Liability", value: "− Rp 280.000.000" },
+        { label: "Pembukuan Ganda (GL)", sub: "Otomatis dari Kas & Invoice", value: "Real-time" },
+        { label: "Kas & Bank Multi Rekening", sub: "BCA, Mandiri, BRI, Bank BI", value: "Tersinkron" },
+        { label: "Faktur Piutang (AR) & Hutang (AP)", sub: "Lengkap Skedul Jatuh Tempo", value: "Teratur" },
+        { label: "Laporan Neraca & Laba Rugi", sub: "Siap Cetak & Export", value: "Format Akurat" },
       ],
     },
     testimonials: [
-      { name: "Bu Sarah", role: "Accountant", company: "CV Mandiri Sejahtera", rating: 5,
-        quote: "Tutup buku bulanan jadi cepat, laporan langsung siap dipresentasikan." },
-      { name: "Pak Eko", role: "CFO", company: "PT Dunia Digital", rating: 4,
-        quote: "Konsolidasi multi-cabang sangat membantu pengambilan keputusan." },
+      {
+        name: "Bu Sarah", role: "Owner & CEO", company: "CV Mandiri Sejahtera", rating: 5,
+        quote: "Sekarang pembukuan bisnis tidak pusing lagi. Laporan keuangan bulanan langsung jadi otomatis tanpa admin khusus!"
+      },
+      {
+        name: "Pak Eko", role: "Finance Manager", company: "PT Dunia Digital", rating: 5,
+        quote: "Tampilan dashboard-nya sangat ramah pengusaha. Fitur kas/bank dan kurs BI nya bikin kerjaan hemat jam-jaman!"
+      },
     ],
     faq: [
-      { q: "Apakah sesuai standar PSAK?", a: "Ya, laporan kami mengikuti PSAK dan SAK ETAP untuk UMKM." },
-      { q: "Bisa export ke e-Faktur?", a: "Ya, format CSV langsung kompatibel dengan aplikasi DJP." },
+      { q: "Apakah saya harus paham akuntansi untuk memakai modul ini?", a: "Sama sekali tidak! Siarpi dirancang sangat ramah pengguna. Jurnal dan laporan keuangan dibuat otomatis oleh sistem." },
+      { q: "Apakah laporan sesuai standar akuntansi Indonesia?", a: "Ya, Neraca, Laba/Rugi, dan Arus Kas disusun otomatis mengikuti standar akuntansi Indonesia (PSAK & SAK ETAP)." },
+      { q: "Apakah mendukung transaksi mata uang asing?", a: "Ya, terintegrasi langsung dengan API Kurs Transaksi & JISDOR Bank Indonesia real-time." },
+      { q: "Bisa dipadukan dengan modul POS / Sales?", a: "Tentu! Setiap penjualan di POS atau Invoice akan otomatis memposting entri kas & piutang ke modul Finance." },
     ],
   },
   inventory: {
     tagline: "Stok real-time dari gudang ke kasir",
     longDescription:
       "Lacak stok antar gudang, otomatisasi reorder, dan kurangi kerugian akibat kehabisan stok atau overstock.",
+    keyBenefits: [
+      "Pantau stok barang real-time di semua cabang & gudang",
+      "Notifikasi otomatis saat stok menipis (auto reorder)",
+      "Stock opname kilat dengan barcode scanner"
+    ],
     features: [
       { title: "Multi Gudang", desc: "Kelola stok di banyak lokasi dengan transfer mudah." },
       { title: "Auto Reorder", desc: "Notifikasi otomatis saat stok mendekati batas minimum." },
@@ -151,10 +200,14 @@ export const moduleDetails: Record<string, ModuleDetail> = {
       ],
     },
     testimonials: [
-      { name: "Pak Joko", role: "Warehouse Manager", company: "Toko Sembako Berkah", rating: 5,
-        quote: "Tidak ada lagi kehabisan stok mendadak. Reorder otomatis sangat membantu." },
-      { name: "Mbak Dewi", role: "Owner", company: "Boutique Anggun", rating: 5,
-        quote: "Stock opname yang dulu 2 hari sekarang cuma 2 jam." },
+      {
+        name: "Pak Joko", role: "Warehouse Manager", company: "Toko Sembako Berkah", rating: 5,
+        quote: "Tidak ada lagi kehabisan stok mendadak. Reorder otomatis sangat membantu."
+      },
+      {
+        name: "Mbak Dewi", role: "Owner", company: "Boutique Anggun", rating: 5,
+        quote: "Stock opname yang dulu 2 hari sekarang cuma 2 jam."
+      },
     ],
     faq: [
       { q: "Bisa konek ke marketplace?", a: "Ya, sinkronisasi dengan Tokopedia, Shopee, dan Lazada." },
@@ -165,6 +218,11 @@ export const moduleDetails: Record<string, ModuleDetail> = {
     tagline: "Kelola proyek tim dengan visual yang jelas",
     longDescription:
       "Atur tugas, deadline, dan kolaborasi tim dengan board kanban, gantt chart, dan timeline interaktif.",
+    keyBenefits: [
+      "Visualisasi progres proyek dengan Kanban & Gantt Chart",
+      "Time tracking per tugas untuk efisiensi biaya & beban kerja",
+      "Kolaborasi tim seamless tanpa meeting harian berlebih"
+    ],
     features: [
       { title: "Kanban Board", desc: "Drag & drop tugas antar status, visual & intuitif." },
       { title: "Gantt Chart", desc: "Timeline proyek dengan dependency antar tugas." },
@@ -186,10 +244,14 @@ export const moduleDetails: Record<string, ModuleDetail> = {
       ],
     },
     testimonials: [
-      { name: "Arif Hidayat", role: "Project Manager", company: "Studio Kreatif", rating: 5,
-        quote: "Tim 15 orang bisa sinkron tanpa meeting harian. Hemat waktu banget." },
-      { name: "Maya Putri", role: "Lead Designer", company: "Agensi Visual", rating: 5,
-        quote: "Komentar langsung di tugas bikin feedback loop jadi cepat." },
+      {
+        name: "Arif Hidayat", role: "Project Manager", company: "Studio Kreatif", rating: 5,
+        quote: "Tim 15 orang bisa sinkron tanpa meeting harian. Hemat waktu banget."
+      },
+      {
+        name: "Maya Putri", role: "Lead Designer", company: "Agensi Visual", rating: 5,
+        quote: "Komentar langsung di tugas bikin feedback loop jadi cepat."
+      },
     ],
     faq: [
       { q: "Bisa integrasi dengan Slack?", a: "Ya, notifikasi tugas otomatis ke channel Slack pilihan." },
@@ -200,6 +262,11 @@ export const moduleDetails: Record<string, ModuleDetail> = {
     tagline: "Kelola pelanggan & leads, tutup deal lebih cepat",
     longDescription:
       "Pipeline penjualan visual, otomatisasi follow-up, dan riwayat lengkap interaksi pelanggan.",
+    keyBenefits: [
+      "Pantau pipeline penjualan visual dari lead hingga closing",
+      "Kirim follow-up otomatis via Email & WhatsApp",
+      "Riwayat pelanggan 360° dalam satu tampilan terpadu"
+    ],
     features: [
       { title: "Sales Pipeline", desc: "Visual deal stages dari lead hingga closing." },
       { title: "Email & WhatsApp", desc: "Kirim broadcast & follow-up langsung dari CRM." },
@@ -221,10 +288,14 @@ export const moduleDetails: Record<string, ModuleDetail> = {
       ],
     },
     testimonials: [
-      { name: "Reza Pratama", role: "Sales Director", company: "PT Solusi B2B", rating: 5,
-        quote: "Conversion rate naik 40% sejak pakai pipeline visual ini." },
-      { name: "Indah Sari", role: "Account Manager", company: "Digital Agency", rating: 5,
-        quote: "Follow-up otomatis menghemat 2 jam per hari per sales." },
+      {
+        name: "Reza Pratama", role: "Sales Director", company: "PT Solusi B2B", rating: 5,
+        quote: "Conversion rate naik 40% sejak pakai pipeline visual ini."
+      },
+      {
+        name: "Indah Sari", role: "Account Manager", company: "Digital Agency", rating: 5,
+        quote: "Follow-up otomatis menghemat 2 jam per hari per sales."
+      },
     ],
     faq: [
       { q: "Bisa kirim WhatsApp blast?", a: "Ya, terintegrasi dengan WhatsApp Business API." },
@@ -235,6 +306,11 @@ export const moduleDetails: Record<string, ModuleDetail> = {
     tagline: "Kehadiran karyawan akurat, dari mana saja",
     longDescription:
       "Absensi via face recognition, GPS, atau QR code. Cocok untuk WFO, WFH, dan tim lapangan.",
+    keyBenefits: [
+      "Absensi akurat anti-titip absen dengan Face Recognition AI",
+      "Validasi lokasi kerja karyawan dengan GPS Geofencing",
+      "Perhitungan jam kerja, shift, & lembur otomatis"
+    ],
     features: [
       { title: "Face Recognition", desc: "Selfie + AI untuk verifikasi identitas anti-titip absen." },
       { title: "GPS & Geofence", desc: "Validasi lokasi sesuai area kerja yang ditentukan." },
@@ -256,10 +332,14 @@ export const moduleDetails: Record<string, ModuleDetail> = {
       ],
     },
     testimonials: [
-      { name: "Pak Hasan", role: "HRD", company: "PT Konstruksi Maju", rating: 5,
-        quote: "Tim lapangan di 5 site bisa absen tanpa ribet, datanya langsung ke HQ." },
-      { name: "Bu Yanti", role: "Manager Operasional", company: "Cafe Chain", rating: 5,
-        quote: "Tidak ada lagi titip absen. Face recognition akurat banget." },
+      {
+        name: "Pak Hasan", role: "HRD", company: "PT Konstruksi Maju", rating: 5,
+        quote: "Tim lapangan di 5 site bisa absen tanpa ribet, datanya langsung ke HQ."
+      },
+      {
+        name: "Bu Yanti", role: "Manager Operasional", company: "Cafe Chain", rating: 5,
+        quote: "Tidak ada lagi titip absen. Face recognition akurat banget."
+      },
     ],
     faq: [
       { q: "Apakah bisa offline?", a: "Ya, data tersimpan lokal & sync saat online." },
@@ -270,6 +350,11 @@ export const moduleDetails: Record<string, ModuleDetail> = {
     tagline: "Tagih pelanggan otomatis, terima bayaran cepat",
     longDescription:
       "Buat invoice profesional dalam hitungan detik, kirim via email/WhatsApp, dan terima pembayaran via transfer/QRIS/VA.",
+    keyBenefits: [
+      "Buat & kirim invoice profesional via WhatsApp/Email 1 klik",
+      "Terima pembayaran instan via QRIS, Virtual Account, & Bank",
+      "Reminder penagihan otomatis untuk piutang tepat waktu"
+    ],
     features: [
       { title: "Template Cantik", desc: "Invoice profesional dengan logo & branding Anda." },
       { title: "Recurring Invoice", desc: "Tagihan berlangganan otomatis tiap periode." },
@@ -291,10 +376,14 @@ export const moduleDetails: Record<string, ModuleDetail> = {
       ],
     },
     testimonials: [
-      { name: "Pak Anton", role: "Owner", company: "Konsultan IT", rating: 5,
-        quote: "Cashflow lebih lancar karena reminder otomatis. Klien bayar lebih cepat." },
-      { name: "Mbak Lia", role: "Admin", company: "PT Distribusi", rating: 5,
-        quote: "Buat invoice 50 klien sekarang cuma 10 menit." },
+      {
+        name: "Pak Anton", role: "Owner", company: "Konsultan IT", rating: 5,
+        quote: "Cashflow lebih lancar karena reminder otomatis. Klien bayar lebih cepat."
+      },
+      {
+        name: "Mbak Lia", role: "Admin", company: "PT Distribusi", rating: 5,
+        quote: "Buat invoice 50 klien sekarang cuma 10 menit."
+      },
     ],
     faq: [
       { q: "Bisa kirim invoice via WhatsApp?", a: "Ya, satu klik untuk kirim PDF + payment link via WA." },
@@ -305,6 +394,11 @@ export const moduleDetails: Record<string, ModuleDetail> = {
     tagline: "Kasir modern untuk toko & resto Anda",
     longDescription:
       "POS yang ringan, cepat, dan terintegrasi dengan inventory & finance. Cocok untuk retail, F&B, dan jasa.",
+    keyBenefits: [
+      "Transaksi kasir kilat dengan scan barcode & multi-pembayaran",
+      "Stok otomatis terpotong & jurnal keuangan langsung tercatat",
+      "Struk cetak thermal / struk digital via Email & WhatsApp"
+    ],
     features: [
       { title: "Transaksi Cepat", desc: "Scan barcode, hitung total, terima bayar dalam detik." },
       { title: "Multi Pembayaran", desc: "Cash, debit, kredit, QRIS, e-wallet—semua didukung." },
@@ -326,10 +420,14 @@ export const moduleDetails: Record<string, ModuleDetail> = {
       ],
     },
     testimonials: [
-      { name: "Pak Bambang", role: "Owner", company: "Warung Bakso Mantap", rating: 5,
-        quote: "Antrian lebih cepat, pelanggan happy. Omzet naik 20%." },
-      { name: "Ko Andi", role: "Manager", company: "Toko Elektronik", rating: 5,
-        quote: "Stok update otomatis tiap transaksi. Tidak ada lagi selisih." },
+      {
+        name: "Pak Bambang", role: "Owner", company: "Warung Bakso Mantap", rating: 5,
+        quote: "Antrian lebih cepat, pelanggan happy. Omzet naik 20%."
+      },
+      {
+        name: "Ko Andi", role: "Manager", company: "Toko Elektronik", rating: 5,
+        quote: "Stok update otomatis tiap transaksi. Tidak ada lagi selisih."
+      },
     ],
     faq: [
       { q: "Butuh hardware khusus?", a: "Cukup tablet/laptop. Printer & scanner opsional." },
@@ -340,6 +438,11 @@ export const moduleDetails: Record<string, ModuleDetail> = {
     tagline: "Insight bisnis dari data, bukan dari tebakan",
     longDescription:
       "Dashboard interaktif yang menggabungkan data dari semua modul. Buat keputusan berbasis data dengan cepat.",
+    keyBenefits: [
+      "Dashboard bisnis terpadu dari seluruh operasi modul",
+      "Analisis tren penjualan, profitabilitas, & performa tim",
+      "Export laporan cepat ke PDF/Excel siap presentasi"
+    ],
     features: [
       { title: "Custom Dashboard", desc: "Drag & drop widget, susun sesuai kebutuhan tim." },
       { title: "Real-time KPI", desc: "Metrik penting selalu update tanpa refresh." },
@@ -361,10 +464,14 @@ export const moduleDetails: Record<string, ModuleDetail> = {
       ],
     },
     testimonials: [
-      { name: "Pak Wira", role: "CEO", company: "Startup Retail", rating: 5,
-        quote: "Akhirnya satu dashboard untuk semua. Meeting eksekutif jadi efisien." },
-      { name: "Bu Tina", role: "Marketing Lead", company: "Brand Lokal", rating: 5,
-        quote: "Forecast akurat membantu kami plan inventory & campaign." },
+      {
+        name: "Pak Wira", role: "CEO", company: "Startup Retail", rating: 5,
+        quote: "Akhirnya satu dashboard untuk semua. Meeting eksekutif jadi efisien."
+      },
+      {
+        name: "Bu Tina", role: "Marketing Lead", company: "Brand Lokal", rating: 5,
+        quote: "Forecast akurat membantu kami plan inventory & campaign."
+      },
     ],
     faq: [
       { q: "Bisa connect data dari sistem lain?", a: "Ya, via API atau import CSV/Excel." },

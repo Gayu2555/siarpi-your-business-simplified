@@ -23,10 +23,10 @@ import {
 
 const navLinks = [
   { to: "/", label: "Beranda" },
+  { to: "/studi-kasus", label: "Studi Kasus" },
   { to: "/modular", label: "Beli Ketengan" },
   { to: "/komparasi", label: "Komparasi" },
   { to: "/roadmap", label: "Roadmap" },
-  { to: "/register", label: "Mulai" },
 ] as const;
 
 export function Header() {
