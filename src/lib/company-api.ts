@@ -64,7 +64,7 @@ export interface CompanyResponse {
 
 /** POST /companies — buat company baru, otomatis mengaitkan user_id sebagai pemilik. */
 export async function createCompany(
-  payload: CreateCompanyRequest
+  payload: CreateCompanyRequest,
 ): Promise<{ ok: boolean; data: CompanyResponse | null }> {
   const { ok, data } = await apiFetch<CompanyResponse>("/companies", {
     method: "POST",
@@ -104,10 +104,11 @@ export function getOnboardingMeta(): OnboardingMeta | null {
 
 /** Generate company code dari nama perusahaan, contoh: "PT Maju Sejahtera" -> "PTMAJUSEJ" + suffix acak. */
 export function generateCompanyCode(name: string): string {
-  const base = name
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, "")
-    .slice(0, 8) || "COMPANY";
+  const base =
+    name
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, "")
+      .slice(0, 8) || "COMPANY";
   const suffix = Math.random().toString(36).slice(2, 6).toUpperCase();
   return `${base}${suffix}`;
 }
@@ -122,7 +123,10 @@ export interface OnboardingStatus {
 }
 
 /** GET /onboarding-status — cek status onboarding user saat ini */
-export async function getOnboardingStatus(): Promise<{ ok: boolean; data: OnboardingStatus | null }> {
+export async function getOnboardingStatus(): Promise<{
+  ok: boolean;
+  data: OnboardingStatus | null;
+}> {
   const { ok, data } = await apiFetch<OnboardingStatus>("/onboarding-status");
   return { ok: ok && !!data?.success, data };
 }

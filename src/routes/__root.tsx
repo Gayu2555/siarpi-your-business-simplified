@@ -49,7 +49,10 @@ export const Route = createRootRoute({
       },
       { name: "msvalidate.01", content: "16C5717F3121D840BD0162D3962EBD7F" },
       { name: "author", content: "Siarpi" },
-      { property: "og:title", content: "Siarpi | All in One Management System & Business Operating System" },
+      {
+        property: "og:title",
+        content: "Siarpi | All in One Management System & Business Operating System",
+      },
       {
         property: "og:description",
         content:

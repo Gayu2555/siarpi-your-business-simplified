@@ -18,21 +18,27 @@ interface ComparisonBeforeAfterSectionProps {
 const defaultComparisons: ComparisonItem[] = [
   {
     beforeTitle: "Lembur Buka Nota & Cari Selisih di Excel",
-    beforeDesc: "Staf harus mengumpulkan tumpukan kwitansi fisik di akhir bulan dan menginput ulang satu per satu. Saat angka tidak cocok, harus melacak selisih jam-jaman sampai malam.",
+    beforeDesc:
+      "Staf harus mengumpulkan tumpukan kwitansi fisik di akhir bulan dan menginput ulang satu per satu. Saat angka tidak cocok, harus melacak selisih jam-jaman sampai malam.",
     afterTitle: "Pembukuan Rapi & Otomatis Tanpa Pusing",
-    afterDesc: "Semua transaksi kas, invoice, dan pembayaran langsung tercatat otomatis. Laporan keuangan seimbang secara real-time tanpa perlu entri ulang.",
+    afterDesc:
+      "Semua transaksi kas, invoice, dan pembayaran langsung tercatat otomatis. Laporan keuangan seimbang secara real-time tanpa perlu entri ulang.",
   },
   {
     beforeTitle: "Tagihan Klien Tercecer & Uang Terhambat",
-    beforeDesc: "Lupa menagih faktur yang sudah lewat jatuh tempo karena tidak ada pengingat. Uang usaha tertahan lama di pelanggan, bikin arus kas operasional tersendat.",
+    beforeDesc:
+      "Lupa menagih faktur yang sudah lewat jatuh tempo karena tidak ada pengingat. Uang usaha tertahan lama di pelanggan, bikin arus kas operasional tersendat.",
     afterTitle: "Tagihan Terbayar Tepat Waktu, Kas Aman",
-    afterDesc: "Pengingat tagihan terkirim otomatis sebelum jatuh tempo. Pelanggan bayar lebih cepat, arus kas perusahaan tetap sehat dan lancar.",
+    afterDesc:
+      "Pengingat tagihan terkirim otomatis sebelum jatuh tempo. Pelanggan bayar lebih cepat, arus kas perusahaan tetap sehat dan lancar.",
   },
   {
     beforeTitle: "Rekonsiliasi Bank Penuh Tebakan",
-    beforeDesc: "Bingung mencocokkan mutasi rekening bank dengan pencatatan internal kasir. Selisih angka sering baru ketahuan saat audit atau akhir tahun.",
+    beforeDesc:
+      "Bingung mencocokkan mutasi rekening bank dengan pencatatan internal kasir. Selisih angka sering baru ketahuan saat audit atau akhir tahun.",
     afterTitle: "Kas & Rekening Bank Terbaca Transparan",
-    afterDesc: "Pencatatan kas dan mutasi bank terhubung secara langsung. Setiap rupiah uang masuk dan keluar terlihat jelas sumber dan tujuannya.",
+    afterDesc:
+      "Pencatatan kas dan mutasi bank terhubung secara langsung. Setiap rupiah uang masuk dan keluar terlihat jelas sumber dan tujuannya.",
   },
 ];
 
@@ -45,7 +51,6 @@ export function ComparisonBeforeAfterSection({
   return (
     <section className="bg-gradient-to-b from-background via-muted/20 to-background py-16 md:py-24 border-b border-border/80">
       <div className="container mx-auto px-4 md:px-6">
-        
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -54,7 +59,10 @@ export function ComparisonBeforeAfterSection({
           transition={{ duration: 0.5 }}
           className="mx-auto max-w-3xl text-center mb-12 space-y-3"
         >
-          <Badge variant="outline" className="rounded-full border-primary/30 text-primary font-semibold bg-primary/5 px-3.5 py-1">
+          <Badge
+            variant="outline"
+            className="rounded-full border-primary/30 text-primary font-semibold bg-primary/5 px-3.5 py-1"
+          >
             Studi Kasus Nyata
           </Badge>
 
@@ -63,7 +71,8 @@ export function ComparisonBeforeAfterSection({
           </h2>
 
           <p className="text-base text-muted-foreground leading-relaxed">
-            Lihat bagaimana Siarpi membantu pemilik usaha menghemat waktu, mencegah kebocoran uang, dan membuat kerja tim jauh lebih tenang.
+            Lihat bagaimana Siarpi membantu pemilik usaha menghemat waktu, mencegah kebocoran uang,
+            dan membuat kerja tim jauh lebih tenang.
           </p>
         </motion.div>
 
@@ -79,7 +88,6 @@ export function ComparisonBeforeAfterSection({
             >
               <Card className="overflow-hidden rounded-3xl border border-border/80 bg-card shadow-soft p-6 md:p-8">
                 <div className="grid gap-6 md:grid-cols-12 md:items-center">
-                  
                   {/* Left Column: Tanpa Siarpi (Cara Manual) */}
                   <div className="md:col-span-5 space-y-3 rounded-2xl border border-rose-200/60 bg-rose-50/40 p-5 dark:border-rose-950/40 dark:bg-rose-950/20">
                     <div className="flex items-center justify-between">
@@ -116,13 +124,11 @@ export function ComparisonBeforeAfterSection({
                       {item.afterDesc}
                     </p>
                   </div>
-
                 </div>
               </Card>
             </motion.div>
           ))}
         </div>
-
       </div>
     </section>
   );

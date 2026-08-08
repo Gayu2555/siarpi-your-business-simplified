@@ -13,16 +13,20 @@ import { Route as StudiKasusRouteImport } from './routes/studi-kasus'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as PayrollRouteImport } from './routes/payroll'
 import { Route as PaymentRouteImport } from './routes/payment'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as ModularRouteImport } from './routes/modular'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as KomparasiRouteImport } from './routes/komparasi'
+import { Route as HrRouteImport } from './routes/hr'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PayrollSubSubIdRouteImport } from './routes/payroll-sub.$subId'
 import { Route as ModulesModuleIdRouteImport } from './routes/modules.$moduleId'
+import { Route as HrSubSubIdRouteImport } from './routes/hr-sub.$subId'
 import { Route as FinanceSubSubIdRouteImport } from './routes/finance-sub.$subId'
 import { Route as ArtikelSlugRouteImport } from './routes/artikel.$slug'
 
@@ -44,6 +48,11 @@ const RoadmapRoute = RoadmapRouteImport.update({
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayrollRoute = PayrollRouteImport.update({
+  id: '/payroll',
+  path: '/payroll',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PaymentRoute = PaymentRouteImport.update({
@@ -71,6 +80,11 @@ const KomparasiRoute = KomparasiRouteImport.update({
   path: '/komparasi',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HrRoute = HrRouteImport.update({
+  id: '/hr',
+  path: '/hr',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
@@ -91,9 +105,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PayrollSubSubIdRoute = PayrollSubSubIdRouteImport.update({
+  id: '/payroll-sub/$subId',
+  path: '/payroll-sub/$subId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ModulesModuleIdRoute = ModulesModuleIdRouteImport.update({
   id: '/modules/$moduleId',
   path: '/modules/$moduleId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HrSubSubIdRoute = HrSubSubIdRouteImport.update({
+  id: '/hr-sub/$subId',
+  path: '/hr-sub/$subId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FinanceSubSubIdRoute = FinanceSubSubIdRouteImport.update({
@@ -112,36 +136,44 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/hr': typeof HrRoute
   '/komparasi': typeof KomparasiRoute
   '/login': typeof LoginRoute
   '/modular': typeof ModularRoute
   '/onboarding': typeof OnboardingRoute
   '/payment': typeof PaymentRoute
+  '/payroll': typeof PayrollRoute
   '/register': typeof RegisterRoute
   '/roadmap': typeof RoadmapRoute
   '/settings': typeof SettingsRoute
   '/studi-kasus': typeof StudiKasusRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/finance-sub/$subId': typeof FinanceSubSubIdRoute
+  '/hr-sub/$subId': typeof HrSubSubIdRoute
   '/modules/$moduleId': typeof ModulesModuleIdRoute
+  '/payroll-sub/$subId': typeof PayrollSubSubIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/checkout': typeof CheckoutRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/hr': typeof HrRoute
   '/komparasi': typeof KomparasiRoute
   '/login': typeof LoginRoute
   '/modular': typeof ModularRoute
   '/onboarding': typeof OnboardingRoute
   '/payment': typeof PaymentRoute
+  '/payroll': typeof PayrollRoute
   '/register': typeof RegisterRoute
   '/roadmap': typeof RoadmapRoute
   '/settings': typeof SettingsRoute
   '/studi-kasus': typeof StudiKasusRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/finance-sub/$subId': typeof FinanceSubSubIdRoute
+  '/hr-sub/$subId': typeof HrSubSubIdRoute
   '/modules/$moduleId': typeof ModulesModuleIdRoute
+  '/payroll-sub/$subId': typeof PayrollSubSubIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -149,18 +181,22 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/hr': typeof HrRoute
   '/komparasi': typeof KomparasiRoute
   '/login': typeof LoginRoute
   '/modular': typeof ModularRoute
   '/onboarding': typeof OnboardingRoute
   '/payment': typeof PaymentRoute
+  '/payroll': typeof PayrollRoute
   '/register': typeof RegisterRoute
   '/roadmap': typeof RoadmapRoute
   '/settings': typeof SettingsRoute
   '/studi-kasus': typeof StudiKasusRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/finance-sub/$subId': typeof FinanceSubSubIdRoute
+  '/hr-sub/$subId': typeof HrSubSubIdRoute
   '/modules/$moduleId': typeof ModulesModuleIdRoute
+  '/payroll-sub/$subId': typeof PayrollSubSubIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -169,54 +205,66 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/dashboard'
     | '/forgot-password'
+    | '/hr'
     | '/komparasi'
     | '/login'
     | '/modular'
     | '/onboarding'
     | '/payment'
+    | '/payroll'
     | '/register'
     | '/roadmap'
     | '/settings'
     | '/studi-kasus'
     | '/artikel/$slug'
     | '/finance-sub/$subId'
+    | '/hr-sub/$subId'
     | '/modules/$moduleId'
+    | '/payroll-sub/$subId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/checkout'
     | '/dashboard'
     | '/forgot-password'
+    | '/hr'
     | '/komparasi'
     | '/login'
     | '/modular'
     | '/onboarding'
     | '/payment'
+    | '/payroll'
     | '/register'
     | '/roadmap'
     | '/settings'
     | '/studi-kasus'
     | '/artikel/$slug'
     | '/finance-sub/$subId'
+    | '/hr-sub/$subId'
     | '/modules/$moduleId'
+    | '/payroll-sub/$subId'
   id:
     | '__root__'
     | '/'
     | '/checkout'
     | '/dashboard'
     | '/forgot-password'
+    | '/hr'
     | '/komparasi'
     | '/login'
     | '/modular'
     | '/onboarding'
     | '/payment'
+    | '/payroll'
     | '/register'
     | '/roadmap'
     | '/settings'
     | '/studi-kasus'
     | '/artikel/$slug'
     | '/finance-sub/$subId'
+    | '/hr-sub/$subId'
     | '/modules/$moduleId'
+    | '/payroll-sub/$subId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -224,18 +272,22 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   DashboardRoute: typeof DashboardRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  HrRoute: typeof HrRoute
   KomparasiRoute: typeof KomparasiRoute
   LoginRoute: typeof LoginRoute
   ModularRoute: typeof ModularRoute
   OnboardingRoute: typeof OnboardingRoute
   PaymentRoute: typeof PaymentRoute
+  PayrollRoute: typeof PayrollRoute
   RegisterRoute: typeof RegisterRoute
   RoadmapRoute: typeof RoadmapRoute
   SettingsRoute: typeof SettingsRoute
   StudiKasusRoute: typeof StudiKasusRoute
   ArtikelSlugRoute: typeof ArtikelSlugRoute
   FinanceSubSubIdRoute: typeof FinanceSubSubIdRoute
+  HrSubSubIdRoute: typeof HrSubSubIdRoute
   ModulesModuleIdRoute: typeof ModulesModuleIdRoute
+  PayrollSubSubIdRoute: typeof PayrollSubSubIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -266,6 +318,13 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payroll': {
+      id: '/payroll'
+      path: '/payroll'
+      fullPath: '/payroll'
+      preLoaderRoute: typeof PayrollRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/payment': {
@@ -303,6 +362,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KomparasiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hr': {
+      id: '/hr'
+      path: '/hr'
+      fullPath: '/hr'
+      preLoaderRoute: typeof HrRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/forgot-password': {
       id: '/forgot-password'
       path: '/forgot-password'
@@ -331,11 +397,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/payroll-sub/$subId': {
+      id: '/payroll-sub/$subId'
+      path: '/payroll-sub/$subId'
+      fullPath: '/payroll-sub/$subId'
+      preLoaderRoute: typeof PayrollSubSubIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/modules/$moduleId': {
       id: '/modules/$moduleId'
       path: '/modules/$moduleId'
       fullPath: '/modules/$moduleId'
       preLoaderRoute: typeof ModulesModuleIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hr-sub/$subId': {
+      id: '/hr-sub/$subId'
+      path: '/hr-sub/$subId'
+      fullPath: '/hr-sub/$subId'
+      preLoaderRoute: typeof HrSubSubIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/finance-sub/$subId': {
@@ -360,18 +440,22 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   DashboardRoute: DashboardRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  HrRoute: HrRoute,
   KomparasiRoute: KomparasiRoute,
   LoginRoute: LoginRoute,
   ModularRoute: ModularRoute,
   OnboardingRoute: OnboardingRoute,
   PaymentRoute: PaymentRoute,
+  PayrollRoute: PayrollRoute,
   RegisterRoute: RegisterRoute,
   RoadmapRoute: RoadmapRoute,
   SettingsRoute: SettingsRoute,
   StudiKasusRoute: StudiKasusRoute,
   ArtikelSlugRoute: ArtikelSlugRoute,
   FinanceSubSubIdRoute: FinanceSubSubIdRoute,
+  HrSubSubIdRoute: HrSubSubIdRoute,
   ModulesModuleIdRoute: ModulesModuleIdRoute,
+  PayrollSubSubIdRoute: PayrollSubSubIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

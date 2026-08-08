@@ -29,7 +29,7 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { articlesRegistry, type ArticleData } from "@/lib/articles";
-import { formatIDR } from "@/lib/modules";
+import { formatIDR } from "@/lib/utils";
 
 export const Route = createFileRoute("/artikel/$slug")({
   head: ({ params }) => {
@@ -43,7 +43,10 @@ export const Route = createFileRoute("/artikel/$slug")({
       meta: [
         { title: metaTitle },
         { name: "description", content: article.summary },
-        { name: "keywords", content: `${article.category}, panduan siarpi, pembukuan bisnis, erp indonesia` },
+        {
+          name: "keywords",
+          content: `${article.category}, panduan siarpi, pembukuan bisnis, erp indonesia`,
+        },
         { property: "og:title", content: metaTitle },
         { property: "og:description", content: article.summary },
         { property: "og:type", content: "article" },
@@ -61,7 +64,9 @@ export const Route = createFileRoute("/artikel/$slug")({
       <Header />
       <main className="container mx-auto flex flex-1 flex-col items-center justify-center px-4 py-20 text-center">
         <h1 className="font-display text-3xl font-bold">Artikel Tidak Ditemukan</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Artikel yang Anda cari tidak tersedia atau telah dipindahkan.</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Artikel yang Anda cari tidak tersedia atau telah dipindahkan.
+        </p>
         <Button asChild className="mt-6 bg-gradient-primary text-primary-foreground font-semibold">
           <Link to="/studi-kasus">Kembali ke Panduan Bisnis</Link>
         </Button>
@@ -81,7 +86,7 @@ function ArticleReaderPage() {
   // Scroll Progress Bar State
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState<string>(article.sections[0]?.id || "");
-  
+
   // Feedback & Interactions
   const [isHelpful, setIsHelpful] = useState<boolean | null>(null);
   const [helpfulCount, setHelpfulCount] = useState<number>(42);
@@ -143,12 +148,10 @@ function ArticleReaderPage() {
       <Header />
 
       <main className="flex-1">
-        
         {/* ARTICLE HEADER */}
         <section className="bg-gradient-to-b from-muted/30 via-background to-background py-10 md:py-16 border-b border-border/80">
           <div className="container mx-auto px-4 md:px-6">
             <div className="mx-auto max-w-4xl space-y-6">
-              
               {/* Back Link */}
               <Link
                 to="/studi-kasus"
@@ -159,7 +162,10 @@ function ArticleReaderPage() {
 
               <div className="space-y-3">
                 <div className="flex items-center gap-3 flex-wrap">
-                  <Badge variant="outline" className="rounded-full border-primary/30 text-primary font-semibold bg-primary/5 px-3 py-1 text-xs">
+                  <Badge
+                    variant="outline"
+                    className="rounded-full border-primary/30 text-primary font-semibold bg-primary/5 px-3 py-1 text-xs"
+                  >
                     {article.category}
                   </Badge>
                   <span className="text-xs text-muted-foreground flex items-center gap-1">
@@ -187,7 +193,9 @@ function ArticleReaderPage() {
                   </div>
                   <div>
                     <div className="font-bold text-foreground">{article.author}</div>
-                    <div className="text-muted-foreground text-[11px]">Ditinjau oleh Tim Akuntansi Siarpi</div>
+                    <div className="text-muted-foreground text-[11px]">
+                      Ditinjau oleh Tim Akuntansi Siarpi
+                    </div>
                   </div>
                 </div>
 
@@ -211,7 +219,6 @@ function ArticleReaderPage() {
                   </Button>
                 </div>
               </div>
-
             </div>
           </div>
         </section>
@@ -219,7 +226,6 @@ function ArticleReaderPage() {
         {/* MAIN BODY WITH STICKY TABLE OF CONTENTS SIDEBAR */}
         <section className="container mx-auto px-4 py-10 md:px-6 md:py-16">
           <div className="mx-auto max-w-5xl grid gap-10 lg:grid-cols-12">
-            
             {/* LEFT STICKY SIDEBAR: TABLE OF CONTENTS */}
             <aside className="hidden lg:block lg:col-span-4">
               <div className="sticky top-24 space-y-6 rounded-2xl border border-border/80 bg-card p-5 shadow-soft">
@@ -254,7 +260,11 @@ function ArticleReaderPage() {
                 <div className="pt-3 border-t border-border/60 text-[11px] text-muted-foreground space-y-2">
                   <div className="font-semibold text-foreground">Butuh Konsultasi Modul?</div>
                   <p>Tanyakan langsung ke spesialis Siarpi via WhatsApp (+62 813-8789-5911).</p>
-                  <Button size="sm" asChild className="w-full text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs gap-1.5">
+                  <Button
+                    size="sm"
+                    asChild
+                    className="w-full text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs gap-1.5"
+                  >
                     <a href={waUrl} target="_blank" rel="noopener noreferrer">
                       <MessageCircle className="h-3.5 w-3.5" /> Tanya Via WhatsApp
                     </a>
@@ -265,10 +275,11 @@ function ArticleReaderPage() {
 
             {/* RIGHT COLUMN: ARTICLE CONTENT */}
             <article className="lg:col-span-8 space-y-10 text-foreground leading-relaxed text-sm md:text-base">
-              
               {/* Summary Lead Box */}
               <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5 md:p-6 text-sm text-foreground/90 font-medium leading-relaxed">
-                <span className="font-bold text-primary block mb-1 uppercase text-xs tracking-wider">Ringkasan Eksekutif:</span>
+                <span className="font-bold text-primary block mb-1 uppercase text-xs tracking-wider">
+                  Ringkasan Eksekutif:
+                </span>
                 {article.summary}
               </div>
 
@@ -280,7 +291,10 @@ function ArticleReaderPage() {
                   </h2>
 
                   {sec.paragraphs.map((p, idx) => (
-                    <p key={idx} className="text-muted-foreground leading-relaxed text-sm md:text-base">
+                    <p
+                      key={idx}
+                      className="text-muted-foreground leading-relaxed text-sm md:text-base"
+                    >
                       {p}
                     </p>
                   ))}
@@ -316,7 +330,9 @@ function ArticleReaderPage() {
                     <div className="rounded-xl border border-border/80 bg-muted/40 p-4 text-xs md:text-sm font-semibold text-foreground flex items-start gap-2.5">
                       <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
                       <div>
-                        <span className="font-bold text-primary block text-[11px] uppercase tracking-wider mb-0.5">Poin Kunci:</span>
+                        <span className="font-bold text-primary block text-[11px] uppercase tracking-wider mb-0.5">
+                          Poin Kunci:
+                        </span>
                         {sec.keyTakeaway}
                       </div>
                     </div>
@@ -327,11 +343,13 @@ function ArticleReaderPage() {
               {/* IN-ARTICLE INTERACTIVE CALCULATOR WIDGET */}
               <div className="my-8 rounded-2xl border border-border/80 bg-card p-6 shadow-soft space-y-4">
                 <div className="flex items-center gap-2 font-display text-sm font-bold text-foreground">
-                  <Calculator className="h-4 w-4 text-primary" /> Simulasi Penghematan Jam Kerja Anda
+                  <Calculator className="h-4 w-4 text-primary" /> Simulasi Penghematan Jam Kerja
+                  Anda
                 </div>
 
                 <p className="text-xs text-muted-foreground">
-                  Berapa jam yang dihabiskan tim Anda setiap minggu untuk mencatat kwitansi atau memindahkan data manual?
+                  Berapa jam yang dihabiskan tim Anda setiap minggu untuk mencatat kwitansi atau
+                  memindahkan data manual?
                 </p>
 
                 <div className="space-y-3">
@@ -350,21 +368,32 @@ function ArticleReaderPage() {
                 </div>
 
                 <div className="rounded-xl bg-muted/40 p-4 text-xs flex items-center justify-between">
-                  <span className="text-muted-foreground font-medium">Estimasi Waktu Dihemat Dengan Siarpi:</span>
-                  <span className="font-display font-bold text-sm text-primary">~{Math.round(calcHours * 0.75)} Jam / Minggu</span>
+                  <span className="text-muted-foreground font-medium">
+                    Estimasi Waktu Dihemat Dengan Siarpi:
+                  </span>
+                  <span className="font-display font-bold text-sm text-primary">
+                    ~{Math.round(calcHours * 0.75)} Jam / Minggu
+                  </span>
                 </div>
               </div>
 
               {/* FAQ SECTION */}
               {article.faq && article.faq.length > 0 && (
-                <section id="faq-section" className="space-y-4 pt-6 border-t border-border/60 scroll-mt-28">
+                <section
+                  id="faq-section"
+                  className="space-y-4 pt-6 border-t border-border/60 scroll-mt-28"
+                >
                   <h3 className="font-display text-xl font-bold text-foreground flex items-center gap-2">
                     <HelpCircle className="h-5 w-5 text-primary" /> Pertanyaan Sering Diajukan (FAQ)
                   </h3>
 
                   <Accordion type="single" collapsible className="w-full space-y-2">
                     {article.faq.map((item, i) => (
-                      <AccordionItem key={i} value={`faq-${i}`} className="rounded-xl border border-border/80 bg-card px-4 py-1">
+                      <AccordionItem
+                        key={i}
+                        value={`faq-${i}`}
+                        className="rounded-xl border border-border/80 bg-card px-4 py-1"
+                      >
                         <AccordionTrigger className="text-xs md:text-sm font-bold text-foreground hover:no-underline">
                           {item.q}
                         </AccordionTrigger>
@@ -406,9 +435,7 @@ function ArticleReaderPage() {
                   </p>
                 )}
               </div>
-
             </article>
-
           </div>
         </section>
 
@@ -423,19 +450,33 @@ function ArticleReaderPage() {
 
                 <div className="grid gap-6 md:grid-cols-2">
                   {otherArticles.map((rel) => (
-                    <Card key={rel.slug} className="rounded-2xl border border-border/80 bg-card p-6 shadow-soft hover:border-primary/40 transition-all flex flex-col justify-between">
+                    <Card
+                      key={rel.slug}
+                      className="rounded-2xl border border-border/80 bg-card p-6 shadow-soft hover:border-primary/40 transition-all flex flex-col justify-between"
+                    >
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-xs text-muted-foreground">
-                          <Badge variant="outline" className="text-[10px] font-semibold">{rel.category}</Badge>
+                          <Badge variant="outline" className="text-[10px] font-semibold">
+                            {rel.category}
+                          </Badge>
                           <span>{rel.readTime}</span>
                         </div>
-                        <h4 className="font-display font-bold text-base text-foreground leading-snug">{rel.title}</h4>
-                        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">{rel.summary}</p>
+                        <h4 className="font-display font-bold text-base text-foreground leading-snug">
+                          {rel.title}
+                        </h4>
+                        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                          {rel.summary}
+                        </p>
                       </div>
 
                       <div className="pt-4 border-t border-border/60 flex items-center justify-between">
                         <span className="text-xs text-muted-foreground">{rel.publishedDate}</span>
-                        <Button size="sm" variant="ghost" asChild className="text-xs font-semibold text-primary p-0 h-auto">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          asChild
+                          className="text-xs font-semibold text-primary p-0 h-auto"
+                        >
                           <Link to="/artikel/$slug" params={{ slug: rel.slug }}>
                             Baca Selengkapnya <ChevronRight className="h-3.5 w-3.5" />
                           </Link>
@@ -457,12 +498,19 @@ function ArticleReaderPage() {
                 Diskusi Penerapan Siarpi untuk Bisnis Anda
               </h2>
               <p className="text-sm md:text-base opacity-90 leading-relaxed">
-                Tim spesialis kami siap menjawab pertanyaan dan mendiskusikan alur kerja spesifik bisnis Anda via WhatsApp.
+                Tim spesialis kami siap menjawab pertanyaan dan mendiskusikan alur kerja spesifik
+                bisnis Anda via WhatsApp.
               </p>
               <div className="pt-2 flex justify-center gap-3">
-                <Button size="lg" variant="secondary" asChild className="font-bold shadow-md bg-white text-slate-900 hover:bg-slate-100 gap-2">
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  asChild
+                  className="font-bold shadow-md bg-white text-slate-900 hover:bg-slate-100 gap-2"
+                >
                   <a href={waUrl} target="_blank" rel="noopener noreferrer">
-                    <MessageCircle className="h-4 w-4 text-emerald-600" /> Konsultasi WhatsApp (+62 813-8789-5911)
+                    <MessageCircle className="h-4 w-4 text-emerald-600" /> Konsultasi WhatsApp (+62
+                    813-8789-5911)
                   </a>
                 </Button>
               </div>

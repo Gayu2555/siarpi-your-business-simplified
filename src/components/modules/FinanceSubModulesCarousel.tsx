@@ -28,7 +28,6 @@ export function FinanceSubModulesCarousel() {
   return (
     <section className="relative bg-gradient-to-b from-background via-muted/30 to-background py-20 md:py-32 border-y border-border overflow-hidden">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 relative">
-        
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -44,15 +43,23 @@ export function FinanceSubModulesCarousel() {
             Ekosistem Akuntansi Terpadu
           </Badge>
           <h2 className="font-display text-3xl font-bold md:text-5xl lg:text-6xl tracking-tight">
-            10 Sub-Modul Mandiri dalam <span className="text-gradient-primary">Satu Platform Finance</span>
+            10 Sub-Modul Mandiri dalam{" "}
+            <span className="text-gradient-primary">Satu Platform Finance</span>
           </h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground leading-relaxed">
-            Setiap sub-modul dirancang khusus untuk menangani spesialisasi keuangan perusahaan Anda secara otomatis, efisien, dan tanpa ribet.
+            Setiap sub-modul dirancang khusus untuk menangani spesialisasi keuangan perusahaan Anda
+            secara otomatis, efisien, dan tanpa ribet.
           </p>
 
           {/* Category Tabs Filter */}
           <div className="mt-8 flex items-center justify-center gap-2 flex-wrap">
-            {["Semua", "Akuntansi Utama", "Operasional Transaksi", "Pajak & Valuta", "Laporan & Planning"].map((cat) => (
+            {[
+              "Semua",
+              "Akuntansi Utama",
+              "Operasional Transaksi",
+              "Pajak & Valuta",
+              "Laporan & Planning",
+            ].map((cat) => (
               <button
                 key={cat}
                 onClick={() => {
@@ -74,7 +81,9 @@ export function FinanceSubModulesCarousel() {
         {/* Carousel Navigation Bar */}
         <div className="mt-12 flex items-center justify-between px-2">
           <div className="text-xs font-semibold text-muted-foreground">
-            Menampilkan <span className="text-foreground font-bold">{filteredSubModules.length}</span> Sub-Modul {activeCategory !== "Semua" ? `kategori "${activeCategory}"` : ""}
+            Menampilkan{" "}
+            <span className="text-foreground font-bold">{filteredSubModules.length}</span> Sub-Modul{" "}
+            {activeCategory !== "Semua" ? `kategori "${activeCategory}"` : ""}
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -111,59 +120,62 @@ export function FinanceSubModulesCarousel() {
                 transition={{ duration: 0.4, delay: i * 0.05 }}
                 className="snap-start shrink-0 w-[88vw] sm:w-[420px] lg:w-[460px]"
               >
-                    <Link to="/finance-sub/$subId" params={{ subId: sub.id }} className="group">
-                      <Card className="relative flex h-full flex-col justify-between rounded-3xl border border-border/80 bg-card/95 p-8 md:p-9 shadow-soft backdrop-blur-md transition-all duration-300 hover:border-primary/50 hover:shadow-2xl hover:-translate-y-1.5">
-                        <div>
-                          {/* Top Header Badge & Large Icon */}
-                          <div className="flex items-center justify-between mb-6">
-                            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-primary text-primary-foreground shadow-md transition-transform duration-300 group-hover:scale-110">
-                              <SubIcon className="h-7 w-7" />
+                <Link to="/finance-sub/$subId" params={{ subId: sub.id }} className="group">
+                  <Card className="relative flex h-full flex-col justify-between rounded-3xl border border-border/80 bg-card/95 p-8 md:p-9 shadow-soft backdrop-blur-md transition-all duration-300 hover:border-primary/50 hover:shadow-2xl hover:-translate-y-1.5">
+                    <div>
+                      {/* Top Header Badge & Large Icon */}
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-primary text-primary-foreground shadow-md transition-transform duration-300 group-hover:scale-110">
+                          <SubIcon className="h-7 w-7" />
+                        </div>
+                        <Badge
+                          variant="secondary"
+                          className="px-3 py-1 text-xs uppercase font-bold tracking-wider rounded-lg bg-primary/10 text-primary"
+                        >
+                          {sub.category}
+                        </Badge>
+                      </div>
+
+                      {/* Sub Module Title & Sales Description */}
+                      <h3 className="font-display text-2xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
+                        {sub.name}
+                      </h3>
+                      <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+                        {sub.description}
+                      </p>
+
+                      {/* Sub Features Checklist */}
+                      <div className="mt-6 space-y-3 border-t border-border/60 pt-5">
+                        {sub.subFeatures.map((sf) => (
+                          <div
+                            key={sf}
+                            className="flex items-center gap-3 text-xs font-medium text-foreground/90"
+                          >
+                            <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-sky-100 text-sky-600 shadow-2xs">
+                              <Check className="h-3.5 w-3.5 stroke-[3]" />
                             </div>
-                            <Badge
-                              variant="secondary"
-                              className="px-3 py-1 text-xs uppercase font-bold tracking-wider rounded-lg bg-primary/10 text-primary"
-                            >
-                              {sub.category}
-                            </Badge>
+                            <span>{sf}</span>
                           </div>
+                        ))}
+                      </div>
+                    </div>
 
-                          {/* Sub Module Title & Sales Description */}
-                          <h3 className="font-display text-2xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
-                            {sub.name}
-                          </h3>
-                          <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-                            {sub.description}
-                          </p>
-
-                          {/* Sub Features Checklist */}
-                          <div className="mt-6 space-y-3 border-t border-border/60 pt-5">
-                            {sub.subFeatures.map((sf) => (
-                              <div key={sf} className="flex items-center gap-3 text-xs font-medium text-foreground/90">
-                                <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-sky-100 text-sky-600 shadow-2xs">
-                                  <Check className="h-3.5 w-3.5 stroke-[3]" />
-                                </div>
-                                <span>{sf}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Bottom Corporate Status */}
-                        <div className="mt-8 border-t border-border/40 pt-4 flex items-center justify-between">
-                          <span className="text-xs font-bold text-primary flex items-center gap-1.5 opacity-90 group-hover:opacity-100 transition-opacity">
-                            Terintegrasi Penuh <Check className="h-3.5 w-3.5" />
-                          </span>
-                          <span className="text-xs font-semibold text-muted-foreground group-hover:text-foreground flex items-center gap-1 transition-colors">
-                            Selengkapnya <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
-                          </span>
-                        </div>
-                      </Card>
-                    </Link>
+                    {/* Bottom Corporate Status */}
+                    <div className="mt-8 border-t border-border/40 pt-4 flex items-center justify-between">
+                      <span className="text-xs font-bold text-primary flex items-center gap-1.5 opacity-90 group-hover:opacity-100 transition-opacity">
+                        Terintegrasi Penuh <Check className="h-3.5 w-3.5" />
+                      </span>
+                      <span className="text-xs font-semibold text-muted-foreground group-hover:text-foreground flex items-center gap-1 transition-colors">
+                        Selengkapnya{" "}
+                        <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
+                      </span>
+                    </div>
+                  </Card>
+                </Link>
               </motion.div>
             );
           })}
         </div>
-
       </div>
     </section>
   );

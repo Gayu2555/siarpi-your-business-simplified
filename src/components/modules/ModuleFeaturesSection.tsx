@@ -19,14 +19,16 @@ export function ModuleFeaturesSection({ moduleName, features }: ModuleFeaturesSe
         transition={{ duration: 0.5 }}
         className="mx-auto max-w-2xl text-center"
       >
-        <Badge variant="outline" className="mb-4 rounded-full">Fitur Utama</Badge>
+        <Badge variant="outline" className="mb-4 rounded-full">
+          Fitur Utama
+        </Badge>
         <h2 className="font-display text-3xl font-bold md:text-5xl">
           Semua yang Anda butuhkan dari <span className="text-gradient-primary">{moduleName}</span>
         </h2>
       </motion.div>
 
       <div className="mt-12 grid gap-6 md:grid-cols-2">
-        {features.map((f: Feature, i: number) => (
+        {(features ?? []).map((f: Feature, i: number) => (
           <motion.div
             key={f.title}
             initial={{ opacity: 0, y: 20 }}

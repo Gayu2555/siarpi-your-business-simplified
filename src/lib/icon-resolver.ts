@@ -38,8 +38,7 @@ export function resolvePhosphorIcon(iconClass: string): {
     .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
     .join("");
 
-  const Icon =
-    (PhosphorIcons as Record<string, unknown>)[pascalName] as PhosphorIcon | undefined;
+  const Icon = (PhosphorIcons as Record<string, unknown>)[pascalName] as PhosphorIcon | undefined;
 
   return { Icon: Icon ?? PhosphorIcons.Package, weight };
 }

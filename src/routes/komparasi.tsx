@@ -6,13 +6,15 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { formatIDR } from "@/lib/modules";
+import { formatIDR } from "@/lib/utils";
 
 export const Route = createFileRoute("/komparasi")({
   head: () => {
     const title = "Komparasi | Siarpi vs Odoo, Zoho, SAP & NetSuite";
-    const description = "Bandingkan Siarpi dengan ERP global seperti Odoo, Zoho One, SAP Business One, dan NetSuite. Pelajari perbandingan harga, kepatuhan pajak Indonesia, dan kemudahan pemakaian.";
-    const keywords = "alternatif odoo indonesia, alternatif zoho indonesia, komparasi erp, erp lokal indonesia, perbandingan software akuntansi, siarpi vs odoo";
+    const description =
+      "Bandingkan Siarpi dengan ERP global seperti Odoo, Zoho One, SAP Business One, dan NetSuite. Pelajari perbandingan harga, kepatuhan pajak Indonesia, dan kemudahan pemakaian.";
+    const keywords =
+      "alternatif odoo indonesia, alternatif zoho indonesia, komparasi erp, erp lokal indonesia, perbandingan software akuntansi, siarpi vs odoo";
     const ogImage = "/dashboard-preview.jpg";
 
     return {
@@ -56,7 +58,9 @@ const OdooLogo = ({ className }: LogoProps) => (
       <circle cx="8" cy="12" r="6" fill="#714B67" />
       <circle cx="16" cy="12" r="6" fill="#8F8F8F" />
     </svg>
-    <span className="text-sm font-bold" style={{ color: "#714B67" }}>Odoo</span>
+    <span className="text-sm font-bold" style={{ color: "#714B67" }}>
+      Odoo
+    </span>
   </div>
 );
 
@@ -64,9 +68,21 @@ const ZohoLogo = ({ className }: LogoProps) => (
   <div className={`flex items-center gap-1.5 ${className ?? ""}`}>
     <svg viewBox="0 0 24 24" className="h-6 w-6">
       <rect width="24" height="24" rx="5" fill="#E42527" />
-      <text x="12" y="17" textAnchor="middle" fill="white" fontSize="13" fontWeight="900" fontFamily="Arial">Z</text>
+      <text
+        x="12"
+        y="17"
+        textAnchor="middle"
+        fill="white"
+        fontSize="13"
+        fontWeight="900"
+        fontFamily="Arial"
+      >
+        Z
+      </text>
     </svg>
-    <span className="text-sm font-bold" style={{ color: "#E42527" }}>Zoho One</span>
+    <span className="text-sm font-bold" style={{ color: "#E42527" }}>
+      Zoho One
+    </span>
   </div>
 );
 
@@ -74,7 +90,17 @@ const SapLogo = ({ className }: LogoProps) => (
   <div className={`flex items-center gap-1.5 ${className ?? ""}`}>
     <svg viewBox="0 0 60 24" className="h-6 w-14">
       <rect width="60" height="24" fill="#0FAAFF" />
-      <text x="30" y="17" textAnchor="middle" fill="white" fontSize="13" fontWeight="900" fontFamily="Arial">SAP</text>
+      <text
+        x="30"
+        y="17"
+        textAnchor="middle"
+        fill="white"
+        fontSize="13"
+        fontWeight="900"
+        fontFamily="Arial"
+      >
+        SAP
+      </text>
     </svg>
   </div>
 );
@@ -85,7 +111,9 @@ const NetsuiteLogo = ({ className }: LogoProps) => (
       <rect width="24" height="24" rx="4" fill="#1A1A1A" />
       <path d="M6 6h3l6 9V6h3v12h-3l-6-9v9H6z" fill="#FF6E00" />
     </svg>
-    <span className="text-sm font-bold" style={{ color: "#FF6E00" }}>NetSuite</span>
+    <span className="text-sm font-bold" style={{ color: "#FF6E00" }}>
+      NetSuite
+    </span>
   </div>
 );
 
@@ -117,12 +145,36 @@ type Competitor = {
 const siarpiMonthly = 690000;
 
 const competitors: Competitor[] = [
-  { key: "siarpi", Logo: SiarpiLogo, setup: "1 hari", monthly: formatIDR(siarpiMonthly), monthlyValue: siarpiMonthly },
+  {
+    key: "siarpi",
+    Logo: SiarpiLogo,
+    setup: "1 hari",
+    monthly: formatIDR(siarpiMonthly),
+    monthlyValue: siarpiMonthly,
+  },
   { key: "odoo", Logo: OdooLogo, setup: "2–4 minggu", monthly: "Rp 4–8 jt", monthlyValue: 6000000 },
-  { key: "zoho", Logo: ZohoLogo, setup: "1–2 minggu", monthly: "Rp 5–10 jt", monthlyValue: 7500000 },
+  {
+    key: "zoho",
+    Logo: ZohoLogo,
+    setup: "1–2 minggu",
+    monthly: "Rp 5–10 jt",
+    monthlyValue: 7500000,
+  },
   { key: "sap", Logo: SapLogo, setup: "2–4 bulan", monthly: "Rp 25–60 jt", monthlyValue: 40000000 },
-  { key: "netsuite", Logo: NetsuiteLogo, setup: "3–6 bulan", monthly: "Rp 35–80 jt", monthlyValue: 55000000 },
-  { key: "dynamics", Logo: DynamicsLogo, setup: "2–5 bulan", monthly: "Rp 20–50 jt", monthlyValue: 35000000 },
+  {
+    key: "netsuite",
+    Logo: NetsuiteLogo,
+    setup: "3–6 bulan",
+    monthly: "Rp 35–80 jt",
+    monthlyValue: 55000000,
+  },
+  {
+    key: "dynamics",
+    Logo: DynamicsLogo,
+    setup: "2–5 bulan",
+    monthly: "Rp 20–50 jt",
+    monthlyValue: 35000000,
+  },
 ];
 
 type FeatureRow = {
@@ -133,31 +185,80 @@ type FeatureRow = {
 const rows: FeatureRow[] = [
   {
     feature: "Bahasa Indonesia native",
-    values: { siarpi: true, odoo: "partial", zoho: "partial", sap: false, netsuite: false, dynamics: "partial" },
+    values: {
+      siarpi: true,
+      odoo: "partial",
+      zoho: "partial",
+      sap: false,
+      netsuite: false,
+      dynamics: "partial",
+    },
   },
   {
     feature: "Pajak PPh 21 & BPJS otomatis",
-    values: { siarpi: true, odoo: false, zoho: false, sap: "partial", netsuite: false, dynamics: false },
+    values: {
+      siarpi: true,
+      odoo: false,
+      zoho: false,
+      sap: "partial",
+      netsuite: false,
+      dynamics: false,
+    },
   },
   {
     feature: "QRIS & e-Faktur built-in",
-    values: { siarpi: true, odoo: false, zoho: false, sap: false, netsuite: false, dynamics: false },
+    values: {
+      siarpi: true,
+      odoo: false,
+      zoho: false,
+      sap: false,
+      netsuite: false,
+      dynamics: false,
+    },
   },
   {
     feature: "Beli per modul (ketengan)",
-    values: { siarpi: true, odoo: true, zoho: false, sap: false, netsuite: false, dynamics: "partial" },
+    values: {
+      siarpi: true,
+      odoo: true,
+      zoho: false,
+      sap: false,
+      netsuite: false,
+      dynamics: "partial",
+    },
   },
   {
     feature: "Tanpa konsultan / partner",
-    values: { siarpi: true, odoo: false, zoho: "partial", sap: false, netsuite: false, dynamics: false },
+    values: {
+      siarpi: true,
+      odoo: false,
+      zoho: "partial",
+      sap: false,
+      netsuite: false,
+      dynamics: false,
+    },
   },
   {
     feature: "Setup < 1 hari",
-    values: { siarpi: true, odoo: false, zoho: false, sap: false, netsuite: false, dynamics: false },
+    values: {
+      siarpi: true,
+      odoo: false,
+      zoho: false,
+      sap: false,
+      netsuite: false,
+      dynamics: false,
+    },
   },
   {
     feature: "Support tim lokal Indonesia",
-    values: { siarpi: true, odoo: "partial", zoho: "partial", sap: "partial", netsuite: false, dynamics: "partial" },
+    values: {
+      siarpi: true,
+      odoo: "partial",
+      zoho: "partial",
+      sap: "partial",
+      netsuite: false,
+      dynamics: "partial",
+    },
   },
   {
     feature: "Trial gratis tanpa kartu kredit",
@@ -165,11 +266,25 @@ const rows: FeatureRow[] = [
   },
   {
     feature: "UI modern & mobile-first",
-    values: { siarpi: true, odoo: "partial", zoho: true, sap: false, netsuite: false, dynamics: "partial" },
+    values: {
+      siarpi: true,
+      odoo: "partial",
+      zoho: true,
+      sap: false,
+      netsuite: false,
+      dynamics: "partial",
+    },
   },
   {
     feature: "Cocok untuk UKM Indonesia",
-    values: { siarpi: true, odoo: "partial", zoho: "partial", sap: false, netsuite: false, dynamics: false },
+    values: {
+      siarpi: true,
+      odoo: "partial",
+      zoho: "partial",
+      sap: false,
+      netsuite: false,
+      dynamics: false,
+    },
   },
 ];
 
@@ -199,7 +314,9 @@ function CellIcon({ value }: { value: Cell }) {
 }
 
 function KomparasiPage() {
-  const cheapestCompetitor = Math.min(...competitors.filter((c) => c.key !== "siarpi").map((c) => c.monthlyValue));
+  const cheapestCompetitor = Math.min(
+    ...competitors.filter((c) => c.key !== "siarpi").map((c) => c.monthlyValue),
+  );
   const savingsVsCheapest = cheapestCompetitor - siarpiMonthly;
   const savingsPercent = Math.round((savingsVsCheapest / cheapestCompetitor) * 100);
 
@@ -224,8 +341,8 @@ function KomparasiPage() {
               Siarpi vs <span className="text-gradient-primary">Odoo, Zoho, SAP & NetSuite</span>
             </h1>
             <p className="mt-6 text-lg text-muted-foreground lg:text-xl">
-              Perbandingan jujur antara Siarpi dengan ERP & business suite global yang
-              banyak dipakai perusahaan besar.
+              Perbandingan jujur antara Siarpi dengan ERP & business suite global yang banyak
+              dipakai perusahaan besar.
             </p>
           </motion.div>
 
@@ -251,9 +368,7 @@ function KomparasiPage() {
       <section className="py-20">
         <div className="container mx-auto px-4 md:px-6">
           <div className="mx-auto max-w-3xl text-center">
-            <h2 className="font-display text-3xl font-bold lg:text-4xl">
-              Estimasi Harga & Setup
-            </h2>
+            <h2 className="font-display text-3xl font-bold lg:text-4xl">Estimasi Harga & Setup</h2>
             <p className="mt-4 text-muted-foreground">
               Untuk perusahaan ~25 pengguna. Termasuk biaya lisensi & implementasi rata-rata.
             </p>
@@ -284,7 +399,9 @@ function KomparasiPage() {
                     )}
                     <c.Logo />
                     <div className="mt-6">
-                      <div className="text-xs uppercase tracking-wider text-muted-foreground">Estimasi/bulan</div>
+                      <div className="text-xs uppercase tracking-wider text-muted-foreground">
+                        Estimasi/bulan
+                      </div>
                       <div
                         className={`mt-1 font-display text-2xl font-bold ${
                           isSiarpi ? "text-primary" : "text-foreground"
@@ -295,7 +412,9 @@ function KomparasiPage() {
                     </div>
                     <div className="mt-4 flex items-center justify-between border-t border-border pt-4 text-sm">
                       <span className="text-muted-foreground">Setup time</span>
-                      <span className={`font-semibold ${isSiarpi ? "text-primary" : ""}`}>{c.setup}</span>
+                      <span className={`font-semibold ${isSiarpi ? "text-primary" : ""}`}>
+                        {c.setup}
+                      </span>
                     </div>
                   </Card>
                 </motion.div>
@@ -309,9 +428,7 @@ function KomparasiPage() {
       <section className="border-t border-border/50 bg-muted/20 py-20">
         <div className="container mx-auto px-4 md:px-6">
           <div className="mx-auto max-w-3xl text-center">
-            <h2 className="font-display text-3xl font-bold lg:text-4xl">
-              Perbandingan Fitur
-            </h2>
+            <h2 className="font-display text-3xl font-bold lg:text-4xl">Perbandingan Fitur</h2>
             <p className="mt-4 text-muted-foreground">
               Yang paling penting untuk bisnis Indonesia.
             </p>
@@ -383,9 +500,21 @@ function KomparasiPage() {
           </div>
           <div className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-3">
             {[
-              { icon: Zap, title: "Setup 1 Hari", desc: "Bukan 3 bulan dengan konsultan mahal seperti SAP/NetSuite." },
-              { icon: Shield, title: "Compliance Lokal", desc: "PPh 21, BPJS, e-Faktur, QRIS — bawaan, bukan add-on." },
-              { icon: Sparkles, title: "Bahasa & Support ID", desc: "Tim support orang Indonesia, paham bisnis lokal." },
+              {
+                icon: Zap,
+                title: "Setup 1 Hari",
+                desc: "Bukan 3 bulan dengan konsultan mahal seperti SAP/NetSuite.",
+              },
+              {
+                icon: Shield,
+                title: "Compliance Lokal",
+                desc: "PPh 21, BPJS, e-Faktur, QRIS — bawaan, bukan add-on.",
+              },
+              {
+                icon: Sparkles,
+                title: "Bahasa & Support ID",
+                desc: "Tim support orang Indonesia, paham bisnis lokal.",
+              },
             ].map((b) => (
               <Card key={b.title} className="p-6">
                 <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -409,7 +538,11 @@ function KomparasiPage() {
             Coba Siarpi 14 hari gratis. Tanpa konsultan, tanpa kontrak panjang, tanpa kartu kredit.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button size="lg" asChild className="bg-gradient-primary text-primary-foreground shadow-soft hover:shadow-glow">
+            <Button
+              size="lg"
+              asChild
+              className="bg-gradient-primary text-primary-foreground shadow-soft hover:shadow-glow"
+            >
               <Link to="/onboarding">
                 Mulai Gratis Sekarang <ArrowRight className="ml-1 h-4 w-4" />
               </Link>

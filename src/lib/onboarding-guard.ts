@@ -4,7 +4,7 @@ import { getOnboardingStatus } from "./company-api";
 
 export async function guardOnboardingRoute(
   currentPath: "/onboarding" | "/checkout" | "/payment" | "/dashboard",
-  searchId?: string
+  searchId?: string,
 ) {
   if (typeof window === "undefined") {
     return;

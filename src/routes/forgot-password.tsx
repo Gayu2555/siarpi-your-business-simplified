@@ -70,9 +70,13 @@ function ForgotPasswordPage() {
                   <h1 className="font-display text-2xl font-bold">Email Terkirim</h1>
                   <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
                     Kami telah mengirimkan instruksi pemulihan kata sandi ke email{" "}
-                    <span className="font-semibold text-foreground">{email}</span>. Silakan periksa kotak masuk atau spam Anda.
+                    <span className="font-semibold text-foreground">{email}</span>. Silakan periksa
+                    kotak masuk atau spam Anda.
                   </p>
-                  <Button asChild className="mt-8 w-full bg-gradient-primary text-primary-foreground">
+                  <Button
+                    asChild
+                    className="mt-8 w-full bg-gradient-primary text-primary-foreground"
+                  >
                     <Link to="/login">Masuk Kembali</Link>
                   </Button>
                 </div>
@@ -81,7 +85,8 @@ function ForgotPasswordPage() {
                   <div className="text-center">
                     <h1 className="font-display text-2xl font-bold md:text-3xl">Lupa Password?</h1>
                     <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                      Masukkan email yang terdaftar pada akun Anda. Kami akan mengirimkan instruksi untuk membuat password baru.
+                      Masukkan email yang terdaftar pada akun Anda. Kami akan mengirimkan instruksi
+                      untuk membuat password baru.
                     </p>
                   </div>
 

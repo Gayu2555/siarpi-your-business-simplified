@@ -21,8 +21,16 @@ type Status = "now" | "next" | "future";
 
 const items: Record<Status, { title: string; desc: string; progress?: number }[]> = {
   now: [
-    { title: "Payroll Automation", desc: "Hitung gaji & pajak otomatis sesuai regulasi PPh 21.", progress: 80 },
-    { title: "Dashboard Analytics", desc: "Visualisasi KPI real-time untuk semua modul.", progress: 65 },
+    {
+      title: "Payroll Automation",
+      desc: "Hitung gaji & pajak otomatis sesuai regulasi PPh 21.",
+      progress: 80,
+    },
+    {
+      title: "Dashboard Analytics",
+      desc: "Visualisasi KPI real-time untuk semua modul.",
+      progress: 65,
+    },
     { title: "Multi-cabang Support", desc: "Kelola beberapa lokasi dari satu akun.", progress: 40 },
   ],
   next: [
@@ -40,7 +48,12 @@ const items: Record<Status, { title: string; desc: string; progress?: number }[]
 // Data tab hanya berisi string (iconName), bukan komponen langsung — supaya
 // aman dipakai di mana pun (termasuk kalau suatu saat lewat loader/SSR).
 const tabs: { id: Status; label: string; iconName: string; color: string }[] = [
-  { id: "now", label: "Now", iconName: "Clock", color: "bg-gradient-primary text-primary-foreground" },
+  {
+    id: "now",
+    label: "Now",
+    iconName: "Clock",
+    color: "bg-gradient-primary text-primary-foreground",
+  },
   { id: "next", label: "Next", iconName: "Sparkles", color: "bg-accent text-accent-foreground" },
   { id: "future", label: "Future", iconName: "Circle", color: "bg-muted text-muted-foreground" },
 ];
@@ -62,10 +75,10 @@ function RoadmapPage() {
 
       <main className="container mx-auto flex-1 px-4 py-16 md:px-6 md:py-24">
         <div className="mx-auto max-w-2xl text-center">
-          <Badge variant="outline" className="mb-4 rounded-full">Roadmap</Badge>
-          <h1 className="font-display text-4xl font-bold md:text-5xl">
-            Apa yang akan datang
-          </h1>
+          <Badge variant="outline" className="mb-4 rounded-full">
+            Roadmap
+          </Badge>
+          <h1 className="font-display text-4xl font-bold md:text-5xl">Apa yang akan datang</h1>
           <p className="mt-4 text-muted-foreground">
             Transparansi penuh — lihat apa yang sedang kami kerjakan dan rencana ke depan.
           </p>
@@ -80,7 +93,9 @@ function RoadmapPage() {
                 key={t.id}
                 onClick={() => setActive(t.id)}
                 className={`flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                  active === t.id ? t.color + " shadow-soft" : "text-muted-foreground hover:text-foreground"
+                  active === t.id
+                    ? t.color + " shadow-soft"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <TabIcon className="h-4 w-4" />
@@ -102,14 +117,22 @@ function RoadmapPage() {
                 transition={{ duration: 0.4, delay: i * 0.08 }}
                 className="relative pl-12 md:pl-16"
               >
-                <div className={`absolute left-0 flex h-8 w-8 items-center justify-center rounded-full md:h-12 md:w-12 ${
-                  active === "now" ? "bg-gradient-primary text-primary-foreground" :
-                  active === "next" ? "bg-accent text-accent-foreground border-2 border-primary/30" :
-                  "bg-muted text-muted-foreground border-2 border-border"
-                }`}>
-                  {active === "now" ? <CheckCircle2 className="h-4 w-4 md:h-5 md:w-5" /> :
-                   active === "next" ? <Sparkles className="h-4 w-4 md:h-5 md:w-5" /> :
-                   <Circle className="h-4 w-4 md:h-5 md:w-5" />}
+                <div
+                  className={`absolute left-0 flex h-8 w-8 items-center justify-center rounded-full md:h-12 md:w-12 ${
+                    active === "now"
+                      ? "bg-gradient-primary text-primary-foreground"
+                      : active === "next"
+                        ? "bg-accent text-accent-foreground border-2 border-primary/30"
+                        : "bg-muted text-muted-foreground border-2 border-border"
+                  }`}
+                >
+                  {active === "now" ? (
+                    <CheckCircle2 className="h-4 w-4 md:h-5 md:w-5" />
+                  ) : active === "next" ? (
+                    <Sparkles className="h-4 w-4 md:h-5 md:w-5" />
+                  ) : (
+                    <Circle className="h-4 w-4 md:h-5 md:w-5" />
+                  )}
                 </div>
                 <Card className="rounded-2xl border-border p-6 transition-shadow hover:shadow-card">
                   <div className="flex flex-wrap items-start justify-between gap-3">
@@ -117,7 +140,9 @@ function RoadmapPage() {
                       <h3 className="font-display text-lg font-semibold">{item.title}</h3>
                       <p className="mt-1 text-sm text-muted-foreground">{item.desc}</p>
                     </div>
-                    <Badge variant="outline" className="rounded-full capitalize">{active}</Badge>
+                    <Badge variant="outline" className="rounded-full capitalize">
+                      {active}
+                    </Badge>
                   </div>
                   {item.progress !== undefined && (
                     <div className="mt-4">

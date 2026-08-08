@@ -80,7 +80,9 @@ export function ModuleMockupPreview({ moduleName, moduleId, mockup }: ModuleMock
                     key={idx}
                     onClick={() => setActiveImgIdx(idx)}
                     className={`h-2 rounded-full transition-all ${
-                      activeImgIdx === idx ? "w-6 bg-primary" : "w-2 bg-muted-foreground/40 hover:bg-muted-foreground"
+                      activeImgIdx === idx
+                        ? "w-6 bg-primary"
+                        : "w-2 bg-muted-foreground/40 hover:bg-muted-foreground"
                     }`}
                     aria-label={`Slide ${idx + 1}`}
                   />

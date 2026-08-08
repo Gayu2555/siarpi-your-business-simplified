@@ -8,10 +8,9 @@ export function apiUrl(path: string): string {
 // Generic fetch wrapper — auto attach Authorization header kalau ada token
 export async function apiFetch<T = any>(
   path: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<{ ok: boolean; status: number; data: T }> {
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("siarpi_token") : null;
+  const token = typeof window !== "undefined" ? localStorage.getItem("siarpi_token") : null;
 
   const headers: HeadersInit = {
     "Content-Type": "application/json",

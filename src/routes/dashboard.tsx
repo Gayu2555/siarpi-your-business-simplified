@@ -120,7 +120,7 @@ function DashboardPage() {
               <Card className="relative overflow-hidden rounded-3xl border-border bg-card/60 p-8 shadow-soft backdrop-blur-md">
                 <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-primary/5 blur-3xl" />
                 <div className="absolute -left-16 -bottom-16 h-48 w-48 rounded-full bg-indigo-500/5 blur-3xl" />
-                
+
                 <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
@@ -128,24 +128,33 @@ function DashboardPage() {
                         <Building2 className="h-6 w-6" />
                       </div>
                       <div>
-                        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Workspace Perusahaan</span>
+                        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                          Workspace Perusahaan
+                        </span>
                         <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">
                           {companyName || "Perusahaan Aktif"}
                         </h2>
                       </div>
                     </div>
                     <p className="mt-4 text-sm text-muted-foreground max-w-xl">
-                      Selamat datang di portal manajemen bisnis Siarpi. Gunakan menu dropdown di bawah untuk melihat modul aktif Anda, atau klik tombol masuk untuk beralih ke aplikasi utama.
+                      Selamat datang di portal manajemen bisnis Siarpi. Gunakan menu dropdown di
+                      bawah untuk melihat modul aktif Anda, atau klik tombol masuk untuk beralih ke
+                      aplikasi utama.
                     </p>
                     <div className="mt-6 flex flex-wrap gap-4">
-                      <Button asChild size="default" className="rounded-xl bg-primary text-primary-foreground hover:shadow-glow transition-all duration-300">
-                        <a 
-                          href={typeof window !== 'undefined' && localStorage.getItem("siarpi_token") 
-                            ? `https://app.siarpi.com/?token=${encodeURIComponent(localStorage.getItem("siarpi_token") || "")}`
-                            : "https://app.siarpi.com"
-                          } 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
+                      <Button
+                        asChild
+                        size="default"
+                        className="rounded-xl bg-primary text-primary-foreground hover:shadow-glow transition-all duration-300"
+                      >
+                        <a
+                          href={
+                            typeof window !== "undefined" && localStorage.getItem("siarpi_token")
+                              ? `https://app.siarpi.com/?token=${encodeURIComponent(localStorage.getItem("siarpi_token") || "")}`
+                              : "https://app.siarpi.com"
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="flex items-center gap-2 font-semibold"
                         >
                           Masuk ke Dashboard Utama
@@ -156,7 +165,10 @@ function DashboardPage() {
                   </div>
 
                   {/* Dropdown Modul Aktif */}
-                  <div className="relative w-full md:w-auto md:min-w-[280px]" onClick={(e) => e.stopPropagation()}>
+                  <div
+                    className="relative w-full md:w-auto md:min-w-[280px]"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -169,10 +181,15 @@ function DashboardPage() {
                         Lihat Modul Aktif
                       </span>
                       <div className="flex items-center gap-2">
-                        <Badge variant="secondary" className="rounded-full bg-primary/10 text-primary px-2.5 py-0.5 text-xs font-bold">
+                        <Badge
+                          variant="secondary"
+                          className="rounded-full bg-primary/10 text-primary px-2.5 py-0.5 text-xs font-bold"
+                        >
                           {modulesResponse?.ownedModules.length ?? 0}
                         </Badge>
-                        <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-300 ${dropdownOpen ? "rotate-180" : ""}`} />
+                        <ChevronDown
+                          className={`h-4 w-4 text-muted-foreground transition-transform duration-300 ${dropdownOpen ? "rotate-180" : ""}`}
+                        />
                       </div>
                     </button>
 
@@ -185,7 +202,8 @@ function DashboardPage() {
                           transition={{ duration: 0.2 }}
                           className="absolute right-0 top-[105%] z-50 w-full min-w-[300px] overflow-hidden rounded-2xl border border-border bg-popover p-2 shadow-glow"
                         >
-                          {modulesResponse?.ownedModules && modulesResponse.ownedModules.length > 0 ? (
+                          {modulesResponse?.ownedModules &&
+                          modulesResponse.ownedModules.length > 0 ? (
                             <div className="space-y-1">
                               <div className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                                 Modul Aktif Anda
@@ -197,7 +215,9 @@ function DashboardPage() {
                                     key={m.key}
                                     className="flex items-center gap-3 rounded-xl p-3 text-sm font-semibold text-foreground"
                                   >
-                                    <span className={`flex h-8 w-8 items-center justify-center rounded-lg ${m.bg_color || "bg-primary/10"} ${m.icon_color || "text-primary"}`}>
+                                    <span
+                                      className={`flex h-8 w-8 items-center justify-center rounded-lg ${m.bg_color || "bg-primary/10"} ${m.icon_color || "text-primary"}`}
+                                    >
                                       <Icon weight={weight} className="h-4.5 w-4.5" />
                                     </span>
                                     <span>{m.name}</span>
@@ -239,7 +259,9 @@ function DashboardPage() {
                         <motion.div key={m.key} variants={itemVariants}>
                           <Card className="flex h-full flex-col overflow-hidden rounded-3xl border-border bg-card/60 p-6 shadow-sm transition-all duration-300 hover:border-primary/20 hover:shadow-soft opacity-80 hover:opacity-100">
                             <div className="flex items-start gap-4">
-                              <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${m.bg_color || "bg-primary/10"} ${m.icon_color || "text-primary"}`}>
+                              <div
+                                className={`flex h-12 w-12 items-center justify-center rounded-2xl ${m.bg_color || "bg-primary/10"} ${m.icon_color || "text-primary"}`}
+                              >
                                 <Icon weight={weight} className="h-6 w-6" />
                               </div>
                               <div className="flex-1">
@@ -255,7 +277,12 @@ function DashboardPage() {
                               <span className="text-sm font-semibold text-foreground">
                                 Rp {m.price.toLocaleString("id-ID")}/bln
                               </span>
-                              <Button asChild variant="outline" size="sm" className="rounded-xl border-primary/20 text-primary hover:bg-gradient-primary hover:text-primary-foreground">
+                              <Button
+                                asChild
+                                variant="outline"
+                                size="sm"
+                                className="rounded-xl border-primary/20 text-primary hover:bg-gradient-primary hover:text-primary-foreground"
+                              >
                                 <Link to="/modules/$moduleId" params={{ moduleId: m.key }}>
                                   Detail Modul
                                 </Link>

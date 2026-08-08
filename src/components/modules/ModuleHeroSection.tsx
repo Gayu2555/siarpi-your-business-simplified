@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Check } from "lucide-react";
-import { formatIDR } from "@/lib/modules";
+import { formatIDR } from "@/lib/utils";
 
 interface ModuleHeroSectionProps {
   module: {
@@ -44,9 +44,7 @@ export function ModuleHeroSection({ module: m, detail: d, renderIcon }: ModuleHe
       <h1 className="font-display text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">
         {d.tagline}
       </h1>
-      <p className="mt-5 text-base text-muted-foreground md:text-lg">
-        {d.longDescription}
-      </p>
+      <p className="mt-5 text-base text-muted-foreground md:text-lg">{d.longDescription}</p>
 
       {/* Point-Point Selling Checklist (Maksimal 3 Poin) */}
       {d.keyBenefits && d.keyBenefits.length > 0 && (

@@ -59,11 +59,7 @@ export function Header() {
         {/* Logo */}
         <div className="relative w-28 md:w-44 shrink-0">
           <Link to="/" className="absolute left-0 top-1/2 -translate-y-[36%]">
-            <img
-              src={pageLogo}
-              alt="Siarpi Logo"
-              className="w-28 object-contain md:w-44"
-            />
+            <img src={pageLogo} alt="Siarpi Logo" className="w-28 object-contain md:w-44" />
           </Link>
         </div>
 
@@ -113,9 +109,7 @@ export function Header() {
                       <span className="truncate text-sm font-semibold text-foreground">
                         {getDisplayName(user)}
                       </span>
-                      <span className="truncate text-xs text-muted-foreground">
-                        {user?.email}
-                      </span>
+                      <span className="truncate text-xs text-muted-foreground">{user?.email}</span>
                     </div>
                   </div>
                 </DropdownMenuLabel>
@@ -159,11 +153,7 @@ export function Header() {
         </div>
 
         {/* Mobile toggle */}
-        <button
-          className="md:hidden"
-          onClick={() => setOpen(!open)}
-          aria-label="Toggle menu"
-        >
+        <button className="md:hidden" onClick={() => setOpen(!open)} aria-label="Toggle menu">
           {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
@@ -193,12 +183,8 @@ export function Header() {
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex min-w-0 flex-col">
-                    <span className="truncate text-sm font-semibold">
-                      {getDisplayName(user)}
-                    </span>
-                    <span className="truncate text-xs text-muted-foreground">
-                      {user?.email}
-                    </span>
+                    <span className="truncate text-sm font-semibold">{getDisplayName(user)}</span>
+                    <span className="truncate text-xs text-muted-foreground">{user?.email}</span>
                   </div>
                 </div>
                 <Link

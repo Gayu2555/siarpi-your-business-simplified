@@ -29,7 +29,6 @@ export function BusinessSolutionsSection() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* 2-Column Layout: Left Header & Controls (Col 5), Right Image Asset Area (Col 7) */}
         <div className="grid gap-10 lg:grid-cols-12 lg:items-center">
-          
           {/* Left Column: Left-Aligned Header, Tabs & Key Insights */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -38,16 +37,21 @@ export function BusinessSolutionsSection() {
             transition={{ duration: 0.5 }}
             className="lg:col-span-5 text-left space-y-5 max-w-lg"
           >
-            <Badge variant="outline" className="rounded-full border-primary/30 text-primary font-semibold bg-primary/5 px-3.5 py-1">
+            <Badge
+              variant="outline"
+              className="rounded-full border-primary/30 text-primary font-semibold bg-primary/5 px-3.5 py-1"
+            >
               Solusi Terpadu Siarpi
             </Badge>
 
             <h2 className="font-display text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl leading-[1.15]">
-              Solusi Terbaik Aspek <span className="text-gradient-primary">Operasional & Keuangan</span>
+              Solusi Terbaik Aspek{" "}
+              <span className="text-gradient-primary">Operasional & Keuangan</span>
             </h2>
 
             <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-              Siarpi menyediakan berbagai solusi dari hulu ke hilir—mulai dari pembukuan, akuntansi, pajak, kas/bank, hingga operasional bisnis Anda.
+              Siarpi menyediakan berbagai solusi dari hulu ke hilir—mulai dari pembukuan, akuntansi,
+              pajak, kas/bank, hingga operasional bisnis Anda.
             </p>
 
             {/* Pill Tabs Switcher */}
@@ -146,9 +150,13 @@ export function BusinessSolutionsSection() {
               </div>
               <div>
                 <p className="font-bold text-foreground">
-                  {activeTab === "core" ? "Akurasi Pembukuan & Uptime System" : "Standar Akuntansi & Compliance"}
+                  {activeTab === "core"
+                    ? "Akurasi Pembukuan & Uptime System"
+                    : "Standar Akuntansi & Compliance"}
                 </p>
-                <p className="text-[11px] text-muted-foreground">Tersinkronisasi otomatis secara real-time</p>
+                <p className="text-[11px] text-muted-foreground">
+                  Tersinkronisasi otomatis secara real-time
+                </p>
               </div>
             </div>
           </motion.div>
@@ -163,7 +171,7 @@ export function BusinessSolutionsSection() {
           >
             <div className="relative group overflow-hidden rounded-3xl border border-border/80 bg-card/80 p-2.5 shadow-2xl backdrop-blur-md transition-all duration-500 hover:shadow-primary/10">
               <div className="absolute -inset-4 bg-gradient-primary opacity-15 blur-3xl pointer-events-none" />
-              
+
               <AnimatePresence mode="wait">
                 <motion.img
                   key={currentImgIdx}
@@ -202,16 +210,16 @@ export function BusinessSolutionsSection() {
                     key={idx}
                     onClick={() => setCurrentImgIdx(idx)}
                     className={`h-2 rounded-full transition-all ${
-                      currentImgIdx === idx ? "w-6 bg-primary" : "w-2 bg-muted-foreground/40 hover:bg-muted-foreground"
+                      currentImgIdx === idx
+                        ? "w-6 bg-primary"
+                        : "w-2 bg-muted-foreground/40 hover:bg-muted-foreground"
                     }`}
                     aria-label={`Slide ${idx + 1}`}
                   />
                 ))}
               </div>
-
             </div>
           </motion.div>
-
         </div>
       </div>
     </section>

@@ -5,34 +5,194 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
-import { fetchCatalogModules, fetchSuites, type ApiModule, type SuiteWithPlans, formatIDR } from "@/lib/modules-api";
+import {
+  fetchCatalogModules,
+  fetchSuites,
+  type ApiModule,
+  type SuiteWithPlans,
+} from "@/lib/modules-api";
+import { formatIDR } from "@/lib/utils";
 import { resolvePhosphorIcon, resolveLucideIcon } from "@/lib/icon-resolver";
 import { useState, useEffect } from "react";
 import {
-  Check, Star, ArrowRight, Zap, Layers,
-  RefreshCw, GraduationCap, CreditCard, Building2, Smartphone, QrCode,
-  Palette, Puzzle, Quote, Users, Crown,
+  Check,
+  Star,
+  ArrowRight,
+  Zap,
+  Layers,
+  RefreshCw,
+  GraduationCap,
+  CreditCard,
+  Building2,
+  Smartphone,
+  QrCode,
+  Palette,
+  Puzzle,
+  Quote,
+  Users,
+  Crown,
 } from "lucide-react";
 import dashboardImg from "@/assets/dashboard-preview.jpg";
 
 // Fallback modules — plain data tanpa React components, dipakai saat API tidak tersedia
 const FALLBACK_MODULES: ApiModule[] = [
-  { key: "hr",        name: "HR",        label: "HR",        description: "Manajemen karyawan & rekrutmen", icon: "i-ph-users-fill",       bg_color: "bg-blue-100",    icon_color: "text-blue-600",    hover_color: "blue",    route: "", suite_key: "talents",  price: 49000,  is_core: false, is_listed: true },
-  { key: "payroll",   name: "Payroll",   label: "Payroll",   description: "Gaji otomatis & pajak",           icon: "i-ph-money-fill",       bg_color: "bg-emerald-100", icon_color: "text-emerald-600", hover_color: "emerald", route: "", suite_key: "talents",  price: 79000,  is_core: false, is_listed: true },
-  { key: "finance",   name: "Finance",   label: "Finance",   description: "Akuntansi & laporan keuangan",    icon: "i-ph-chart-bar-fill",   bg_color: "bg-green-100",   icon_color: "text-green-600",   hover_color: "green",   route: "", suite_key: "finance",  price: 99000,  is_core: false, is_listed: true },
-  { key: "inventory", name: "Inventory", label: "Inventory", description: "Stok barang real-time",           icon: "i-ph-cube-fill",        bg_color: "bg-blue-100",    icon_color: "text-blue-600",    hover_color: "blue",    route: "", suite_key: "commerce", price: 69000,  is_core: false, is_listed: true },
-  { key: "project",   name: "Project",   label: "Project",   description: "Manajemen proyek tim",            icon: "i-ph-columns-fill",     bg_color: "bg-orange-100",  icon_color: "text-orange-600",  hover_color: "orange",  route: "", suite_key: "growth",   price: 59000,  is_core: false, is_listed: true },
-  { key: "crm",       name: "CRM",       label: "CRM",       description: "Kelola pelanggan & leads",        icon: "i-ph-megaphone-fill",   bg_color: "bg-yellow-100",  icon_color: "text-yellow-600",  hover_color: "yellow",  route: "", suite_key: "growth",   price: 69000,  is_core: false, is_listed: true },
-  { key: "absensi",   name: "Absensi",   label: "Absensi",   description: "Kehadiran & shift",               icon: "i-ph-fingerprint-fill", bg_color: "bg-purple-100",  icon_color: "text-purple-600",  hover_color: "purple",  route: "", suite_key: "talents",  price: 39000,  is_core: false, is_listed: true },
-  { key: "invoice",   name: "Invoice",   label: "Invoice",   description: "Tagihan & pembayaran",            icon: "i-ph-receipt-fill",     bg_color: "bg-pink-100",    icon_color: "text-pink-600",    hover_color: "pink",    route: "", suite_key: "finance",  price: 49000,  is_core: false, is_listed: true },
-  { key: "pos",       name: "POS",       label: "POS",       description: "Point of sale toko",              icon: "i-ph-storefront-fill",  bg_color: "bg-red-100",     icon_color: "text-red-600",     hover_color: "red",     route: "", suite_key: "commerce", price: 79000,  is_core: false, is_listed: true },
-  { key: "analytics", name: "Analytics", label: "Analytics", description: "Dashboard & insight",             icon: "i-ph-chart-line-fill",  bg_color: "bg-teal-100",    icon_color: "text-teal-600",    hover_color: "teal",    route: "", suite_key: "growth",   price: 89000,  is_core: false, is_listed: true },
+  {
+    key: "hr",
+    name: "HR",
+    label: "HR",
+    description: "Manajemen karyawan & rekrutmen",
+    icon: "i-ph-users-fill",
+    bg_color: "bg-blue-100",
+    icon_color: "text-blue-600",
+    hover_color: "blue",
+    route: "",
+    suite_key: "talents",
+    price: 49000,
+    is_core: false,
+    is_listed: true,
+  },
+  {
+    key: "payroll",
+    name: "Payroll",
+    label: "Payroll",
+    description: "Gaji otomatis & pajak",
+    icon: "i-ph-money-fill",
+    bg_color: "bg-emerald-100",
+    icon_color: "text-emerald-600",
+    hover_color: "emerald",
+    route: "",
+    suite_key: "talents",
+    price: 79000,
+    is_core: false,
+    is_listed: true,
+  },
+  {
+    key: "finance",
+    name: "Finance",
+    label: "Finance",
+    description: "Akuntansi & laporan keuangan",
+    icon: "i-ph-chart-bar-fill",
+    bg_color: "bg-green-100",
+    icon_color: "text-green-600",
+    hover_color: "green",
+    route: "",
+    suite_key: "finance",
+    price: 99000,
+    is_core: false,
+    is_listed: true,
+  },
+  {
+    key: "inventory",
+    name: "Inventory",
+    label: "Inventory",
+    description: "Stok barang real-time",
+    icon: "i-ph-cube-fill",
+    bg_color: "bg-blue-100",
+    icon_color: "text-blue-600",
+    hover_color: "blue",
+    route: "",
+    suite_key: "commerce",
+    price: 69000,
+    is_core: false,
+    is_listed: true,
+  },
+  {
+    key: "project",
+    name: "Project",
+    label: "Project",
+    description: "Manajemen proyek tim",
+    icon: "i-ph-columns-fill",
+    bg_color: "bg-orange-100",
+    icon_color: "text-orange-600",
+    hover_color: "orange",
+    route: "",
+    suite_key: "growth",
+    price: 59000,
+    is_core: false,
+    is_listed: true,
+  },
+  {
+    key: "crm",
+    name: "CRM",
+    label: "CRM",
+    description: "Kelola pelanggan & leads",
+    icon: "i-ph-megaphone-fill",
+    bg_color: "bg-yellow-100",
+    icon_color: "text-yellow-600",
+    hover_color: "yellow",
+    route: "",
+    suite_key: "growth",
+    price: 69000,
+    is_core: false,
+    is_listed: true,
+  },
+  {
+    key: "absensi",
+    name: "Absensi",
+    label: "Absensi",
+    description: "Kehadiran & shift",
+    icon: "i-ph-fingerprint-fill",
+    bg_color: "bg-purple-100",
+    icon_color: "text-purple-600",
+    hover_color: "purple",
+    route: "",
+    suite_key: "talents",
+    price: 39000,
+    is_core: false,
+    is_listed: true,
+  },
+  {
+    key: "invoice",
+    name: "Invoice",
+    label: "Invoice",
+    description: "Tagihan & pembayaran",
+    icon: "i-ph-receipt-fill",
+    bg_color: "bg-pink-100",
+    icon_color: "text-pink-600",
+    hover_color: "pink",
+    route: "",
+    suite_key: "finance",
+    price: 49000,
+    is_core: false,
+    is_listed: true,
+  },
+  {
+    key: "pos",
+    name: "POS",
+    label: "POS",
+    description: "Point of sale toko",
+    icon: "i-ph-storefront-fill",
+    bg_color: "bg-red-100",
+    icon_color: "text-red-600",
+    hover_color: "red",
+    route: "",
+    suite_key: "commerce",
+    price: 79000,
+    is_core: false,
+    is_listed: true,
+  },
+  {
+    key: "analytics",
+    name: "Analytics",
+    label: "Analytics",
+    description: "Dashboard & insight",
+    icon: "i-ph-chart-line-fill",
+    bg_color: "bg-teal-100",
+    icon_color: "text-teal-600",
+    hover_color: "teal",
+    route: "",
+    suite_key: "growth",
+    price: 89000,
+    is_core: false,
+    is_listed: true,
+  },
 ];
 
 export const Route = createFileRoute("/")({
   head: () => {
     const metaTitle = "Siarpi | All in One Management System & Business Operating System";
-    const metaDesc = "Business Operating System (BOS) lengkap untuk mengontrol seluruh operasional bisnis Anda: Finance, HR & Payroll, Inventory, CRM, dan Analytics. Aktifkan modul yang Anda butuhkan saja mulai Rp 39.000/bulan!";
+    const metaDesc =
+      "Business Operating System (BOS) lengkap untuk mengontrol seluruh operasional bisnis Anda: Finance, HR & Payroll, Inventory, CRM, dan Analytics. Aktifkan modul yang Anda butuhkan saja mulai Rp 39.000/bulan!";
     const ogImage = "/dashboard-preview.jpg";
     const keywords = [
       "siarpi all in one management system",
@@ -49,42 +209,42 @@ export const Route = createFileRoute("/")({
     const websiteJsonLd = {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      "name": "Siarpi ERP",
-      "url": "https://siarpi.com",
-      "description": metaDesc,
+      name: "Siarpi ERP",
+      url: "https://siarpi.com",
+      description: metaDesc,
     };
 
     const softwareJsonLd = {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
-      "name": "Siarpi Enterprise ERP",
-      "operatingSystem": "Web, Android, iOS, Windows, macOS",
-      "applicationCategory": "BusinessApplication",
-      "offers": {
+      name: "Siarpi Enterprise ERP",
+      operatingSystem: "Web, Android, iOS, Windows, macOS",
+      applicationCategory: "BusinessApplication",
+      offers: {
         "@type": "AggregateOffer",
-        "priceCurrency": "IDR",
-        "lowPrice": "39000",
-        "highPrice": "99000",
-        "offerCount": "10",
+        priceCurrency: "IDR",
+        lowPrice: "39000",
+        highPrice: "99000",
+        offerCount: "10",
       },
-      "aggregateRating": {
+      aggregateRating: {
         "@type": "AggregateRating",
-        "ratingValue": "4.9",
-        "ratingCount": "2500",
+        ratingValue: "4.9",
+        ratingCount: "2500",
       },
     };
 
     const organizationJsonLd = {
       "@context": "https://schema.org",
       "@type": "Organization",
-      "name": "Siarpi",
-      "url": "https://siarpi.com",
-      "contactPoint": {
+      name: "Siarpi",
+      url: "https://siarpi.com",
+      contactPoint: {
         "@type": "ContactPoint",
-        "telephone": "+62-813-8789-5911",
-        "contactType": "customer service",
-        "areaServed": "ID",
-        "availableLanguage": "Indonesian",
+        telephone: "+62-813-8789-5911",
+        contactType: "customer service",
+        areaServed: "ID",
+        availableLanguage: "Indonesian",
       },
     };
 
@@ -125,10 +285,26 @@ export const Route = createFileRoute("/")({
 });
 
 const benefits = [
-  { iconName: "Zap", title: "Bayar yang Dipakai Aja", desc: "Beli modul sesuai kebutuhan bisnis Anda. Mulai dari Rp 39.000/bulan tanpa biaya paketan mahal." },
-  { iconName: "RefreshCw", title: "Bebas Rekap Manual", desc: "Penjualan kasir, stok barang, dan catatan kas terhubung otomatis tanpa perlu salin di Excel." },
-  { iconName: "GraduationCap", title: "Langsung Pakai Tanpa Training", desc: "Tampilan simpel dan ramah pengguna. Staf kasir atau admin Anda bisa langsung mengerti dalam 5 menit." },
-  { iconName: "Smartphone", title: "Pantau dari Mana Saja", desc: "Cek laporan Laba Rugi, sisa stok, dan tagihan pelanggan langsung dari HP atau laptop secara real-time." },
+  {
+    iconName: "Zap",
+    title: "Bayar yang Dipakai Aja",
+    desc: "Beli modul sesuai kebutuhan bisnis Anda. Mulai dari Rp 39.000/bulan tanpa biaya paketan mahal.",
+  },
+  {
+    iconName: "RefreshCw",
+    title: "Bebas Rekap Manual",
+    desc: "Penjualan kasir, stok barang, dan catatan kas terhubung otomatis tanpa perlu salin di Excel.",
+  },
+  {
+    iconName: "GraduationCap",
+    title: "Langsung Pakai Tanpa Training",
+    desc: "Tampilan simpel dan ramah pengguna. Staf kasir atau admin Anda bisa langsung mengerti dalam 5 menit.",
+  },
+  {
+    iconName: "Smartphone",
+    title: "Pantau dari Mana Saja",
+    desc: "Cek laporan Laba Rugi, sisa stok, dan tagihan pelanggan langsung dari HP atau laptop secara real-time.",
+  },
 ];
 
 const payments = [
@@ -153,42 +329,48 @@ const clients = [
 // Feedback / testimoni dari pelanggan nyata yang sudah pakai Siarpi
 const testimonials = [
   {
-    quote: "Onboarding karyawan baru sekarang cuma 1 hari. Dulu bisa seminggu lebih. Tim HR saya akhirnya bisa fokus ke hal strategis.",
+    quote:
+      "Onboarding karyawan baru sekarang cuma 1 hari. Dulu bisa seminggu lebih. Tim HR saya akhirnya bisa fokus ke hal strategis.",
     name: "Rina Wijaya",
     role: "HR Manager",
     company: "PT Maju Bersama",
     rating: 5,
   },
   {
-    quote: "Payroll yang dulu makan 3 hari sekarang selesai 30 menit. Pajak & BPJS auto-hitung. Game changer untuk tim finance kami.",
+    quote:
+      "Payroll yang dulu makan 3 hari sekarang selesai 30 menit. Pajak & BPJS auto-hitung. Game changer untuk tim finance kami.",
     name: "Linda Kusuma",
     role: "Finance Director",
     company: "PT Sinar Abadi",
     rating: 5,
   },
   {
-    quote: "Antrian di kasir lebih cepat, stok update otomatis tiap transaksi. Omzet warung saya naik 20% dalam 2 bulan.",
+    quote:
+      "Antrian di kasir lebih cepat, stok update otomatis tiap transaksi. Omzet warung saya naik 20% dalam 2 bulan.",
     name: "Pak Bambang",
     role: "Owner",
     company: "Warung Bakso Mantap",
     rating: 5,
   },
   {
-    quote: "Tim 15 orang bisa sinkron tanpa meeting harian. Project Management Siarpi bikin kami hemat banyak waktu.",
+    quote:
+      "Tim 15 orang bisa sinkron tanpa meeting harian. Project Management Siarpi bikin kami hemat banyak waktu.",
     name: "Arif Hidayat",
     role: "Project Manager",
     company: "Studio Kreatif",
     rating: 5,
   },
   {
-    quote: "Conversion rate naik 40% sejak pakai pipeline visual CRM. Follow-up otomatis menghemat 2 jam per hari per sales.",
+    quote:
+      "Conversion rate naik 40% sejak pakai pipeline visual CRM. Follow-up otomatis menghemat 2 jam per hari per sales.",
     name: "Reza Pratama",
     role: "Sales Director",
     company: "PT Solusi B2B",
     rating: 5,
   },
   {
-    quote: "Tim kecil saya bisa kelola 50+ karyawan tanpa perlu admin HR khusus. Bayar pun pakai QRIS, gampang banget.",
+    quote:
+      "Tim kecil saya bisa kelola 50+ karyawan tanpa perlu admin HR khusus. Bayar pun pakai QRIS, gampang banget.",
     name: "Doni Saputra",
     role: "Founder",
     company: "Kopi Kenangan Lokal",
@@ -258,16 +440,32 @@ function LandingPage() {
               </h1>
 
               <p className="mt-6 max-w-xl text-base text-muted-foreground md:text-lg">
-                Business Operating System (BOS) lengkap untuk mengontrol seluruh divisi bisnis Anda: Keuangan, HR & Payroll, Stok Barang, CRM, hingga Analisis Eksekutif.{" "}
-                <span className="font-semibold text-foreground">Aktifkan modul yang Anda butuhkan saja</span>.
+                Business Operating System (BOS) lengkap untuk mengontrol seluruh divisi bisnis Anda:
+                Keuangan, HR & Payroll, Stok Barang, CRM, hingga Analisis Eksekutif.{" "}
+                <span className="font-semibold text-foreground">
+                  Aktifkan modul yang Anda butuhkan saja
+                </span>
+                .
               </p>
 
               {/* Feature bullets */}
               <ul className="mt-8 space-y-4">
                 {[
-                  { icon: Layers, color: "amber", text: "Business Operating System Terpadu: Kontrol Keuangan, Payroll, HR, Stok, & Proyek dari satu dasbor pusat." },
-                  { icon: RefreshCw, color: "emerald", text: "Otomatisasi Lintas Divisi: Data transaksi, pencatatan kas, dan gaji terhubung real-time." },
-                  { icon: Puzzle, color: "blue", text: "Beli Ketengan Sesuai Kebutuhan: Aktifkan modul yang dibutuhkan saja mulai Rp 39.000/bulan." },
+                  {
+                    icon: Layers,
+                    color: "amber",
+                    text: "Business Operating System Terpadu: Kontrol Keuangan, Payroll, HR, Stok, & Proyek dari satu dasbor pusat.",
+                  },
+                  {
+                    icon: RefreshCw,
+                    color: "emerald",
+                    text: "Otomatisasi Lintas Divisi: Data transaksi, pencatatan kas, dan gaji terhubung real-time.",
+                  },
+                  {
+                    icon: Puzzle,
+                    color: "blue",
+                    text: "Beli Ketengan Sesuai Kebutuhan: Aktifkan modul yang dibutuhkan saja mulai Rp 39.000/bulan.",
+                  },
                 ].map((b) => (
                   <li key={b.text} className="flex items-center gap-3">
                     <span
@@ -357,7 +555,9 @@ function LandingPage() {
       {/* MODULES */}
       <section className="container mx-auto px-4 py-20 md:px-6 md:py-28">
         <div className="mx-auto max-w-2xl text-center">
-          <Badge variant="outline" className="mb-4 rounded-full">Modules</Badge>
+          <Badge variant="outline" className="mb-4 rounded-full">
+            Modules
+          </Badge>
           <h2 className="font-display text-3xl font-bold md:text-5xl">
             Semua yang bisnis Anda butuhkan
           </h2>
@@ -390,15 +590,20 @@ function LandingPage() {
                   >
                     <Link to="/modules/$moduleId" params={{ moduleId: m.key }}>
                       <Card className="group flex h-full cursor-pointer flex-col items-center gap-3 rounded-2xl border-border p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-soft">
-                        <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${m.bg_color} transition-transform duration-300 group-hover:scale-110`}>
+                        <div
+                          className={`flex h-12 w-12 items-center justify-center rounded-xl ${m.bg_color} transition-transform duration-300 group-hover:scale-110`}
+                        >
                           <Icon weight={weight} className={`h-6 w-6 ${m.icon_color}`} />
                         </div>
                         <div className="font-display font-semibold">{m.name}</div>
                         {m.description && (
-                          <p className="text-xs text-muted-foreground line-clamp-2">{m.description}</p>
+                          <p className="text-xs text-muted-foreground line-clamp-2">
+                            {m.description}
+                          </p>
                         )}
                         <div className="mt-auto text-xs font-medium text-primary">
-                          {formatIDR(m.price)}<span className="text-muted-foreground">/bln</span>
+                          {formatIDR(m.price)}
+                          <span className="text-muted-foreground">/bln</span>
                         </div>
                       </Card>
                     </Link>
@@ -418,7 +623,9 @@ function LandingPage() {
       <section className="bg-muted/30 py-20 md:py-28">
         <div className="container mx-auto px-4 md:px-6">
           <div className="mx-auto max-w-2xl text-center">
-            <Badge variant="outline" className="mb-4 rounded-full">Kenapa Siarpi</Badge>
+            <Badge variant="outline" className="mb-4 rounded-full">
+              Kenapa Siarpi
+            </Badge>
             <h2 className="font-display text-3xl font-bold md:text-5xl">
               Dirancang untuk bisnis Indonesia
             </h2>
@@ -427,21 +634,21 @@ function LandingPage() {
             {benefits.map((b, i) => {
               const BIcon = resolveLucideIcon(b.iconName);
               return (
-              <motion.div
-                key={b.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.08 }}
-              >
-                <Card className="h-full rounded-2xl border-border p-6 transition-shadow hover:shadow-card">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground shadow-soft">
-                    <BIcon className="h-5 w-5" />
-                  </div>
-                  <h3 className="mt-4 font-display text-lg font-semibold">{b.title}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">{b.desc}</p>
-                </Card>
-              </motion.div>
+                <motion.div
+                  key={b.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: i * 0.08 }}
+                >
+                  <Card className="h-full rounded-2xl border-border p-6 transition-shadow hover:shadow-card">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground shadow-soft">
+                      <BIcon className="h-5 w-5" />
+                    </div>
+                    <h3 className="mt-4 font-display text-lg font-semibold">{b.title}</h3>
+                    <p className="mt-2 text-sm text-muted-foreground">{b.desc}</p>
+                  </Card>
+                </motion.div>
               );
             })}
           </div>
@@ -451,10 +658,10 @@ function LandingPage() {
       {/* PRICING — Paket Suite dari API */}
       <section className="container mx-auto px-4 py-20 md:px-6 md:py-28">
         <div className="mx-auto max-w-2xl text-center">
-          <Badge variant="outline" className="mb-4 rounded-full">Harga</Badge>
-          <h2 className="font-display text-3xl font-bold md:text-5xl">
-            Pilih paket yang sesuai
-          </h2>
+          <Badge variant="outline" className="mb-4 rounded-full">
+            Harga
+          </Badge>
+          <h2 className="font-display text-3xl font-bold md:text-5xl">Pilih paket yang sesuai</h2>
           <p className="mt-4 text-muted-foreground">
             Tanpa kartu kredit. Bayar dengan metode lokal Indonesia.
           </p>
@@ -463,7 +670,10 @@ function LandingPage() {
         {suitesLoading ? (
           <div className="mt-12 grid gap-6 lg:grid-cols-3">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-72 animate-pulse rounded-3xl border border-border bg-muted/40" />
+              <div
+                key={i}
+                className="h-72 animate-pulse rounded-3xl border border-border bg-muted/40"
+              />
             ))}
           </div>
         ) : suites ? (
@@ -474,18 +684,28 @@ function LandingPage() {
               return (
                 <div key={suite.key}>
                   <div className="mb-6 flex items-center gap-3">
-                    <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-${suite.color}-100`}>
-                      <suiteIcon.Icon weight={suiteIcon.weight} className={`h-5 w-5 text-${suite.color}-600`} />
+                    <div
+                      className={`flex h-10 w-10 items-center justify-center rounded-xl bg-${suite.color}-100`}
+                    >
+                      <suiteIcon.Icon
+                        weight={suiteIcon.weight}
+                        className={`h-5 w-5 text-${suite.color}-600`}
+                      />
                     </div>
                     <div>
                       <h3 className="font-display text-xl font-bold">{suite.name}</h3>
-                      {suite.tagline && <p className="text-sm text-muted-foreground">{suite.tagline}</p>}
+                      {suite.tagline && (
+                        <p className="text-sm text-muted-foreground">{suite.tagline}</p>
+                      )}
                     </div>
                   </div>
 
-                  <div className={`grid gap-6 ${suite.plans.length === 1 ? "max-w-sm" : suite.plans.length === 2 ? "lg:grid-cols-2 max-w-2xl" : "lg:grid-cols-3"}`}>
+                  <div
+                    className={`grid gap-6 ${suite.plans.length === 1 ? "max-w-sm" : suite.plans.length === 2 ? "lg:grid-cols-2 max-w-2xl" : "lg:grid-cols-3"}`}
+                  >
                     {suite.plans.map((plan, i) => {
-                      const isPro = i === Math.floor(suite.plans.length / 2) && suite.plans.length > 1;
+                      const isPro =
+                        i === Math.floor(suite.plans.length / 2) && suite.plans.length > 1;
                       const isUnlimitedSeats = plan.included_seats === -1;
                       const isUnlimitedModules = plan.module_quota === -1 || plan.is_all_access;
                       return (
@@ -516,20 +736,28 @@ function LandingPage() {
                             )}
                             <h4 className="font-display text-xl font-bold">{plan.name}</h4>
                             {plan.description && (
-                              <p className="mt-1 text-sm text-muted-foreground">{plan.description}</p>
+                              <p className="mt-1 text-sm text-muted-foreground">
+                                {plan.description}
+                              </p>
                             )}
                             <div className="mt-6">
-                              <span className="font-display text-4xl font-bold">{formatIDR(plan.base_price)}</span>
+                              <span className="font-display text-4xl font-bold">
+                                {formatIDR(plan.base_price)}
+                              </span>
                               <span className="text-muted-foreground">/bulan</span>
                             </div>
                             <ul className="mt-6 flex-1 space-y-2.5">
                               <li className="flex items-center gap-2 text-sm">
                                 <Check className="h-4 w-4 shrink-0 text-primary" />
-                                {isUnlimitedModules ? "Semua modul included" : `${plan.module_quota} modul pilihan`}
+                                {isUnlimitedModules
+                                  ? "Semua modul included"
+                                  : `${plan.module_quota} modul pilihan`}
                               </li>
                               <li className="flex items-center gap-2 text-sm">
                                 <Check className="h-4 w-4 shrink-0 text-primary" />
-                                {isUnlimitedSeats ? "Unlimited user" : `Hingga ${plan.included_seats} user`}
+                                {isUnlimitedSeats
+                                  ? "Unlimited user"
+                                  : `Hingga ${plan.included_seats} user`}
                                 {plan.price_per_seat > 0 && (
                                   <span className="text-xs text-muted-foreground">
                                     (+{formatIDR(plan.price_per_seat)}/user tambahan)
@@ -539,8 +767,14 @@ function LandingPage() {
                               {(suite.modules ?? []).slice(0, 4).map((m) => {
                                 const mIcon = resolvePhosphorIcon(m.icon);
                                 return (
-                                  <li key={m.key} className="flex items-center gap-2 text-sm text-muted-foreground">
-                                    <mIcon.Icon weight={mIcon.weight} className={`h-4 w-4 shrink-0 ${m.icon_color}`} />
+                                  <li
+                                    key={m.key}
+                                    className="flex items-center gap-2 text-sm text-muted-foreground"
+                                  >
+                                    <mIcon.Icon
+                                      weight={mIcon.weight}
+                                      className={`h-4 w-4 shrink-0 ${m.icon_color}`}
+                                    />
                                     {m.name}
                                   </li>
                                 );
@@ -604,7 +838,9 @@ function LandingPage() {
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-muted/40 font-display text-sm font-bold text-foreground/70">
                   {c.initial}
                 </div>
-                <span className="text-center text-[11px] text-muted-foreground line-clamp-1">{c.name}</span>
+                <span className="text-center text-[11px] text-muted-foreground line-clamp-1">
+                  {c.name}
+                </span>
               </motion.div>
             ))}
           </div>
@@ -613,7 +849,9 @@ function LandingPage() {
           <div className="mx-auto mt-12 grid max-w-4xl grid-cols-2 gap-6 rounded-2xl border border-border bg-muted/30 p-6 md:grid-cols-4 md:p-8">
             {stats.map((s) => (
               <div key={s.label} className="text-center">
-                <div className="font-display text-2xl font-bold text-gradient-primary md:text-3xl">{s.value}</div>
+                <div className="font-display text-2xl font-bold text-gradient-primary md:text-3xl">
+                  {s.value}
+                </div>
                 <div className="mt-1 text-xs text-muted-foreground md:text-sm">{s.label}</div>
               </div>
             ))}
@@ -656,7 +894,11 @@ function LandingPage() {
                 </p>
                 <div className="mt-6 flex items-center gap-3 border-t border-border pt-4">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-primary font-display text-sm font-bold text-primary-foreground">
-                    {t.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
+                    {t.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .slice(0, 2)
+                      .join("")}
                   </div>
                   <div>
                     <div className="text-sm font-semibold">{t.name}</div>
@@ -686,12 +928,15 @@ function LandingPage() {
             {payments.map((p) => {
               const PIcon = resolveLucideIcon(p.iconName);
               return (
-              <Card key={p.label} className="flex flex-col items-center gap-3 rounded-2xl border-border p-6 transition-shadow hover:shadow-card">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground shadow-soft">
-                  <PIcon className="h-6 w-6" />
-                </div>
-                <span className="text-sm font-medium">{p.label}</span>
-              </Card>
+                <Card
+                  key={p.label}
+                  className="flex flex-col items-center gap-3 rounded-2xl border-border p-6 transition-shadow hover:shadow-card"
+                >
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground shadow-soft">
+                    <PIcon className="h-6 w-6" />
+                  </div>
+                  <span className="text-sm font-medium">{p.label}</span>
+                </Card>
               );
             })}
           </div>
@@ -707,7 +952,11 @@ function LandingPage() {
           <p className="mt-4 text-primary-foreground/80">
             Mulai gratis hari ini, tanpa kartu kredit.
           </p>
-          <Button size="lg" asChild className="mt-8 bg-background text-foreground hover:bg-background/90">
+          <Button
+            size="lg"
+            asChild
+            className="mt-8 bg-background text-foreground hover:bg-background/90"
+          >
             <Link to="/onboarding">
               Mulai Sekarang <ArrowRight className="ml-1 h-4 w-4" />
             </Link>

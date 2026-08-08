@@ -9,8 +9,15 @@ import { Badge } from "@/components/ui/badge";
 import { apiUrl } from "@/lib/api";
 import { setAuthToken, setStoredUser, type SiarpiUser } from "@/lib/auth";
 import {
-  Eye, EyeOff, Mail, Lock, ArrowRight, Chrome,
-  Smartphone, Building2, Shield,
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  ArrowRight,
+  Chrome,
+  Smartphone,
+  Building2,
+  Shield,
 } from "lucide-react";
 import { z } from "zod";
 

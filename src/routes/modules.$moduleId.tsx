@@ -5,12 +5,16 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
-import { modules, formatIDR, getModuleIcon } from "@/lib/modules";
+import { modules, getModuleIcon } from "@/lib/modules";
+import { formatIDR } from "@/lib/utils";
 import { fetchCatalogModules, type ApiModule } from "@/lib/modules-api";
 import { resolvePhosphorIcon } from "@/lib/icon-resolver";
 import { moduleDetails, type Testimonial } from "@/lib/module-details";
 import {
-  Accordion, AccordionContent, AccordionItem, AccordionTrigger,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
 } from "@/components/ui/accordion";
 import { ArrowRight, ArrowLeft, Star, Quote } from "lucide-react";
 
@@ -18,6 +22,7 @@ import { ArrowRight, ArrowLeft, Star, Quote } from "lucide-react";
 import { ModuleHeroSection } from "@/components/modules/ModuleHeroSection";
 import { ModuleMockupPreview } from "@/components/modules/ModuleMockupPreview";
 import { FinanceSubModulesCarousel } from "@/components/modules/FinanceSubModulesCarousel";
+import { ModuleSubModulesSection } from "@/components/modules/ModuleSubModulesSection";
 import { ModuleFeaturesSection } from "@/components/modules/ModuleFeaturesSection";
 import { BusinessSolutionsSection } from "@/components/modules/BusinessSolutionsSection";
 import { ComparisonBeforeAfterSection } from "@/components/modules/ComparisonBeforeAfterSection";
@@ -61,21 +66,21 @@ export const Route = createFileRoute("/modules/$moduleId")({
     const jsonLd = {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
-      "name": `Siarpi ERP — Modul ${m.name}`,
-      "operatingSystem": "Web, Windows, macOS, Linux, Android, iOS",
-      "applicationCategory": "BusinessApplication",
-      "offers": {
+      name: `Siarpi ERP — Modul ${m.name}`,
+      operatingSystem: "Web, Windows, macOS, Linux, Android, iOS",
+      applicationCategory: "BusinessApplication",
+      offers: {
         "@type": "Offer",
-        "price": String(m.price),
-        "priceCurrency": "IDR",
-        "availability": "https://schema.org/InStock",
+        price: String(m.price),
+        priceCurrency: "IDR",
+        availability: "https://schema.org/InStock",
       },
-      "aggregateRating": {
+      aggregateRating: {
         "@type": "AggregateRating",
-        "ratingValue": "4.9",
-        "ratingCount": "1280",
+        ratingValue: "4.9",
+        ratingCount: "1280",
       },
-      "description": metaDesc,
+      description: metaDesc,
     };
 
     return {
@@ -108,7 +113,7 @@ export const Route = createFileRoute("/modules/$moduleId")({
     try {
       const catalog = await fetchCatalogModules();
       apiMod = catalog.find(
-        (x) => x.key === params.moduleId || x.key === params.moduleId.toLowerCase()
+        (x) => x.key === params.moduleId || x.key === params.moduleId.toLowerCase(),
       );
     } catch {
       // Fallback silently if API is offline
@@ -196,8 +201,8 @@ function ModulePage() {
         {/* COMPARISON BEFORE & AFTER SECTION (Tanpa Siarpi vs Pakai Siarpi) */}
         <ComparisonBeforeAfterSection moduleName={m.name} />
 
-        {/* FINANCE SUB-MODULES CAROUSEL SHOWCASE */}
-        {m.id === "finance" && <FinanceSubModulesCarousel />}
+        {/* SUB-MODULES SHOWCASE FOR HR, PAYROLL, FINANCE */}
+        <ModuleSubModulesSection moduleId={m.id} moduleName={m.name} />
 
         {/* TESTIMONIALS SECTION */}
         <section className="bg-muted/30 py-20 md:py-28">
@@ -209,14 +214,16 @@ function ModulePage() {
               transition={{ duration: 0.5 }}
               className="mx-auto max-w-2xl text-center"
             >
-              <Badge variant="outline" className="mb-4 rounded-full">Testimoni</Badge>
+              <Badge variant="outline" className="mb-4 rounded-full">
+                Testimoni
+              </Badge>
               <h2 className="font-display text-3xl font-bold md:text-5xl">
                 Dipercaya oleh bisnis Indonesia
               </h2>
             </motion.div>
 
             <div className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-2">
-              {d.testimonials.map((t: Testimonial, i: number) => (
+              {(d?.testimonials ?? []).map((t: Testimonial, i: number) => (
                 <motion.div
                   key={t.name}
                   initial={{ opacity: 0, y: 20 }}
@@ -259,7 +266,9 @@ function ModulePage() {
             transition={{ duration: 0.5 }}
             className="mx-auto max-w-2xl text-center"
           >
-            <Badge variant="outline" className="mb-4 rounded-full">FAQ</Badge>
+            <Badge variant="outline" className="mb-4 rounded-full">
+              FAQ
+            </Badge>
             <h2 className="font-display text-3xl font-bold md:text-5xl">
               Pertanyaan yang sering diajukan
             </h2>
@@ -273,7 +282,7 @@ function ModulePage() {
             className="mx-auto mt-12 max-w-3xl"
           >
             <Accordion type="single" collapsible className="w-full">
-              {d.faq.map((f: { q: string; a: string }, i: number) => (
+              {(d?.faq ?? []).map((f: { q: string; a: string }, i: number) => (
                 <AccordionItem key={i} value={`item-${i}`} className="border-border">
                   <AccordionTrigger className="font-display text-left text-base font-semibold hover:no-underline">
                     {f.q}
@@ -293,7 +302,9 @@ function ModulePage() {
             <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
               <div>
                 <h3 className="font-display text-2xl font-bold">Modul lainnya untuk bisnis Anda</h3>
-                <p className="text-sm text-muted-foreground">Kombinasikan dengan modul ini untuk sistem yang utuh.</p>
+                <p className="text-sm text-muted-foreground">
+                  Kombinasikan dengan modul ini untuk sistem yang utuh.
+                </p>
               </div>
               <Button variant="outline" asChild>
                 <Link to="/">Lihat Semua Modul</Link>
@@ -314,7 +325,9 @@ function ModulePage() {
                         <p className="mt-1 text-xs text-muted-foreground">{rm.description}</p>
                       </div>
                       <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-3">
-                        <span className="font-display text-xs font-bold">{formatIDR(rm.price)}</span>
+                        <span className="font-display text-xs font-bold">
+                          {formatIDR(rm.price)}
+                        </span>
                         <span className="inline-flex items-center text-xs font-medium text-primary">
                           Detail <ArrowRight className="ml-1 h-3 w-3" />
                         </span>
@@ -347,7 +360,12 @@ function ModulePage() {
                 <Button size="lg" variant="secondary" asChild className="font-semibold shadow-lg">
                   <Link to="/onboarding">Daftar Coba Gratis</Link>
                 </Button>
-                <Button size="lg" variant="outline" asChild className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  asChild
+                  className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10"
+                >
                   <Link to="/komparasi">Bandingkan Paket</Link>
                 </Button>
               </div>

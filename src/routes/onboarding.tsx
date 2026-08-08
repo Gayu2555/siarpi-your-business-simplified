@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/site/Header";
 import { resolvePhosphorIcon } from "@/lib/icon-resolver";
-import { formatIDR } from "@/lib/modules-api";
+import { formatIDR } from "@/lib/utils";
 import { isAuthenticated, getStoredUser, setAuthToken, setStoredUser } from "@/lib/auth";
 import {
   createCompany,
@@ -20,8 +20,14 @@ import {
 import { useEffect } from "react";
 import { createCheckout } from "@/lib/checkout-api";
 import {
-  Building2, Rocket, Briefcase, Check, ArrowRight, ArrowLeft,
-  Sparkles, Loader2,
+  Building2,
+  Rocket,
+  Briefcase,
+  Check,
+  ArrowRight,
+  ArrowLeft,
+  Sparkles,
+  Loader2,
 } from "lucide-react";
 
 import { guardOnboardingRoute } from "@/lib/onboarding-guard";
@@ -49,22 +55,90 @@ const businessTypes = [
 
 // Plain data — tidak menyimpan React components agar aman untuk SSR serialization
 const modules = [
-  { id: "hr", name: "HR", description: "Manajemen karyawan & rekrutmen", icon: "i-ph-users-fill", price: 49000 },
-  { id: "payroll", name: "Payroll", description: "Gaji otomatis & pajak", icon: "i-ph-money-fill", price: 79000 },
-  { id: "finance", name: "Finance", description: "Akuntansi & laporan keuangan", icon: "i-ph-chart-bar-fill", price: 99000 },
-  { id: "inventory", name: "Inventory", description: "Stok barang real-time", icon: "i-ph-cube-fill", price: 69000 },
-  { id: "project", name: "Project", description: "Manajemen proyek tim", icon: "i-ph-columns-fill", price: 59000 },
-  { id: "crm", name: "CRM", description: "Kelola pelanggan & leads", icon: "i-ph-megaphone-fill", price: 69000 },
-  { id: "absensi", name: "Absensi", description: "Kehadiran & shift", icon: "i-ph-fingerprint-fill", price: 39000 },
-  { id: "invoice", name: "Invoice", description: "Tagihan & pembayaran", icon: "i-ph-receipt-fill", price: 49000 },
-  { id: "pos", name: "POS", description: "Point of sale toko", icon: "i-ph-storefront-fill", price: 79000 },
-  { id: "analytics", name: "Analytics", description: "Dashboard & insight", icon: "i-ph-chart-line-fill", price: 89000 },
+  {
+    id: "hr",
+    name: "HR",
+    description: "Manajemen karyawan & rekrutmen",
+    icon: "i-ph-users-fill",
+    price: 49000,
+  },
+  {
+    id: "payroll",
+    name: "Payroll",
+    description: "Gaji otomatis & pajak",
+    icon: "i-ph-money-fill",
+    price: 79000,
+  },
+  {
+    id: "finance",
+    name: "Finance",
+    description: "Akuntansi & laporan keuangan",
+    icon: "i-ph-chart-bar-fill",
+    price: 99000,
+  },
+  {
+    id: "inventory",
+    name: "Inventory",
+    description: "Stok barang real-time",
+    icon: "i-ph-cube-fill",
+    price: 69000,
+  },
+  {
+    id: "project",
+    name: "Project",
+    description: "Manajemen proyek tim",
+    icon: "i-ph-columns-fill",
+    price: 59000,
+  },
+  {
+    id: "crm",
+    name: "CRM",
+    description: "Kelola pelanggan & leads",
+    icon: "i-ph-megaphone-fill",
+    price: 69000,
+  },
+  {
+    id: "absensi",
+    name: "Absensi",
+    description: "Kehadiran & shift",
+    icon: "i-ph-fingerprint-fill",
+    price: 39000,
+  },
+  {
+    id: "invoice",
+    name: "Invoice",
+    description: "Tagihan & pembayaran",
+    icon: "i-ph-receipt-fill",
+    price: 49000,
+  },
+  {
+    id: "pos",
+    name: "POS",
+    description: "Point of sale toko",
+    icon: "i-ph-storefront-fill",
+    price: 79000,
+  },
+  {
+    id: "analytics",
+    name: "Analytics",
+    description: "Dashboard & insight",
+    icon: "i-ph-chart-line-fill",
+    price: 89000,
+  },
 ];
 
 const industries = [
-  "Retail", "F&B (Makanan & Minuman)", "Teknologi", "Manufaktur",
-  "Jasa Konsultasi", "Konstruksi", "Kesehatan", "Pendidikan",
-  "Logistik & Transportasi", "Pertanian", "Lainnya",
+  "Retail",
+  "F&B (Makanan & Minuman)",
+  "Teknologi",
+  "Manufaktur",
+  "Jasa Konsultasi",
+  "Konstruksi",
+  "Kesehatan",
+  "Pendidikan",
+  "Logistik & Transportasi",
+  "Pertanian",
+  "Lainnya",
 ];
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -134,7 +208,7 @@ function OnboardingPage() {
 
   const toggleModule = (id: string) => {
     setSelectedModules((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
 
@@ -234,7 +308,9 @@ function OnboardingPage() {
           {/* Progress */}
           <div className="mb-10">
             <div className="mb-3 flex items-center justify-between text-sm">
-              <span className="font-medium">Langkah {step} dari {totalSteps}</span>
+              <span className="font-medium">
+                Langkah {step} dari {totalSteps}
+              </span>
               <span className="text-muted-foreground">{Math.round(progress)}%</span>
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-muted">
@@ -285,16 +361,18 @@ function OnboardingPage() {
                               key={t.id}
                               type="button"
                               onClick={() => setBizType(t.id)}
-                              className={`group flex flex-col items-start gap-3 rounded-2xl border-2 p-5 text-left transition-all ${bizType === t.id
+                              className={`group flex flex-col items-start gap-3 rounded-2xl border-2 p-5 text-left transition-all ${
+                                bizType === t.id
                                   ? "border-primary bg-accent/50 shadow-soft"
                                   : "border-border hover:border-primary/40"
-                                }`}
+                              }`}
                             >
                               <div
-                                className={`flex h-10 w-10 items-center justify-center rounded-xl ${bizType === t.id
+                                className={`flex h-10 w-10 items-center justify-center rounded-xl ${
+                                  bizType === t.id
                                     ? "bg-gradient-primary text-primary-foreground"
                                     : "bg-muted"
-                                  }`}
+                                }`}
                               >
                                 <t.icon className="h-5 w-5" />
                               </div>
@@ -328,9 +406,13 @@ function OnboardingPage() {
                             onChange={(e) => setIndustry(e.target.value)}
                             className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                           >
-                            <option value="" disabled>Pilih industri</option>
+                            <option value="" disabled>
+                              Pilih industri
+                            </option>
                             {industries.map((ind) => (
-                              <option key={ind} value={ind}>{ind}</option>
+                              <option key={ind} value={ind}>
+                                {ind}
+                              </option>
                             ))}
                           </select>
                         </div>
@@ -357,16 +439,16 @@ function OnboardingPage() {
                             key={m.id}
                             type="button"
                             onClick={() => toggleModule(m.id)}
-                            className={`flex items-center gap-3 rounded-xl border-2 p-4 text-left transition-all ${active
+                            className={`flex items-center gap-3 rounded-xl border-2 p-4 text-left transition-all ${
+                              active
                                 ? "border-primary bg-accent/50"
                                 : "border-border hover:border-primary/40"
-                              }`}
+                            }`}
                           >
                             <div
-                              className={`flex h-10 w-10 items-center justify-center rounded-lg ${active
-                                  ? "bg-gradient-primary text-primary-foreground"
-                                  : "bg-muted"
-                                }`}
+                              className={`flex h-10 w-10 items-center justify-center rounded-lg ${
+                                active ? "bg-gradient-primary text-primary-foreground" : "bg-muted"
+                              }`}
                             >
                               <Icon weight={weight} className="h-5 w-5" />
                             </div>
@@ -375,12 +457,11 @@ function OnboardingPage() {
                               <div className="text-xs text-muted-foreground">{m.description}</div>
                             </div>
                             <div
-                              className={`flex h-5 w-5 items-center justify-center rounded-md border-2 ${active ? "border-primary bg-primary" : "border-border"
-                                }`}
+                              className={`flex h-5 w-5 items-center justify-center rounded-md border-2 ${
+                                active ? "border-primary bg-primary" : "border-border"
+                              }`}
                             >
-                              {active && (
-                                <Check className="h-3 w-3 text-primary-foreground" />
-                              )}
+                              {active && <Check className="h-3 w-3 text-primary-foreground" />}
                             </div>
                           </button>
                         );

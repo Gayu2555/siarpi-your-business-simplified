@@ -21,19 +21,47 @@ export function Footer() {
           <div>
             <h4 className="font-display text-sm font-semibold">Produk</h4>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-              <li><Link to="/" className="hover:text-foreground">Modules</Link></li>
-              <li><Link to="/studi-kasus" className="hover:text-foreground">Studi Kasus</Link></li>
-              <li><Link to="/modular" className="hover:text-foreground">Beli Ketengan</Link></li>
-              <li><Link to="/roadmap" className="hover:text-foreground">Roadmap</Link></li>
+              <li>
+                <Link to="/" className="hover:text-foreground">
+                  Modules
+                </Link>
+              </li>
+              <li>
+                <Link to="/studi-kasus" className="hover:text-foreground">
+                  Studi Kasus
+                </Link>
+              </li>
+              <li>
+                <Link to="/modular" className="hover:text-foreground">
+                  Beli Ketengan
+                </Link>
+              </li>
+              <li>
+                <Link to="/roadmap" className="hover:text-foreground">
+                  Roadmap
+                </Link>
+              </li>
             </ul>
           </div>
 
           <div>
             <h4 className="font-display text-sm font-semibold">Harga</h4>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-              <li><Link to="/" className="hover:text-foreground">Paket</Link></li>
-              <li><Link to="/modular" className="hover:text-foreground">Modular</Link></li>
-              <li><Link to="/onboarding" className="hover:text-foreground">Demo</Link></li>
+              <li>
+                <Link to="/" className="hover:text-foreground">
+                  Paket
+                </Link>
+              </li>
+              <li>
+                <Link to="/modular" className="hover:text-foreground">
+                  Modular
+                </Link>
+              </li>
+              <li>
+                <Link to="/onboarding" className="hover:text-foreground">
+                  Demo
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -45,10 +73,34 @@ export function Footer() {
               <li>Jakarta, Indonesia</li>
             </ul>
             <div className="mt-4 flex gap-3">
-              <a href="#" aria-label="Instagram" className="rounded-lg border border-border p-2 hover:bg-accent"><Instagram className="h-4 w-4" /></a>
-              <a href="#" aria-label="Twitter" className="rounded-lg border border-border p-2 hover:bg-accent"><Twitter className="h-4 w-4" /></a>
-              <a href="#" aria-label="LinkedIn" className="rounded-lg border border-border p-2 hover:bg-accent"><Linkedin className="h-4 w-4" /></a>
-              <a href="#" aria-label="Email" className="rounded-lg border border-border p-2 hover:bg-accent"><Mail className="h-4 w-4" /></a>
+              <a
+                href="#"
+                aria-label="Instagram"
+                className="rounded-lg border border-border p-2 hover:bg-accent"
+              >
+                <Instagram className="h-4 w-4" />
+              </a>
+              <a
+                href="#"
+                aria-label="Twitter"
+                className="rounded-lg border border-border p-2 hover:bg-accent"
+              >
+                <Twitter className="h-4 w-4" />
+              </a>
+              <a
+                href="#"
+                aria-label="LinkedIn"
+                className="rounded-lg border border-border p-2 hover:bg-accent"
+              >
+                <Linkedin className="h-4 w-4" />
+              </a>
+              <a
+                href="#"
+                aria-label="Email"
+                className="rounded-lg border border-border p-2 hover:bg-accent"
+              >
+                <Mail className="h-4 w-4" />
+              </a>
             </div>
           </div>
         </div>

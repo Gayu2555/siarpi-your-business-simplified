@@ -61,7 +61,7 @@ export interface SuiteWithPlans extends ProductSuite {
 /** GET /public/modules — katalog modul berbayar yang tersedia (is_listed=true) */
 export async function fetchCatalogModules(): Promise<ApiModule[]> {
   const { ok, data } = await apiFetch<{ success: boolean; modules: ApiModule[] }>(
-    "/public/modules"
+    "/public/modules",
   );
   if (!ok || !data?.success) return [];
   return data.modules ?? [];
@@ -70,14 +70,11 @@ export async function fetchCatalogModules(): Promise<ApiModule[]> {
 /** GET /public/suites — semua suite beserta plan & modul (untuk pricing page) */
 export async function fetchSuites(): Promise<SuiteWithPlans[]> {
   const { ok, data } = await apiFetch<{ success: boolean; suites: SuiteWithPlans[] }>(
-    "/public/suites"
+    "/public/suites",
   );
   if (!ok || !data?.success) return [];
   return data.suites ?? [];
 }
-
-// ── Format helpers ────────────────────────────────────────────────────────────
-export const formatIDR = (n: number) => `Rp ${n.toLocaleString("id-ID")}`;
 
 export interface ModuleWithStatus extends ApiModule {
   status: string; // "active" | "available" | "pending_payment"
@@ -97,7 +94,7 @@ export async function fetchCompanyModules(): Promise<CompanyModulesResponse | nu
   if (!token) return null;
 
   const { ok, status, data } = await apiFetch<{ success: boolean; data: CompanyModulesResponse }>(
-    "/company/modules"
+    "/company/modules",
   );
   if (!ok || status === 401 || !data?.success) return null;
   return data.data;
