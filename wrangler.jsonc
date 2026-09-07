@@ -5,5 +5,12 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
-  "main": "@tanstack/react-start/server-entry",
+  // Entry sendiri (src/server.ts) yang membungkus
+  // "@tanstack/react-start/server-entry" supaya security header bisa
+  // dipasang. Menunjuk langsung ke paketnya membuat tidak ada tempat untuk
+  // menyisipkan HSTS/X-Frame-Options/Referrer-Policy/CSP.
+  //
+  // Build memancarkan dist/server/index.js + dist/server/wrangler.json
+  // (main: index.js) -- itu yang dipakai `wrangler deploy`, bukan file ini.
+  "main": "./src/server.ts",
 }

@@ -11,6 +11,11 @@ import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, Layers, Plus, Building2, ChevronDown, ExternalLink } from "lucide-react";
 import { apiFetch } from "@/lib/api";
+import { createHandoffCode } from "@/lib/auth-api";
+
+// Bisa ditimpa lewat VITE_MAIN_APP_URL supaya alur handoff bisa diuji ke
+// aplikasi utama yang jalan lokal, bukan selalu ke produksi.
+const MAIN_APP_URL = import.meta.env.VITE_MAIN_APP_URL || "https://app.siarpi.com";
 
 export const Route = createFileRoute("/dashboard")({
   beforeLoad: async () => {
@@ -34,6 +39,39 @@ function DashboardPage() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [openingApp, setOpeningApp] = useState(false);
+
+  // Pindah ke app.siarpi.com TANPA menempelkan JWT di URL. Yang dikirim cuma
+  // kode sekali-pakai berumur 60 detik; aplikasi tujuan yang menukarnya jadi
+  // token lewat POST /auth/handoff/exchange (lihat auth/handoff.go).
+  async function handleOpenMainApp() {
+    if (openingApp) return;
+    setOpeningApp(true);
+
+    // Tab dibuka DULU dan sinkron dengan klik, sebelum await -- kalau dibuka
+    // setelah fetch selesai, popup blocker memblokirnya.
+    const tab = window.open("about:blank", "_blank");
+    if (tab) tab.opener = null; // cegah reverse tabnabbing
+
+    try {
+      const code = await createHandoffCode();
+      // Kalau kodenya gagal dibuat, tetap antar ke aplikasi utama; user
+      // tinggal login manual di sana, bukan mentok di tab kosong.
+      const target = code ? `${MAIN_APP_URL}/?handoff=${encodeURIComponent(code)}` : MAIN_APP_URL;
+
+      if (tab) {
+        tab.location.replace(target);
+      } else {
+        window.location.href = target;
+      }
+    } catch (err) {
+      console.error("Gagal menyiapkan sesi handoff:", err);
+      if (tab) tab.location.replace(MAIN_APP_URL);
+      else window.location.href = MAIN_APP_URL;
+    } finally {
+      setOpeningApp(false);
+    }
+  }
 
   useEffect(() => {
     // Fetch company modules
@@ -143,23 +181,22 @@ function DashboardPage() {
                     </p>
                     <div className="mt-6 flex flex-wrap gap-4">
                       <Button
-                        asChild
                         size="default"
-                        className="rounded-xl bg-primary text-primary-foreground hover:shadow-glow transition-all duration-300"
+                        onClick={handleOpenMainApp}
+                        disabled={openingApp}
+                        className="flex items-center gap-2 rounded-xl bg-primary font-semibold text-primary-foreground transition-all duration-300 hover:shadow-glow"
                       >
-                        <a
-                          href={
-                            typeof window !== "undefined" && localStorage.getItem("siarpi_token")
-                              ? `https://app.siarpi.com/?token=${encodeURIComponent(localStorage.getItem("siarpi_token") || "")}`
-                              : "https://app.siarpi.com"
-                          }
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 font-semibold"
-                        >
-                          Masuk ke Dashboard Utama
-                          <ExternalLink className="h-4 w-4" />
-                        </a>
+                        {openingApp ? (
+                          <>
+                            Menyiapkan sesi…
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          </>
+                        ) : (
+                          <>
+                            Masuk ke Dashboard Utama
+                            <ExternalLink className="h-4 w-4" />
+                          </>
+                        )}
                       </Button>
                     </div>
                   </div>

@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Menu, X, LayoutDashboard, Settings, LogOut, ChevronDown } from "lucide-react";
+import { Menu, X, LayoutDashboard, LogOut, ChevronDown } from "lucide-react";
 import pageLogo from "@/assets/Page 1.png";
 import {
   clearAuthToken,
@@ -24,6 +24,7 @@ import {
 const navLinks = [
   { to: "/", label: "Beranda" },
   { to: "/studi-kasus", label: "Studi Kasus" },
+  { to: "/blog", label: "Blog" },
   { to: "/modular", label: "Beli Ketengan" },
   { to: "/komparasi", label: "Komparasi" },
   { to: "/roadmap", label: "Roadmap" },
@@ -120,12 +121,10 @@ export function Header() {
                     Dashboard
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild className="cursor-pointer rounded-lg">
-                  <Link to="/settings">
-                    <Settings className="mr-2 h-4 w-4" />
-                    Pengaturan
-                  </Link>
-                </DropdownMenuItem>
+                {/* Entri "Pengaturan" DIHAPUS: /settings di sini cuma halaman
+                    kosong bertuliskan "sedang dalam pengembangan", sementara
+                    pengaturan akun yang sebenarnya ada di aplikasi utama.
+                    Menautkannya dari menu setiap user = jalan buntu. */}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={handleLogout}
@@ -194,13 +193,7 @@ export function Header() {
                 >
                   <LayoutDashboard className="h-4 w-4" /> Dashboard
                 </Link>
-                <Link
-                  to="/settings"
-                  onClick={() => setOpen(false)}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted"
-                >
-                  <Settings className="h-4 w-4" /> Pengaturan
-                </Link>
+                {/* Lihat catatan di menu desktop -- entri Pengaturan dihapus. */}
                 <button
                   onClick={handleLogout}
                   className="flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-destructive hover:bg-destructive/10"

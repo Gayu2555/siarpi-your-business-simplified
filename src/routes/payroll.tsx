@@ -18,7 +18,7 @@ import {
   Sliders,
   Link2,
 } from "lucide-react";
-import { ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { BusinessSolutionsSection } from "@/components/modules/BusinessSolutionsSection";
 import { ComparisonBeforeAfterSection } from "@/components/modules/ComparisonBeforeAfterSection";
 import { ModuleSubModulesSection } from "@/components/modules/ModuleSubModulesSection";
@@ -441,4 +441,6 @@ function PayrollLandingPage() {
   );
 }
 
-export default PayrollLandingPage;
+// Tanpa export default: file route yang mengekspor apa pun selain `Route`
+// membatalkan code-splitting TanStack Router, jadi komponen halaman ini ikut
+// terbawa ke bundel utama. Komponennya sudah dipakai lewat `component:` di atas.

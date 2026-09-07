@@ -30,34 +30,104 @@ import {
 } from "lucide-react";
 import { articlesRegistry, type ArticleData } from "@/lib/articles";
 import { formatIDR } from "@/lib/utils";
+import { CmsArticleView } from "@/components/blog/CmsArticleView";
+import {
+  absoluteMediaUrl,
+  fetchPostBySlug,
+  fetchPublishedPosts,
+  parseIndonesianDate,
+} from "@/lib/blog-api";
+import { mergeArticleSources, type BlogIndexItem } from "@/lib/blog-index";
+import type { BlogPost } from "@/lib/blog-api";
+import {
+  articleJsonLd,
+  articleMeta,
+  breadcrumbJsonLd,
+  canonicalUrl,
+  jsonLdScript,
+  DEFAULT_OG_IMAGE,
+  type ArticleSeoInput,
+} from "@/lib/seo";
+
+// Bentuk data loader ditulis EKSPLISIT: tanpa ini TypeScript mengolapskan
+// union dua sumber jadi `never` dan seluruh head()/komponen kehilangan tipe.
+type ArticleLoaderData =
+  | { kind: "bawaan"; article: ArticleData }
+  | { kind: "cms"; post: BlogPost; related: BlogIndexItem[] };
 
 export const Route = createFileRoute("/artikel/$slug")({
-  head: ({ params }) => {
-    const article = articlesRegistry[params.slug];
-    if (!article) {
-      return { meta: [{ title: "Artikel Tidak Ditemukan | Siarpi Blog" }] };
+  head: ({ loaderData, params }) => {
+    // head() menerima loaderData sebelum tipe rute ter-generate penuh, jadi
+    // bentuknya ditegaskan di sini (bisa undefined saat notFound).
+    const data = loaderData as ArticleLoaderData | undefined;
+    if (!data) {
+      // Halaman 404 tidak boleh ikut terindeks.
+      return {
+        meta: [
+          { title: "Artikel Tidak Ditemukan | Siarpi Blog" },
+          { name: "robots", content: "noindex, follow" },
+        ],
+      };
     }
 
-    const metaTitle = `${article.title} | Siarpi Business Blog`;
+    const path = `/artikel/${params.slug}`;
+    const seo: ArticleSeoInput =
+      data.kind === "bawaan"
+        ? {
+            title: data.article.title,
+            description: data.article.summary,
+            path,
+            imageUrl: DEFAULT_OG_IMAGE,
+            imageAlt: data.article.title,
+            publishedTime: parseIndonesianDate(data.article.publishedDate),
+            authorName: data.article.author,
+            tags: [data.article.category],
+          }
+        : {
+            title: data.post.title,
+            description: data.post.excerpt,
+            path,
+            imageUrl: absoluteMediaUrl(data.post.thumbnail_url) || DEFAULT_OG_IMAGE,
+            imageAlt: data.post.thumbnail_alt || data.post.title,
+            publishedTime: data.post.published_at ?? data.post.created_at,
+            modifiedTime: data.post.updated_at,
+            authorName: "Tim Siarpi",
+            tags: data.post.tags ?? [],
+          };
+
     return {
-      meta: [
-        { title: metaTitle },
-        { name: "description", content: article.summary },
-        {
-          name: "keywords",
-          content: `${article.category}, panduan siarpi, pembukuan bisnis, erp indonesia`,
-        },
-        { property: "og:title", content: metaTitle },
-        { property: "og:description", content: article.summary },
-        { property: "og:type", content: "article" },
-        { name: "twitter:card", content: "summary_large_image" },
+      meta: articleMeta(seo),
+      links: [{ rel: "canonical", href: canonicalUrl(path) }],
+      scripts: [
+        jsonLdScript(articleJsonLd(seo)),
+        jsonLdScript(
+          breadcrumbJsonLd([
+            { name: "Beranda", path: "/" },
+            { name: "Blog", path: "/blog" },
+            { name: seo.title, path },
+          ]),
+        ),
       ],
     };
   },
-  loader: async ({ params }) => {
+  // DUA SUMBER, SATU URL: artikel bawaan (lib/articles.ts) diperiksa lebih
+  // dulu supaya URL lama beserta nilai SEO-nya tidak pernah tergeser oleh
+  // artikel CMS yang kebetulan memakai slug sama. Baru kalau tidak ketemu,
+  // artikel diambil dari Blog CMS di MongoDB.
+  loader: async ({ params }): Promise<ArticleLoaderData> => {
     const article = articlesRegistry[params.slug];
-    if (!article) throw notFound();
-    return { article };
+    if (article) {
+      return { kind: "bawaan", article };
+    }
+
+    const post = await fetchPostBySlug(params.slug);
+    if (!post) throw notFound();
+
+    // Daftar artikel lain untuk blok "terkait" di bawah artikel.
+    const others = await fetchPublishedPosts({ page: 1, pageSize: 30 });
+    const related = mergeArticleSources(others.posts).filter((item) => item.slug !== post.slug);
+
+    return { kind: "cms", post, related };
   },
   notFoundComponent: () => (
     <div className="flex min-h-screen flex-col bg-background">
@@ -78,8 +148,18 @@ export const Route = createFileRoute("/artikel/$slug")({
 });
 
 function ArticleReaderPage() {
-  const { article } = Route.useLoaderData() as { article: ArticleData };
+  const data = Route.useLoaderData() as ArticleLoaderData;
 
+  // Artikel CMS punya renderer Markdown-nya sendiri. Artikel bawaan tetap
+  // dirender komponen terstruktur di bawah ini — tidak diubah sama sekali,
+  // supaya callout, FAQ, dan kalkulator di dalamnya nol risiko regresi.
+  if (data.kind === "cms") {
+    return <CmsArticleView post={data.post} related={data.related} />;
+  }
+  return <BuiltInArticleReader article={data.article} />;
+}
+
+function BuiltInArticleReader({ article }: { article: ArticleData }) {
   const waTemplateText = `Halo Tim Siarpi, saya baru selesai membaca artikel "${article.title}" dan ingin berkonsultasi mengenai penerapan modul Siarpi untuk bisnis saya. Bisakah dibantu jadwal diskusinya? Terima kasih!`;
   const waUrl = `https://wa.me/6281387895911?text=${encodeURIComponent(waTemplateText)}`;
 

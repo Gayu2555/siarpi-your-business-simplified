@@ -12,8 +12,8 @@ interface ModuleMockupPreviewProps {
     subtitle: string;
     image?: string;
     images?: string[];
-    stats: ScreenshotBlock[];
-    rows: { label: string; sub: string; value: string }[];
+    stats?: ScreenshotBlock[];
+    rows?: { label: string; sub: string; value: string }[];
   };
 }
 
@@ -116,7 +116,7 @@ export function ModuleMockupPreview({ moduleName, moduleId, mockup }: ModuleMock
             </div>
 
             <div className="grid grid-cols-3 gap-3">
-              {mockup.stats.map((s: ScreenshotBlock) => (
+              {(mockup.stats ?? []).map((s: ScreenshotBlock) => (
                 <div
                   key={s.label}
                   className={`rounded-xl p-3 ${
@@ -134,7 +134,7 @@ export function ModuleMockupPreview({ moduleName, moduleId, mockup }: ModuleMock
             </div>
 
             <div className="space-y-2">
-              {mockup.rows.map((r: { label: string; sub: string; value: string }) => (
+              {(mockup.rows ?? []).map((r: { label: string; sub: string; value: string }) => (
                 <div
                   key={r.label}
                   className="flex items-center justify-between rounded-lg border border-border bg-background/50 px-3 py-2.5"

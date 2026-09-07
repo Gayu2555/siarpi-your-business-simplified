@@ -315,7 +315,11 @@ const scaleGuidesData: Record<"umkm" | "smb" | "enterprise", ScaleGuide> = {
   },
 };
 
-export function InteractiveGuidePage() {
+// TIDAK di-export: file route yang mengekspor apa pun selain `Route` membuat
+// TanStack Router membatalkan code-splitting untuk halaman ini, sehingga
+// komponennya ikut masuk bundel utama. Komponen ini hanya dipakai oleh
+// `component:` di atas.
+function InteractiveGuidePage() {
   const [activeScale, setActiveScale] = useState<"umkm" | "smb" | "enterprise">("umkm");
 
   // Interactive Calculator State
