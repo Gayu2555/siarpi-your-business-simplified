@@ -1,6 +1,5 @@
-import { createFileRoute, useNavigate, useSearch, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { z } from "zod";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -8,18 +7,17 @@ import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/site/Header";
 import { resolvePhosphorIcon } from "@/lib/icon-resolver";
 import { formatIDR } from "@/lib/utils";
-import { isAuthenticated, getStoredUser } from "@/lib/auth";
+import { getStoredUser } from "@/lib/auth";
 import { getCheckout, type Checkout } from "@/lib/checkout-api";
 import { ArrowRight, ArrowLeft, Loader2, ShieldCheck } from "lucide-react";
 
 import { guardOnboardingRoute } from "@/lib/onboarding-guard";
-
-const searchSchema = z.object({
-  id: z.string(),
-});
+import { requiredSearchString } from "@/lib/search-params";
 
 export const Route = createFileRoute("/checkout")({
-  validateSearch: searchSchema,
+  validateSearch: (search: Record<string, unknown>) => ({
+    id: requiredSearchString(search.id),
+  }),
   beforeLoad: async ({ search }) => {
     await guardOnboardingRoute("/checkout", search.id);
   },

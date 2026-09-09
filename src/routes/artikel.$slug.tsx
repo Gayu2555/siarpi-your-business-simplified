@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+import { lazy, Suspense, useState, useEffect } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { motion } from "framer-motion";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { Button } from "@/components/ui/button";
@@ -30,7 +29,6 @@ import {
 } from "lucide-react";
 import { articlesRegistry, type ArticleData } from "@/lib/articles";
 import { formatIDR } from "@/lib/utils";
-import { CmsArticleView } from "@/components/blog/CmsArticleView";
 import {
   absoluteMediaUrl,
   fetchPostBySlug,
@@ -55,7 +53,14 @@ type ArticleLoaderData =
   | { kind: "bawaan"; article: ArticleData }
   | { kind: "cms"; post: BlogPost; related: BlogIndexItem[] };
 
+const loadCmsArticleView = () => import("@/components/blog/CmsArticleView");
+const LazyCmsArticleView = lazy(() =>
+  loadCmsArticleView().then((module) => ({ default: module.CmsArticleView })),
+);
+
 export const Route = createFileRoute("/artikel/$slug")({
+  staleTime: 60_000,
+  preloadStaleTime: 60_000,
   head: ({ loaderData, params }) => {
     // head() menerima loaderData sebelum tipe rute ter-generate penuh, jadi
     // bentuknya ditegaskan di sini (bisa undefined saat notFound).
@@ -97,7 +102,19 @@ export const Route = createFileRoute("/artikel/$slug")({
 
     return {
       meta: articleMeta(seo),
-      links: [{ rel: "canonical", href: canonicalUrl(path) }],
+      links: [
+        { rel: "canonical", href: canonicalUrl(path) },
+        ...(data.kind === "cms" && seo.imageUrl
+          ? [
+              {
+                rel: "preload",
+                as: "image" as const,
+                href: seo.imageUrl,
+                fetchPriority: "high" as const,
+              },
+            ]
+          : []),
+      ],
       scripts: [
         jsonLdScript(articleJsonLd(seo)),
         jsonLdScript(
@@ -123,8 +140,12 @@ export const Route = createFileRoute("/artikel/$slug")({
     const post = await fetchPostBySlug(params.slug);
     if (!post) throw notFound();
 
-    // Daftar artikel lain untuk blok "terkait" di bawah artikel.
-    const others = await fetchPublishedPosts({ page: 1, pageSize: 30 });
+    // Download renderer Markdown dan rekomendasi bersamaan. Chunk Markdown
+    // hanya dimuat untuk artikel CMS, tidak untuk artikel bawaan.
+    const [, others] = await Promise.all([
+      loadCmsArticleView(),
+      fetchPublishedPosts({ page: 1, pageSize: 30 }),
+    ]);
     const related = mergeArticleSources(others.posts).filter((item) => item.slug !== post.slug);
 
     return { kind: "cms", post, related };
@@ -154,9 +175,29 @@ function ArticleReaderPage() {
   // dirender komponen terstruktur di bawah ini — tidak diubah sama sekali,
   // supaya callout, FAQ, dan kalkulator di dalamnya nol risiko regresi.
   if (data.kind === "cms") {
-    return <CmsArticleView post={data.post} related={data.related} />;
+    return (
+      <Suspense fallback={<ArticleLoadingFallback />}>
+        <LazyCmsArticleView post={data.post} related={data.related} />
+      </Suspense>
+    );
   }
   return <BuiltInArticleReader article={data.article} />;
+}
+
+function ArticleLoadingFallback() {
+  return (
+    <div className="flex min-h-screen flex-col bg-background">
+      <Header />
+      <main className="container mx-auto flex-1 px-4 py-16 md:px-6">
+        <div className="mx-auto max-w-4xl animate-pulse space-y-6" aria-label="Memuat artikel">
+          <div className="h-4 w-32 rounded bg-muted" />
+          <div className="h-12 max-w-2xl rounded bg-muted" />
+          <div className="h-5 max-w-xl rounded bg-muted" />
+          <div className="aspect-[16/9] rounded-2xl bg-muted" />
+        </div>
+      </main>
+    </div>
+  );
 }
 
 function BuiltInArticleReader({ article }: { article: ArticleData }) {

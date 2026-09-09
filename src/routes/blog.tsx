@@ -1,6 +1,4 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { z } from "zod";
-import { motion } from "framer-motion";
 import { useState } from "react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
@@ -10,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowRight, Search, BookOpen, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import { fetchPublishedPosts } from "@/lib/blog-api";
+import { optionalSearchString, positiveSearchInteger } from "@/lib/search-params";
 import {
   collectTags,
   filterArticles,
@@ -29,17 +28,23 @@ const PAGE_SIZE = 9;
 
 // Pencarian & filter lewat query param (BUKAN state lokal) supaya tiap
 // kombinasi punya URL sendiri yang bisa dibagikan dan di-crawl.
-const searchSchema = z.object({
-  page: z.coerce.number().int().min(1).optional(),
-  q: z.string().optional(),
-  tag: z.string().optional(),
-});
+type BlogSearch = { page?: number; q?: string; tag?: string };
+
+function validateBlogSearch(search: Record<string, unknown>): BlogSearch {
+  return {
+    page: positiveSearchInteger(search.page),
+    q: optionalSearchString(search.q),
+    tag: optionalSearchString(search.tag),
+  };
+}
 
 const META_DESCRIPTION =
   "Panduan praktis, tips akuntansi, dan studi kasus seputar pembukuan, pajak, HR, dan operasional bisnis dari tim Siarpi.";
 
 export const Route = createFileRoute("/blog")({
-  validateSearch: searchSchema,
+  staleTime: 60_000,
+  preloadStaleTime: 60_000,
+  validateSearch: validateBlogSearch,
   loaderDeps: ({ search }) => ({ page: search.page ?? 1 }),
   loader: async ({ deps }) => {
     // Artikel CMS diambil banyak sekaligus lalu digabung dengan artikel
@@ -57,6 +62,7 @@ export const Route = createFileRoute("/blog")({
         ? `Blog & Panduan Bisnis — Halaman ${page} | ${SITE_NAME}`
         : `Blog & Panduan Bisnis Indonesia | ${SITE_NAME}`;
 
+    const leadImage = items.find((item) => item.thumbnailUrl)?.thumbnailUrl;
     return {
       meta: [
         { title },
@@ -72,7 +78,12 @@ export const Route = createFileRoute("/blog")({
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: META_DESCRIPTION },
       ],
-      links: paginationLinks("/blog", page, totalPages),
+      links: [
+        ...paginationLinks("/blog", page, totalPages),
+        ...(leadImage
+          ? [{ rel: "preload", as: "image" as const, href: leadImage, fetchPriority: "high" as const }]
+          : []),
+      ],
       scripts: [
         jsonLdScript(
           blogListJsonLd(
@@ -107,6 +118,7 @@ function BlogIndexPage() {
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const visible = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const tags = collectTags(items);
+  const priorityImageSlug = visible.find((item) => item.thumbnailUrl)?.slug;
 
   function applySearch(next: { q?: string; tag?: string; page?: number }) {
     navigate({
@@ -218,8 +230,12 @@ function BlogIndexPage() {
             </div>
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {visible.map((item, index) => (
-                <ArticleCard key={item.slug} item={item} index={index} />
+              {visible.map((item) => (
+                <ArticleCard
+                  key={item.slug}
+                  item={item}
+                  prioritizeImage={item.slug === priorityImageSlug}
+                />
               ))}
             </div>
           )}
@@ -259,21 +275,24 @@ function BlogIndexPage() {
   );
 }
 
-function ArticleCard({ item, index }: { item: BlogIndexItem; index: number }) {
+function ArticleCard({
+  item,
+  prioritizeImage,
+}: {
+  item: BlogIndexItem;
+  prioritizeImage: boolean;
+}) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, delay: Math.min(index * 0.05, 0.3) }}
-    >
+    <div>
       <Link to="/artikel/$slug" params={{ slug: item.slug }} className="group block h-full">
         <Card className="flex h-full flex-col overflow-hidden rounded-3xl border-border bg-card/60 shadow-sm transition-all duration-300 hover:border-primary/30 hover:shadow-soft">
           {item.thumbnailUrl ? (
             <img
               src={item.thumbnailUrl}
               alt={item.thumbnailAlt}
-              loading="lazy"
+              loading={prioritizeImage ? "eager" : "lazy"}
               decoding="async"
+              fetchPriority={prioritizeImage ? "high" : "auto"}
               className="aspect-[16/9] w-full object-cover"
             />
           ) : (
@@ -311,6 +330,6 @@ function ArticleCard({ item, index }: { item: BlogIndexItem; index: number }) {
           </div>
         </Card>
       </Link>
-    </motion.div>
+    </div>
   );
 }

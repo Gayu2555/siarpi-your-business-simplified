@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { motion } from "framer-motion";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { Card } from "@/components/ui/card";
@@ -237,13 +236,8 @@ export function CmsArticleView({ post, related }: { post: BlogPost; related: Blo
                   Artikel & Panduan Terkait Lainnya
                 </h2>
                 <div className="grid gap-4 sm:grid-cols-3">
-                  {related.slice(0, 3).map((item, index) => (
-                    <motion.div
-                      key={item.slug}
-                      initial={{ opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.05 }}
-                    >
+                  {related.slice(0, 3).map((item) => (
+                    <div key={item.slug}>
                       <Link to="/artikel/$slug" params={{ slug: item.slug }} className="group">
                         <Card className="flex h-full flex-col justify-between space-y-3 rounded-2xl border border-border/80 bg-card p-5 shadow-soft transition-all hover:border-primary/40">
                           <div className="space-y-2">
@@ -265,7 +259,7 @@ export function CmsArticleView({ post, related }: { post: BlogPost; related: Blo
                           </div>
                         </Card>
                       </Link>
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
               </div>

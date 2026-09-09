@@ -5,29 +5,42 @@
 // menembak database PRODUKSI -- yang sebelumnya terjadi karena nilai ini
 // dipaku ke api.siarpi.com tanpa jalan keluar apa pun.
 //
-// Default-nya tetap produksi supaya deploy yang tidak menyetel env var ini
-// berperilaku persis seperti sebelumnya.
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://api.siarpi.com";
+// Development memakai backend lokal agar route yang belum masuk deployment
+// produksi tidak menyebabkan 404/CORS. Nilai eksplisit selalu diprioritaskan.
+export const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  (import.meta.env.DEV ? "http://localhost:4000" : "https://api.siarpi.com");
 
 export function apiUrl(path: string): string {
   return `${API_BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
+export interface ApiFetchOptions extends RequestInit {
+  /** Endpoint publik tidak perlu membawa token pengguna. */
+  auth?: boolean;
+}
+
 // Generic fetch wrapper — auto attach Authorization header kalau ada token
 export async function apiFetch<T = any>(
   path: string,
-  options: RequestInit = {},
+  options: ApiFetchOptions = {},
 ): Promise<{ ok: boolean; status: number; data: T }> {
+  const { auth = true, ...requestOptions } = options;
   const token = typeof window !== "undefined" ? localStorage.getItem("siarpi_token") : null;
 
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    ...(options.headers ?? {}),
-  };
+  const headers = new Headers(requestOptions.headers);
+  const isFormData =
+    typeof FormData !== "undefined" && requestOptions.body instanceof FormData;
+
+  if (requestOptions.body != null && !isFormData && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
+  if (auth && token && !headers.has("Authorization")) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
 
   const res = await fetch(apiUrl(path), {
-    ...options,
+    ...requestOptions,
     headers,
   });
 

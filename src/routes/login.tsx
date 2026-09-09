@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { apiUrl } from "@/lib/api";
 import { setAuthToken, setStoredUser, type SiarpiUser } from "@/lib/auth";
 import { verifyLogin2FA, type AuthResponse } from "@/lib/auth-api";
+import { optionalSearchString } from "@/lib/search-params";
 import {
   Eye,
   EyeOff,
@@ -22,16 +23,18 @@ import {
   Shield,
   ShieldCheck,
 } from "lucide-react";
-import { z } from "zod";
 
 // ── Route ────────────────────────────────────────────────────────────────────
 
-const searchSchema = z.object({
-  redirect: z.string().optional(),
-});
+type LoginSearch = { redirect?: string };
+
+function validateLoginSearch(search: Record<string, unknown>): LoginSearch {
+  const redirect = optionalSearchString(search.redirect);
+  return redirect ? { redirect } : {};
+}
 
 export const Route = createFileRoute("/login")({
-  validateSearch: searchSchema,
+  validateSearch: validateLoginSearch,
   head: () => ({
     meta: [
       { title: "Masuk — Siarpi" },

@@ -182,7 +182,8 @@ export function BusinessSolutionsSection() {
                   src={images[currentImgIdx].src}
                   alt={images[currentImgIdx].alt}
                   className="w-full h-auto object-cover rounded-2xl shadow-sm transition-transform duration-500 group-hover:scale-[1.01]"
-                  loading="eager"
+                  loading="lazy"
+                  decoding="async"
                 />
               </AnimatePresence>
 

@@ -25,6 +25,20 @@ const sanitizeSchema = {
   },
 };
 
+/**
+ * Membaca arahan lebar dari judul gambar Markdown: `![alt](url "w=640")`.
+ *
+ * Mengembalikan null untuk judul yang bukan arahan lebar, supaya artikel lama
+ * yang judul gambarnya sungguhan tetap tampil apa adanya.
+ */
+function readWidthDirective(title: unknown): number | null {
+  if (typeof title !== "string") return null;
+  const match = /^w=(\d+(?:\.\d+)?)$/.exec(title.trim());
+  if (!match) return null;
+  const width = Number(match[1]);
+  return Number.isFinite(width) && width > 0 ? width : null;
+}
+
 /** Ambil teks polos dari children React untuk dijadikan id heading. */
 function textOf(node: React.ReactNode): string {
   if (typeof node === "string" || typeof node === "number") return String(node);
@@ -86,17 +100,33 @@ export function MarkdownContent({ markdown }: { markdown: string }) {
               </a>
             );
           },
-          img: ({ src, alt }) => (
-            // src dari editor berbentuk relatif ("/blog/files/blog-xxx") karena
-            // disajikan API, bukan landing page -- jadi harus diabsolutkan.
-            <img
-              src={absoluteMediaUrl(typeof src === "string" ? src : "")}
-              alt={alt ?? ""}
-              loading="lazy"
-              decoding="async"
-              className="mx-auto w-full rounded-2xl border border-border/70 shadow-soft"
-            />
-          ),
+          img: ({ src, alt, title }) => {
+            // Editor menitipkan lebar pilihan penulis di kolom judul gambar
+            // (`![alt](url "w=640")`), karena Markdown tidak punya tempat lain
+            // untuk atribut. Tanpa dibaca di sini, gambar yang sudah dikecilkan
+            // penulis tetap tayang selebar mungkin — resize-nya jadi bohong.
+            const width = readWidthDirective(title);
+            return (
+              <img
+                // src dari editor berbentuk relatif ("/blog/files/blog-xxx")
+                // karena disajikan API, bukan landing page — jadi diabsolutkan.
+                src={absoluteMediaUrl(typeof src === "string" ? src : "")}
+                alt={alt ?? ""}
+                // Judul yang cuma arahan lebar TIDAK diteruskan ke DOM; kalau
+                // diteruskan, pembaca melihat tooltip bertuliskan "w=640".
+                {...(width === null && title ? { title } : {})}
+                {...(width !== null ? { width } : {})}
+                loading="lazy"
+                decoding="async"
+                style={width !== null ? { maxWidth: "100%", width } : undefined}
+                className={
+                  width !== null
+                    ? "rounded-2xl border border-border/70 shadow-soft"
+                    : "mx-auto w-full rounded-2xl border border-border/70 shadow-soft"
+                }
+              />
+            );
+          },
           table: ({ children }) => (
             // Tabel lebar harus menggulir di dalam wadahnya sendiri, bukan
             // membuat seluruh halaman menggulir ke samping di layar kecil.

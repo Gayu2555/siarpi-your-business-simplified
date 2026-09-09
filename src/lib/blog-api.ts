@@ -48,6 +48,33 @@ interface PostEnvelope {
   post?: BlogPost;
 }
 
+const PUBLIC_REQUEST_TIMEOUT_MS = 5_000;
+const PUBLIC_LIST_CACHE_TTL_MS = 60_000;
+const MAX_PUBLIC_CACHE_ENTRIES = 100;
+const publishedListCache = new Map<string, { expiresAt: number; value: BlogListResult }>();
+const publishedListRequests = new Map<string, Promise<BlogListResult>>();
+const publishedPostCache = new Map<string, { expiresAt: number; value: BlogPost | null }>();
+const publishedPostRequests = new Map<string, Promise<BlogPost | null>>();
+
+function setBoundedCache<T>(
+  cache: Map<string, { expiresAt: number; value: T }>,
+  key: string,
+  value: T,
+) {
+  const now = Date.now();
+  for (const [cachedKey, entry] of cache) {
+    if (entry.expiresAt <= now) cache.delete(cachedKey);
+  }
+
+  if (!cache.has(key) && cache.size >= MAX_PUBLIC_CACHE_ENTRIES) {
+    const oldestKey = cache.keys().next().value;
+    if (oldestKey !== undefined) cache.delete(oldestKey);
+  }
+
+  cache.delete(key);
+  cache.set(key, { expiresAt: now + PUBLIC_LIST_CACHE_TTL_MS, value });
+}
+
 /**
  * Gambar dari backend disimpan sebagai path RELATIF ("/blog/files/blog-xxx")
  * karena disajikan oleh API, bukan oleh landing page. Untuk `og:image` dan
@@ -60,7 +87,7 @@ export function absoluteMediaUrl(path: string | undefined | null): string {
 }
 
 /** GET /public/blogs — daftar artikel yang sudah terbit. */
-export async function fetchPublishedPosts(options: {
+async function fetchPublishedPostsUncached(options: {
   page?: number;
   pageSize?: number;
   q?: string;
@@ -70,7 +97,10 @@ export async function fetchPublishedPosts(options: {
   params.set("page_size", String(options.pageSize ?? 12));
   if (options.q?.trim()) params.set("q", options.q.trim());
 
-  const { ok, data } = await apiFetch<ListEnvelope>(`/public/blogs?${params.toString()}`);
+  const { ok, data } = await apiFetch<ListEnvelope>(`/public/blogs?${params.toString()}`, {
+    auth: false,
+    signal: AbortSignal.timeout(PUBLIC_REQUEST_TIMEOUT_MS),
+  });
   if (!ok || !data?.success) {
     // Blog mati TIDAK boleh menjatuhkan halaman — indeks tetap tampil dengan
     // artikel bawaan, dan pembaca melihat daftar kosong, bukan error 500.
@@ -85,10 +115,73 @@ export async function fetchPublishedPosts(options: {
 }
 
 /** GET /public/blogs/{slug} — null kalau tidak ada / belum terbit. */
+export function fetchPublishedPosts(options: {
+  page?: number;
+  pageSize?: number;
+  q?: string;
+}): Promise<BlogListResult> {
+  const cacheKey = JSON.stringify({
+    page: options.page ?? 1,
+    pageSize: options.pageSize ?? 12,
+    q: options.q?.trim() ?? "",
+  });
+  const cached = publishedListCache.get(cacheKey);
+  if (cached && cached.expiresAt > Date.now()) {
+    return Promise.resolve(cached.value);
+  }
+
+  const pending = publishedListRequests.get(cacheKey);
+  if (pending) return pending;
+
+  const fallback: BlogListResult = {
+    posts: [],
+    totalItems: 0,
+    page: options.page ?? 1,
+    pageSize: options.pageSize ?? 12,
+  };
+  const request = fetchPublishedPostsUncached(options)
+    .catch(() => fallback)
+    .then((value) => {
+      setBoundedCache(publishedListCache, cacheKey, value);
+      return value;
+    })
+    .finally(() => publishedListRequests.delete(cacheKey));
+
+  publishedListRequests.set(cacheKey, request);
+  return request;
+}
+
 export async function fetchPostBySlug(slug: string): Promise<BlogPost | null> {
-  const { ok, data } = await apiFetch<PostEnvelope>(`/public/blogs/${encodeURIComponent(slug)}`);
-  if (!ok || !data?.success || !data.post) return null;
-  return data.post;
+  const cacheKey = slug.trim().toLowerCase();
+  const cached = publishedPostCache.get(cacheKey);
+  if (cached && cached.expiresAt > Date.now()) return cached.value;
+
+  const pending = publishedPostRequests.get(cacheKey);
+  if (pending) return pending;
+
+  const request = (async () => {
+    try {
+      const { ok, status, data } = await apiFetch<PostEnvelope>(
+        `/public/blogs/${encodeURIComponent(slug)}`,
+        {
+          auth: false,
+          signal: AbortSignal.timeout(PUBLIC_REQUEST_TIMEOUT_MS),
+        },
+      );
+      const value = ok && data?.success && data.post ? data.post : null;
+      if (value || status === 404) {
+        setBoundedCache(publishedPostCache, cacheKey, value);
+      }
+      return value;
+    } catch {
+      return null;
+    } finally {
+      publishedPostRequests.delete(cacheKey);
+    }
+  })();
+
+  publishedPostRequests.set(cacheKey, request);
+  return request;
 }
 
 // ── Turunan tampilan ─────────────────────────────────────────────────────────

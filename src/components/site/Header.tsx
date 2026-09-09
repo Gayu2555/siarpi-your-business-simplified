@@ -1,15 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Menu, X, LayoutDashboard, LogOut, ChevronDown } from "lucide-react";
 import pageLogo from "@/assets/Page 1.png";
 import {
@@ -29,6 +20,22 @@ const navLinks = [
   { to: "/komparasi", label: "Komparasi" },
   { to: "/roadmap", label: "Roadmap" },
 ] as const;
+
+function UserAvatar({ user, size = "sm" }: { user: SiarpiUser | null; size?: "sm" | "md" }) {
+  const className = `${size === "md" ? "h-9 w-9" : "h-7 w-7"} shrink-0 rounded-full`;
+  if (user?.avatar_url) {
+    return <img src={user.avatar_url} alt="" className={`${className} object-cover`} />;
+  }
+
+  return (
+    <span
+      aria-hidden="true"
+      className={`${className} flex items-center justify-center bg-gradient-primary text-xs font-semibold text-primary-foreground`}
+    >
+      {getInitials(user)}
+    </span>
+  );
+}
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -82,30 +89,18 @@ export function Header() {
         {/* Desktop right side */}
         <div className="hidden items-center justify-end gap-3 min-w-[190px] md:flex">
           {showAccount ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 rounded-full border border-border py-1 pl-1 pr-3 transition-colors hover:bg-muted">
-                  <Avatar className="h-7 w-7">
-                    <AvatarImage src={user?.avatar_url} alt={getDisplayName(user)} />
-                    <AvatarFallback className="bg-gradient-primary text-xs font-semibold text-primary-foreground">
-                      {getInitials(user)}
-                    </AvatarFallback>
-                  </Avatar>
+            <details className="group relative">
+              <summary className="flex cursor-pointer list-none items-center gap-2 rounded-full border border-border py-1 pl-1 pr-3 transition-colors hover:bg-muted [&::-webkit-details-marker]:hidden">
+                  <UserAvatar user={user} />
                   <span className="max-w-[120px] truncate text-sm font-medium">
                     {getDisplayName(user)}
                   </span>
-                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-64 rounded-2xl">
-                <DropdownMenuLabel className="font-normal">
+                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground transition-transform group-open:rotate-180" />
+              </summary>
+              <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-64 rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-lg">
+                <div className="px-2 py-1.5 font-normal">
                   <div className="flex items-center gap-3 py-1">
-                    <Avatar className="h-9 w-9">
-                      <AvatarImage src={user?.avatar_url} alt={getDisplayName(user)} />
-                      <AvatarFallback className="bg-gradient-primary text-sm font-semibold text-primary-foreground">
-                        {getInitials(user)}
-                      </AvatarFallback>
-                    </Avatar>
+                    <UserAvatar user={user} size="md" />
                     <div className="flex min-w-0 flex-col">
                       <span className="truncate text-sm font-semibold text-foreground">
                         {getDisplayName(user)}
@@ -113,28 +108,26 @@ export function Header() {
                       <span className="truncate text-xs text-muted-foreground">{user?.email}</span>
                     </div>
                   </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild className="cursor-pointer rounded-lg">
-                  <Link to="/dashboard">
+                </div>
+                <div className="my-1 h-px bg-border" />
+                <Link
+                  to="/dashboard"
+                  className="flex items-center rounded-lg px-2 py-1.5 text-sm outline-none hover:bg-muted"
+                >
                     <LayoutDashboard className="mr-2 h-4 w-4" />
                     Dashboard
-                  </Link>
-                </DropdownMenuItem>
-                {/* Entri "Pengaturan" DIHAPUS: /settings di sini cuma halaman
-                    kosong bertuliskan "sedang dalam pengembangan", sementara
-                    pengaturan akun yang sebenarnya ada di aplikasi utama.
-                    Menautkannya dari menu setiap user = jalan buntu. */}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
+                </Link>
+                <div className="my-1 h-px bg-border" />
+                <button
+                  type="button"
                   onClick={handleLogout}
-                  className="cursor-pointer rounded-lg text-destructive focus:text-destructive"
+                  className="flex w-full items-center rounded-lg px-2 py-1.5 text-left text-sm text-destructive outline-none hover:bg-destructive/10"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
                   Keluar
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                </button>
+              </div>
+            </details>
           ) : (
             <>
               <Button variant="ghost" size="sm" asChild>
@@ -175,12 +168,7 @@ export function Header() {
             {showAccount ? (
               <div className="mt-2 border-t border-border pt-3">
                 <div className="flex items-center gap-3 px-3 py-2">
-                  <Avatar className="h-9 w-9">
-                    <AvatarImage src={user?.avatar_url} alt={getDisplayName(user)} />
-                    <AvatarFallback className="bg-gradient-primary text-sm font-semibold text-primary-foreground">
-                      {getInitials(user)}
-                    </AvatarFallback>
-                  </Avatar>
+                  <UserAvatar user={user} size="md" />
                   <div className="flex min-w-0 flex-col">
                     <span className="truncate text-sm font-semibold">{getDisplayName(user)}</span>
                     <span className="truncate text-xs text-muted-foreground">{user?.email}</span>
