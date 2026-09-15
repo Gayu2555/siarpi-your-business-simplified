@@ -29,6 +29,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { modules } from "@/lib/modules";
+import { fetchCatalogModules } from "@/lib/modules-api";
 import { formatIDR } from "@/lib/utils";
 
 export const Route = createFileRoute("/studi-kasus")({
@@ -47,6 +48,13 @@ export const Route = createFileRoute("/studi-kasus")({
       },
     ],
   }),
+  loader: async () => {
+    try {
+      return { catalogModules: await fetchCatalogModules() };
+    } catch {
+      return { catalogModules: [] };
+    }
+  },
   component: InteractiveGuidePage,
 });
 
@@ -57,7 +65,9 @@ interface ScaleGuide {
   heroTitle: string;
   overviewText: string;
   targetAudience: string[];
-  recommendedModules: { id: string; name: string; reason: string; price: number }[];
+  workflowChanges: { process: string; before: string; after: string }[];
+  readinessChecklist: string[];
+  recommendedModules: { id: string; name: string; reason: string }[];
   implementationSteps: { step: string; title: string; desc: string }[];
   keyOutcomes: { metric: string; label: string; desc: string }[];
   commonMistakes: string[];
@@ -77,43 +87,57 @@ const scaleGuidesData: Record<"umkm" | "smb" | "enterprise", ScaleGuide> = {
       "Jasa Konsultan / Freelance / Agensi Kecil",
       "Toko Kelontong & Distributor Lokal",
     ],
+    workflowChanges: [
+      {
+        process: "Pencatatan transaksi",
+        before: "Nota dan pengeluaran direkap ulang ke spreadsheet pada akhir hari.",
+        after: "Dokumen transaksi dicatat pada alur yang sama dan siap masuk laporan.",
+      },
+      {
+        process: "Kontrol persediaan",
+        before: "Jumlah stok diketahui setelah hitung fisik atau saat barang mulai habis.",
+        after: "Mutasi masuk, keluar, dan penyesuaian stok dapat ditelusuri per produk.",
+      },
+      {
+        process: "Pemantauan kas",
+        before: "Saldo usaha bercampur dengan catatan pribadi dan sulit direkonsiliasi.",
+        after: "Kas dan rekening usaha dipisahkan sehingga posisi saldo lebih mudah diperiksa.",
+      },
+    ],
+    readinessChecklist: [
+      "Daftar produk, satuan, dan stok awal",
+      "Saldo awal kas serta rekening usaha",
+      "Daftar pelanggan dan pemasok aktif",
+      "Satu penanggung jawab administrasi",
+    ],
     recommendedModules: [
       {
         id: "finance",
         name: "Modul Finance",
         reason:
           "Otomatisasi catatan kas harian, laporan laba rugi, dan saldo bank tanpa buat jurnal manual.",
-        price: 99000,
-      },
-      {
-        id: "pos",
-        name: "Modul POS (Kasir)",
-        reason:
-          "Point of Sale simpel untuk catat transaksi penjualan di toko fisik & sinkron ke kas.",
-        price: 79000,
       },
       {
         id: "inventory",
         name: "Modul Inventory",
         reason: "Pantau stok bahan/barang jualan agar tahu kapan harus stok ulang.",
-        price: 69000,
       },
     ],
     implementationSteps: [
       {
         step: "01",
         title: "Daftar Akun & Pilih Modul Wajib",
-        desc: "Cukup aktifkan modul Finance & POS/Inventory sesuai kebutuhan usaha.",
+        desc: "Cukup aktifkan modul Finance dan Inventory sesuai kebutuhan usaha.",
       },
       {
         step: "02",
         title: "Input Saldo Kas & Stok Barang",
-        desc: "Masukkan saldo modal kasir dan daftar produk jualan kamu (bisa via Excel).",
+        desc: "Masukkan saldo awal dan daftar produk jualan kamu (bisa via Excel).",
       },
       {
         step: "03",
         title: "Mulai Transaksi Harian",
-        desc: "Setiap penjualan di kasir otomatis memotong stok dan menambah saldo kas.",
+        desc: "Catat penjualan harian agar pergerakan stok dan saldo kas selalu terpantau.",
       },
       {
         step: "04",
@@ -124,12 +148,12 @@ const scaleGuidesData: Record<"umkm" | "smb" | "enterprise", ScaleGuide> = {
     keyOutcomes: [
       {
         metric: "5 Menit",
-        label: "Tutup Kasir Harian",
+        label: "Rekap Operasional Harian",
         desc: "Dulu 2 jam bongkar kuitansi kertas",
       },
       {
         metric: "100%",
-        label: "Bebas Selisih Kasir",
+        label: "Transaksi Lebih Terlacak",
         desc: "Setiap rupiah masuk & keluar tercatat",
       },
       {
@@ -157,30 +181,49 @@ const scaleGuidesData: Record<"umkm" | "smb" | "enterprise", ScaleGuide> = {
       "Klinik Kesehatan & Jaringan Apotek",
       "Pabrik Pengolahan & Kontraktor",
     ],
+    workflowChanges: [
+      {
+        process: "Piutang dan hutang",
+        before: "Jatuh tempo dipantau dari file berbeda oleh tiap admin atau cabang.",
+        after: "Faktur terbuka, umur tagihan, dan pembayaran terlihat dalam satu alur.",
+      },
+      {
+        process: "Persetujuan biaya",
+        before: "Permintaan dan persetujuan pengeluaran tersebar di email atau percakapan.",
+        after: "Status dokumen dan pihak yang menyetujui dapat dilacak secara berjenjang.",
+      },
+      {
+        process: "Penggajian",
+        before: "Absensi, komponen gaji, dan potongan disalin antar-file setiap periode.",
+        after: "Data tenaga kerja menjadi referensi konsisten untuk proses payroll.",
+      },
+    ],
+    readinessChecklist: [
+      "Daftar karyawan beserta struktur organisasi",
+      "Saldo faktur piutang dan hutang berjalan",
+      "Bagan akun serta rekening bank perusahaan",
+      "Matriks otorisasi per nominal atau divisi",
+    ],
     recommendedModules: [
       {
         id: "finance",
         name: "Modul Finance (AR/AP & Bank)",
         reason: "Kelola jatuh tempo faktur piutang toko & pembayaran tagihan supplier.",
-        price: 99000,
       },
       {
         id: "payroll",
         name: "Modul Payroll",
         reason: "Hitung gaji, lembur, BPJS, & PPh 21 puluhan karyawan otomatis.",
-        price: 89000,
       },
       {
         id: "hr",
         name: "Modul HR & Absensi",
         reason: "Kelola data staf, pengajuan cuti, & absensi GPS mobile.",
-        price: 59000,
       },
       {
         id: "inventory",
         name: "Modul Multi-Gudang",
         reason: "Lacak perpindahan barang antar gudang & cabang real-time.",
-        price: 69000,
       },
     ],
     implementationSteps: [
@@ -242,30 +285,49 @@ const scaleGuidesData: Record<"umkm" | "smb" | "enterprise", ScaleGuide> = {
       "Jaringan Logistik & Transportasi Nasional",
       "Pengembang Properti & Konstruksi Skala Besar",
     ],
+    workflowChanges: [
+      {
+        process: "Konsolidasi entitas",
+        before: "Laporan anak usaha diseragamkan manual sebelum dapat digabungkan.",
+        after: "Mapping akun dan unit bisnis menjadi dasar konsolidasi yang konsisten.",
+      },
+      {
+        process: "Kontrol anggaran",
+        before: "Realisasi biaya baru terlihat setelah laporan periodik dikompilasi.",
+        after: "Anggaran dan aktual dapat dibandingkan per unit, proyek, atau pusat biaya.",
+      },
+      {
+        process: "Audit dan tutup buku",
+        before: "Perubahan data setelah closing sulit diketahui dan ditelusuri sumbernya.",
+        after: "Periode, akses, dan jejak perubahan membantu proses review serta audit.",
+      },
+    ],
+    readinessChecklist: [
+      "Struktur legal seluruh entitas dan unit bisnis",
+      "Mapping chart of accounts antar-perusahaan",
+      "Kebijakan closing, pajak, dan mata uang",
+      "Pemilik proses serta approver lintas unit",
+    ],
     recommendedModules: [
       {
         id: "finance",
         name: "Modul Finance Enterprise",
         reason: "Konsolidasi laporan holding, multi-currency BI JISDOR, & e-Faktur DJP.",
-        price: 99000,
       },
       {
         id: "project",
         name: "Modul Project & Budgeting",
         reason: "Monitoring variance budget vs actual per unit bisnis & proyek.",
-        price: 79000,
       },
       {
         id: "payroll",
         name: "Modul Payroll Enterprise",
         reason: "Transfer penggajian massal ratusan/ribuan staf via integrasi bank.",
-        price: 89000,
       },
       {
         id: "analytics",
         name: "Modul Executive Analytics",
         reason: "Visualisasi laporan kesehatan finansial holding untuk direksi.",
-        price: 89000,
       },
     ],
     implementationSteps: [
@@ -315,11 +377,35 @@ const scaleGuidesData: Record<"umkm" | "smb" | "enterprise", ScaleGuide> = {
   },
 };
 
+const implementationFaqs = [
+  {
+    question: "Apakah semua modul harus diaktifkan sejak awal?",
+    answer:
+      "Tidak. Mulai dari proses yang paling mendesak, siapkan data dasarnya, lalu aktifkan modul lain secara bertahap ketika alur pertama sudah stabil.",
+  },
+  {
+    question: "Apakah data spreadsheet lama bisa tetap digunakan?",
+    answer:
+      "Bisa sebagai sumber migrasi. Data perlu dibersihkan dan dipetakan terlebih dahulu agar kode, saldo awal, serta relasi pelanggan atau pemasok tidak ganda.",
+  },
+  {
+    question: "Siapa yang sebaiknya menjadi penanggung jawab implementasi?",
+    answer:
+      "Tunjuk satu process owner dari sisi bisnis yang memahami alur harian dan dapat mengambil keputusan. Untuk perusahaan lebih besar, libatkan owner per fungsi dan satu koordinator lintas divisi.",
+  },
+  {
+    question: "Berapa lama sampai sistem dapat dipakai operasional?",
+    answer:
+      "Durasi bergantung pada jumlah data, kompleksitas approval, dan jumlah unit. Implementasi bertahap biasanya lebih terukur karena setiap fase dapat diuji sebelum cakupannya diperluas.",
+  },
+];
+
 // TIDAK di-export: file route yang mengekspor apa pun selain `Route` membuat
 // TanStack Router membatalkan code-splitting untuk halaman ini, sehingga
 // komponennya ikut masuk bundel utama. Komponen ini hanya dipakai oleh
 // `component:` di atas.
 function InteractiveGuidePage() {
+  const { catalogModules } = Route.useLoaderData();
   const [activeScale, setActiveScale] = useState<"umkm" | "smb" | "enterprise">("umkm");
 
   // Interactive Calculator State
@@ -328,13 +414,23 @@ function InteractiveGuidePage() {
 
   const guide = scaleGuidesData[activeScale];
 
+  const modulePrices = useMemo(() => {
+    const prices = new Map<string, number>(modules.map((module) => [module.id, module.price]));
+
+    for (const module of catalogModules) {
+      prices.set(module.key.toLowerCase(), module.price);
+    }
+
+    return prices;
+  }, [catalogModules]);
+
   // Calculated estimates
   const calculatedHoursSavedPerWeek = useMemo(() => {
-    return Math.round(numHoursManual * 0.75);
-  }, [numHoursManual]);
+    return Math.round(numStaff * numHoursManual * 0.75);
+  }, [numHoursManual, numStaff]);
 
   const calculatedMonthlySavingsIDR = useMemo(() => {
-    // Estimasi penghematan biaya jam kerja / lembur (asumsi jam kerja Rp 40.000/jam)
+    // Estimasi penghematan biaya jam kerja / lembur (asumsi biaya waktu Rp45.000/jam)
     const hoursSavedMonthly = calculatedHoursSavedPerWeek * 4;
     return hoursSavedMonthly * 45000;
   }, [calculatedHoursSavedPerWeek]);
@@ -357,7 +453,7 @@ function InteractiveGuidePage() {
                   Panduan & Strategi Bisnis
                 </Badge>
                 <span className="text-xs text-muted-foreground flex items-center gap-1">
-                  <Clock className="h-3.5 w-3.5" /> 6 menit baca • Diperbarui Juli 2026
+                  <Clock className="h-3.5 w-3.5" /> 10 menit baca • Diperbarui September 2026
                 </span>
               </div>
 
@@ -476,39 +572,43 @@ function InteractiveGuidePage() {
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {guide.recommendedModules.map((mod) => (
-                      <Card
-                        key={mod.id}
-                        className="rounded-2xl border border-border/80 bg-card p-5 space-y-3 flex flex-col justify-between shadow-soft hover:border-primary/40 transition-all"
-                      >
-                        <div className="space-y-2">
-                          <Badge variant="outline" className="text-[10px] font-bold uppercase">
-                            Modul Recomendation
-                          </Badge>
-                          <h4 className="font-display font-bold text-base text-foreground">
-                            {mod.name}
-                          </h4>
-                          <p className="text-xs text-muted-foreground leading-relaxed">
-                            {mod.reason}
-                          </p>
-                        </div>
-                        <div className="pt-3 border-t border-border/60 flex items-center justify-between">
-                          <span className="font-display text-xs font-bold text-foreground">
-                            {formatIDR(mod.price)}/bln
-                          </span>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            asChild
-                            className="text-xs text-primary p-0 h-auto font-semibold"
-                          >
-                            <Link to="/modules/$moduleId" params={{ moduleId: mod.id }}>
-                              Detail <ChevronRight className="h-3.5 w-3.5" />
-                            </Link>
-                          </Button>
-                        </div>
-                      </Card>
-                    ))}
+                    {guide.recommendedModules.map((mod) => {
+                      const price = modulePrices.get(mod.id);
+
+                      return (
+                        <Card
+                          key={mod.id}
+                          className="rounded-2xl border border-border/80 bg-card p-5 space-y-3 flex flex-col justify-between shadow-soft hover:border-primary/40 transition-all"
+                        >
+                          <div className="space-y-2">
+                            <Badge variant="outline" className="text-[10px] font-bold uppercase">
+                              Rekomendasi modul
+                            </Badge>
+                            <h4 className="font-display font-bold text-base text-foreground">
+                              {mod.name}
+                            </h4>
+                            <p className="text-xs text-muted-foreground leading-relaxed">
+                              {mod.reason}
+                            </p>
+                          </div>
+                          <div className="pt-3 border-t border-border/60 flex items-center justify-between">
+                            <span className="font-display text-xs font-bold text-foreground">
+                              {price == null ? "Hubungi sales" : `${formatIDR(price)}/bln`}
+                            </span>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              asChild
+                              className="text-xs text-primary p-0 h-auto font-semibold"
+                            >
+                              <Link to="/modules/$moduleId" params={{ moduleId: mod.id }}>
+                                Detail <ChevronRight className="h-3.5 w-3.5" />
+                              </Link>
+                            </Button>
+                          </div>
+                        </Card>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -546,7 +646,70 @@ function InteractiveGuidePage() {
                   </div>
                 </div>
 
-                {/* 4. KEY OUTCOMES */}
+                {/* 4. BEFORE AND AFTER WORKFLOW */}
+                <div className="space-y-6 border-t border-border/60 pt-4">
+                  <div>
+                    <h3 className="font-display text-xl font-bold text-foreground md:text-2xl">
+                      Perubahan Alur Kerja yang Diharapkan
+                    </h3>
+                    <p className="mt-1 text-xs text-muted-foreground md:text-sm">
+                      Gambaran proses sebelum implementasi dan kondisi operasional yang dituju.
+                    </p>
+                  </div>
+
+                  <div className="overflow-hidden rounded-2xl border border-border/80 bg-card">
+                    <div className="hidden grid-cols-[160px_1fr_1fr] gap-4 border-b border-border/80 bg-muted/40 px-5 py-3 text-[11px] font-bold uppercase text-muted-foreground sm:grid">
+                      <span>Proses</span>
+                      <span>Sebelum</span>
+                      <span>Dengan Siarpi</span>
+                    </div>
+                    {guide.workflowChanges.map((workflow) => (
+                      <div
+                        key={workflow.process}
+                        className="grid gap-4 border-b border-border/60 px-5 py-5 last:border-b-0 sm:grid-cols-[160px_1fr_1fr]"
+                      >
+                        <div className="text-sm font-semibold text-foreground">
+                          {workflow.process}
+                        </div>
+                        <div className="flex items-start gap-2 text-xs leading-relaxed text-muted-foreground">
+                          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-500" />
+                          <span>{workflow.before}</span>
+                        </div>
+                        <div className="flex items-start gap-2 text-xs leading-relaxed text-foreground">
+                          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                          <span>{workflow.after}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 5. DATA READINESS */}
+                <div className="space-y-5 border-y border-border/60 bg-muted/25 px-5 py-6 sm:px-6">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                      <BookOpen className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-display text-lg font-bold text-foreground">
+                        Data yang Perlu Disiapkan
+                      </h3>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Checklist awal agar konfigurasi dan migrasi data lebih terarah.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="grid gap-x-8 gap-y-3 sm:grid-cols-2">
+                    {guide.readinessChecklist.map((item) => (
+                      <div key={item} className="flex items-start gap-2.5 text-sm text-foreground">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                        <span>{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 6. KEY OUTCOMES */}
                 <div className="space-y-6 pt-4 border-t border-border/60">
                   <div>
                     <h3 className="font-display text-xl md:text-2xl font-bold text-foreground">
@@ -570,9 +733,14 @@ function InteractiveGuidePage() {
                       </Card>
                     ))}
                   </div>
+                  <p className="text-[11px] leading-relaxed text-muted-foreground">
+                    Angka di atas merupakan sasaran ilustratif berdasarkan skenario proses. Hasil
+                    aktual bergantung pada kualitas data, disiplin penggunaan, dan kompleksitas
+                    operasional perusahaan.
+                  </p>
                 </div>
 
-                {/* 5. COMMON MISTAKES TO AVOID */}
+                {/* 7. COMMON MISTAKES TO AVOID */}
                 <div className="rounded-2xl border border-rose-200/80 bg-rose-50/40 dark:border-rose-950/60 dark:bg-rose-950/20 p-6 space-y-3">
                   <div className="font-display font-bold text-sm text-rose-700 dark:text-rose-400 uppercase tracking-wider flex items-center gap-2">
                     <AlertCircle className="h-4 w-4" /> Kesalahan Umum yang Sering Terjadi (Dan Cara
@@ -626,7 +794,7 @@ function InteractiveGuidePage() {
 
                     <div>
                       <div className="flex justify-between text-xs font-bold text-foreground mb-2">
-                        <span>Jam Kerja Rekap Manual Per Minggu:</span>
+                        <span>Jam Rekap Manual per Staf/Minggu:</span>
                         <span className="text-primary font-mono text-sm">
                           {numHoursManual} Jam / Minggu
                         </span>
@@ -666,7 +834,44 @@ function InteractiveGuidePage() {
                     </div>
                   </div>
                 </div>
+                <p className="border-t border-border/60 pt-4 text-[11px] leading-relaxed text-muted-foreground">
+                  Estimasi memakai asumsi pengurangan pekerjaan manual sebesar 75%, empat minggu
+                  kerja per bulan, dan biaya waktu Rp45.000 per jam. Gunakan hasil sebagai bahan
+                  perencanaan awal, bukan jaminan penghematan.
+                </p>
               </Card>
+            </div>
+
+            {/* IMPLEMENTATION FAQ */}
+            <div className="space-y-6 border-t border-border/80 pt-8">
+              <div className="max-w-2xl">
+                <Badge variant="outline" className="mb-3 rounded-full">
+                  Persiapan Implementasi
+                </Badge>
+                <h3 className="font-display text-2xl font-bold text-foreground">
+                  Pertanyaan yang Sering Muncul Sebelum Mulai
+                </h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Jawaban singkat untuk menyusun langkah awal tanpa mengganggu operasional berjalan.
+                </p>
+              </div>
+
+              <Accordion
+                type="single"
+                collapsible
+                className="overflow-hidden rounded-2xl border border-border/80 bg-card px-5"
+              >
+                {implementationFaqs.map((faq, index) => (
+                  <AccordionItem key={faq.question} value={`implementation-faq-${index}`}>
+                    <AccordionTrigger className="text-left text-sm font-semibold hover:no-underline">
+                      {faq.question}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-sm leading-relaxed text-muted-foreground">
+                      {faq.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
             </div>
 
             {/* RELATED ARTICLES GRID */}
@@ -690,7 +895,7 @@ function InteractiveGuidePage() {
                         Cara Transisi dari Catatan Buku Tulis ke Pembukuan Digital
                       </h4>
                       <p className="text-xs text-muted-foreground line-clamp-2">
-                        Langkah mudah memindahkan data tanpa takut selisih kasir.
+                        Langkah mudah memindahkan data tanpa takut selisih pencatatan.
                       </p>
                     </div>
                     <div className="text-xs font-semibold text-primary flex items-center gap-1 pt-2 border-t border-border/60">

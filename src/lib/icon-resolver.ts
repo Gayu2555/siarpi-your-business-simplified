@@ -82,11 +82,16 @@ function warnMissingIcon(kind: string, name: string, source: string) {
  * resolvePhosphorIcon("i-ph-cube-fill")
  *   → { Icon: Cube, weight: "fill" }
  */
-export function resolvePhosphorIcon(iconClass: string): {
+export function resolvePhosphorIcon(iconClass?: string | null): {
   Icon: PhosphorIcon;
   weight: PhosphorWeight;
 } {
-  const raw = (iconClass ?? "").replace(/^i-ph-/, "");
+  // Data katalog berasal dari database dan beberapa row lama dapat belum
+  // memiliki icon. Jangan biarkan satu nilai kosong meruntuhkan seluruh page.
+  const source = typeof iconClass === "string" ? iconClass.trim() : "";
+  if (!source) return { Icon: Package, weight: "regular" };
+
+  const raw = source.replace(/^i-ph-/, "");
 
   let weight: PhosphorWeight = "regular";
   let slug = raw;
@@ -107,7 +112,7 @@ export function resolvePhosphorIcon(iconClass: string): {
 
   const Icon = PHOSPHOR_ICONS[pascalName];
   if (!Icon) {
-    warnMissingIcon("Phosphor", pascalName, iconClass);
+    warnMissingIcon("Phosphor", pascalName, source);
     return { Icon: Package, weight };
   }
 

@@ -7,7 +7,6 @@ import {
   HeartHandshake,
   Clock,
   FileText,
-  ShoppingCart,
   BarChart3,
   type LucideIcon,
 } from "lucide-react";
@@ -32,7 +31,6 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   HeartHandshake,
   Clock,
   FileText,
-  ShoppingCart,
   BarChart3,
 };
 
@@ -92,13 +90,6 @@ export const modules = [
     iconName: "FileText",
     description: "Tagihan & pembayaran",
     price: 49000,
-  },
-  {
-    id: "pos",
-    name: "POS",
-    iconName: "ShoppingCart",
-    description: "Point of sale toko",
-    price: 79000,
   },
   {
     id: "analytics",

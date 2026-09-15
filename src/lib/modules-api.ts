@@ -6,6 +6,13 @@
 
 import { apiFetch } from "@/lib/api";
 
+const PUBLIC_CATALOG_TIMEOUT_MS = 5_000;
+const UNRELEASED_MODULE_KEYS = new Set(["pos"]);
+
+export function isReleasedModule(moduleKey: string): boolean {
+  return !UNRELEASED_MODULE_KEYS.has(moduleKey.trim().toLowerCase());
+}
+
 // ── Types (mirror dari modules/models.go) ────────────────────────────────────
 
 export interface ApiModule {
@@ -62,18 +69,23 @@ export interface SuiteWithPlans extends ProductSuite {
 export async function fetchCatalogModules(): Promise<ApiModule[]> {
   const { ok, data } = await apiFetch<{ success: boolean; modules: ApiModule[] }>(
     "/public/modules",
+    { auth: false, signal: AbortSignal.timeout(PUBLIC_CATALOG_TIMEOUT_MS) },
   );
   if (!ok || !data?.success) return [];
-  return data.modules ?? [];
+  return (data.modules ?? []).filter((module) => isReleasedModule(module.key));
 }
 
 /** GET /public/suites — semua suite beserta plan & modul (untuk pricing page) */
 export async function fetchSuites(): Promise<SuiteWithPlans[]> {
   const { ok, data } = await apiFetch<{ success: boolean; suites: SuiteWithPlans[] }>(
     "/public/suites",
+    { auth: false, signal: AbortSignal.timeout(PUBLIC_CATALOG_TIMEOUT_MS) },
   );
   if (!ok || !data?.success) return [];
-  return data.suites ?? [];
+  return (data.suites ?? []).map((suite) => ({
+    ...suite,
+    modules: suite.modules?.filter((module) => isReleasedModule(module.key)) ?? null,
+  }));
 }
 
 export interface ModuleWithStatus extends ApiModule {
@@ -97,5 +109,10 @@ export async function fetchCompanyModules(): Promise<CompanyModulesResponse | nu
     "/company/modules",
   );
   if (!ok || status === 401 || !data?.success) return null;
-  return data.data;
+  return {
+    ...data.data,
+    ownedModules: data.data.ownedModules.filter((module) => isReleasedModule(module.key)),
+    availableModules: data.data.availableModules.filter((module) => isReleasedModule(module.key)),
+    pendingModuleKeys: data.data.pendingModuleKeys.filter(isReleasedModule),
+  };
 }

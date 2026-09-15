@@ -6,10 +6,19 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { ConsultationCtaSection } from "@/components/site/ConsultationCtaSection";
 import { fetchCatalogModules, type ApiModule } from "@/lib/modules-api";
 import { formatIDR } from "@/lib/utils";
 import { resolvePhosphorIcon } from "@/lib/icon-resolver";
-import { Plus, Check, ShoppingCart, Trash2, ArrowRight, X, Loader2 } from "lucide-react";
+import {
+  Plus,
+  Check,
+  ShoppingCart,
+  Trash2,
+  ArrowRight,
+  X,
+  Loader2,
+} from "lucide-react";
 import { isAuthenticated, getStoredUser } from "@/lib/auth";
 import { getOnboardingStatus } from "@/lib/company-api";
 import { createCheckout } from "@/lib/checkout-api";
@@ -69,6 +78,9 @@ function ModularPage() {
   const remove = (id: string) => setCart((p) => p.filter((x) => x !== id));
 
   const total = cart.reduce((s, id) => s + (modulesList.find((m) => m.key === id)?.price ?? 0), 0);
+  const selectedModuleNames = cart
+    .map((id) => modulesList.find((module) => module.key === id)?.name)
+    .filter((moduleName): moduleName is string => Boolean(moduleName));
 
   const handleProceed = async () => {
     if (cart.length === 0) return;
@@ -262,6 +274,8 @@ function ModularPage() {
             </aside>
           </div>
         )}
+
+        <ConsultationCtaSection className="mt-16" context={selectedModuleNames} />
       </main>
 
       {/* Mobile cart FAB + sheet */}

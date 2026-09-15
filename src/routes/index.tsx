@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { ConsultationCtaSection } from "@/components/site/ConsultationCtaSection";
 import {
   fetchCatalogModules,
   fetchSuites,
@@ -157,21 +158,6 @@ const FALLBACK_MODULES: ApiModule[] = [
     is_listed: true,
   },
   {
-    key: "pos",
-    name: "POS",
-    label: "POS",
-    description: "Point of sale toko",
-    icon: "i-ph-storefront-fill",
-    bg_color: "bg-red-100",
-    icon_color: "text-red-600",
-    hover_color: "red",
-    route: "",
-    suite_key: "commerce",
-    price: 79000,
-    is_core: false,
-    is_listed: true,
-  },
-  {
     key: "analytics",
     name: "Analytics",
     label: "Analytics",
@@ -225,7 +211,7 @@ export const Route = createFileRoute("/")({
         priceCurrency: "IDR",
         lowPrice: "39000",
         highPrice: "99000",
-        offerCount: "10",
+        offerCount: "9",
       },
       aggregateRating: {
         "@type": "AggregateRating",
@@ -293,17 +279,46 @@ const benefits = [
   {
     iconName: "RefreshCw",
     title: "Bebas Rekap Manual",
-    desc: "Penjualan kasir, stok barang, dan catatan kas terhubung otomatis tanpa perlu salin di Excel.",
+    desc: "Dokumen transaksi, stok barang, dan catatan kas terhubung tanpa perlu salin data di Excel.",
   },
   {
     iconName: "GraduationCap",
     title: "Langsung Pakai Tanpa Training",
-    desc: "Tampilan simpel dan ramah pengguna. Staf kasir atau admin Anda bisa langsung mengerti dalam 5 menit.",
+    desc: "Tampilan simpel dan ramah pengguna. Staf operasional atau admin Anda bisa cepat beradaptasi.",
   },
   {
     iconName: "Smartphone",
     title: "Pantau dari Mana Saja",
     desc: "Cek laporan Laba Rugi, sisa stok, dan tagihan pelanggan langsung dari HP atau laptop secara real-time.",
+  },
+];
+
+const caseStudies = [
+  {
+    segment: "UMKM retail & distribusi",
+    icon: Building2,
+    title: "Stok dan pembukuan berjalan dalam satu alur",
+    challenge: "Data stok, tagihan pelanggan, dan arus kas masih tersebar di beberapa spreadsheet.",
+    result: "Fokus hasil: stok lebih terkontrol dan rekap keuangan harian lebih singkat.",
+    modules: ["Finance", "Inventory", "Invoice"],
+  },
+  {
+    segment: "Perusahaan jasa berkembang",
+    icon: Users,
+    title: "Administrasi tim tidak lagi menghambat pertumbuhan",
+    challenge:
+      "Data karyawan, absensi, cuti, dan perhitungan gaji dikerjakan melalui alur terpisah.",
+    result: "Fokus hasil: data tenaga kerja konsisten dari kehadiran sampai penggajian.",
+    modules: ["HR", "Absensi", "Payroll"],
+  },
+  {
+    segment: "Manufaktur & multi-unit",
+    icon: Layers,
+    title: "Operasional dan anggaran dapat dipantau lintas unit",
+    challenge:
+      "Pengadaan, produksi, anggaran proyek, dan laporan manajemen sulit dikonsolidasikan.",
+    result: "Fokus hasil: keputusan lintas unit memakai data operasional yang lebih utuh.",
+    modules: ["Procurement", "Production", "Analytics"],
   },
 ];
 
@@ -346,7 +361,7 @@ const testimonials = [
   },
   {
     quote:
-      "Antrian di kasir lebih cepat, stok update otomatis tiap transaksi. Omzet warung saya naik 20% dalam 2 bulan.",
+      "Stok masuk dan keluar sekarang lebih mudah dilacak. Tim kami tidak lagi menghabiskan waktu untuk rekap manual setiap hari.",
     name: "Pak Bambang",
     role: "Owner",
     company: "Warung Bakso Mantap",
@@ -552,6 +567,42 @@ function LandingPage() {
         </div>
       </section>
 
+      {/* BENEFITS */}
+      <section className="bg-muted/30 py-20 md:py-28">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="mx-auto max-w-2xl text-center">
+            <Badge variant="outline" className="mb-4 rounded-full">
+              Mengapa Siarpi
+            </Badge>
+            <h2 className="font-display text-3xl font-bold md:text-5xl">
+              Dirancang untuk bisnis Indonesia
+            </h2>
+          </div>
+          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {benefits.map((b, i) => {
+              const BIcon = resolveLucideIcon(b.iconName);
+              return (
+                <motion.div
+                  key={b.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: i * 0.08 }}
+                >
+                  <Card className="h-full rounded-2xl border-border p-6 transition-shadow hover:shadow-card">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground shadow-soft">
+                      <BIcon className="h-5 w-5" />
+                    </div>
+                    <h3 className="mt-4 font-display text-lg font-semibold">{b.title}</h3>
+                    <p className="mt-2 text-sm text-muted-foreground">{b.desc}</p>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* MODULES */}
       <section className="container mx-auto px-4 py-20 md:px-6 md:py-28">
         <div className="mx-auto max-w-2xl text-center">
@@ -619,34 +670,72 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* BENEFITS */}
+      {/* DISKUSIKAN DENGAN TIM SIARPI */}
+      <ConsultationCtaSection />
+
+      {/* STUDI KASUS */}
       <section className="bg-muted/30 py-20 md:py-28">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="mx-auto max-w-2xl text-center">
-            <Badge variant="outline" className="mb-4 rounded-full">
-              Kenapa Siarpi
-            </Badge>
-            <h2 className="font-display text-3xl font-bold md:text-5xl">
-              Dirancang untuk bisnis Indonesia
-            </h2>
+          <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-2xl">
+              <Badge variant="outline" className="mb-4 rounded-full bg-background">
+                Studi Kasus
+              </Badge>
+              <h2 className="font-display text-3xl font-bold md:text-5xl">
+                Lihat Siarpi bekerja di alur bisnis nyata
+              </h2>
+              <p className="mt-4 text-muted-foreground">
+                Jelajahi skenario implementasi berdasarkan skala usaha, tantangan operasional, dan
+                kombinasi modul yang relevan.
+              </p>
+            </div>
+            <Button variant="outline" asChild className="w-fit bg-background">
+              <Link to="/studi-kasus">
+                Buka semua studi kasus <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
-          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {benefits.map((b, i) => {
-              const BIcon = resolveLucideIcon(b.iconName);
+
+          <div className="mt-12 grid gap-5 lg:grid-cols-3">
+            {caseStudies.map((study, index) => {
+              const CaseIcon = study.icon;
               return (
                 <motion.div
-                  key={b.title}
+                  key={study.segment}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: i * 0.08 }}
+                  transition={{ duration: 0.4, delay: index * 0.08 }}
                 >
-                  <Card className="h-full rounded-2xl border-border p-6 transition-shadow hover:shadow-card">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground shadow-soft">
-                      <BIcon className="h-5 w-5" />
+                  <Card className="flex h-full flex-col rounded-2xl border-border p-6 transition-all hover:border-primary/40 hover:shadow-card">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                        <CaseIcon className="h-5 w-5" />
+                      </div>
+                      <span className="text-xs font-semibold uppercase text-muted-foreground">
+                        {study.segment}
+                      </span>
                     </div>
-                    <h3 className="mt-4 font-display text-lg font-semibold">{b.title}</h3>
-                    <p className="mt-2 text-sm text-muted-foreground">{b.desc}</p>
+                    <h3 className="mt-5 font-display text-lg font-semibold">{study.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                      {study.challenge}
+                    </p>
+                    <p className="mt-5 border-l-2 border-primary pl-3 text-sm font-medium">
+                      {study.result}
+                    </p>
+                    <div className="mt-5 flex flex-wrap gap-2">
+                      {study.modules.map((moduleName) => (
+                        <Badge key={moduleName} variant="secondary" className="rounded-full">
+                          {moduleName}
+                        </Badge>
+                      ))}
+                    </div>
+                    <Link
+                      to="/studi-kasus"
+                      className="mt-auto inline-flex items-center pt-6 text-sm font-medium text-primary hover:underline"
+                    >
+                      Lihat alur lengkap <ArrowRight className="ml-1.5 h-4 w-4" />
+                    </Link>
                   </Card>
                 </motion.div>
               );

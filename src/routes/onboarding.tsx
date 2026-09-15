@@ -19,6 +19,7 @@ import {
 } from "@/lib/company-api";
 import { useEffect } from "react";
 import { createCheckout } from "@/lib/checkout-api";
+import { startFreeTrial } from "@/lib/trial-api";
 import {
   Building2,
   Rocket,
@@ -28,6 +29,8 @@ import {
   ArrowLeft,
   Sparkles,
   Loader2,
+  ShieldCheck,
+  CalendarClock,
 } from "lucide-react";
 
 import { guardOnboardingRoute } from "@/lib/onboarding-guard";
@@ -112,13 +115,6 @@ const modules = [
     price: 49000,
   },
   {
-    id: "pos",
-    name: "POS",
-    description: "Point of sale toko",
-    icon: "i-ph-storefront-fill",
-    price: 79000,
-  },
-  {
     id: "analytics",
     name: "Analytics",
     description: "Dashboard & insight",
@@ -142,10 +138,9 @@ const industries = [
 ];
 
 // ── Component ─────────────────────────────────────────────────────────────────
-// Catatan alur: onboarding HANYA mengumpulkan profil perusahaan + pilihan
-// modul, lalu membuat company + checkout. Pemilihan metode bayar dan proses
-// charge dipindah ke halaman /checkout dan /payment terpisah (lihat
-// routes/checkout.tsx dan routes/payment.tsx).
+// Onboarding mengumpulkan profil perusahaan dan kebutuhan modul. Pada langkah
+// terakhir owner dapat memulai trial all-access tanpa pembayaran, atau masuk
+// ke checkout bila memang ingin langsung berlangganan.
 
 function OnboardingPage() {
   const navigate = useNavigate();
@@ -165,7 +160,13 @@ function OnboardingPage() {
       const saved = localStorage.getItem("siarpi_cart");
       if (saved) {
         localStorage.removeItem("siarpi_cart");
-        return JSON.parse(saved);
+        const savedModules = JSON.parse(saved);
+        return Array.isArray(savedModules)
+          ? savedModules.filter(
+              (moduleKey: unknown): moduleKey is string =>
+                typeof moduleKey === "string" && moduleKey.toLowerCase() !== "pos",
+            )
+          : [];
       }
     } catch (e) {
       // ignore
@@ -174,8 +175,9 @@ function OnboardingPage() {
   });
 
   // Submit state
-  const [submitting, setSubmitting] = useState(false);
+  const [submitMode, setSubmitMode] = useState<"trial" | "checkout" | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const submitting = submitMode !== null;
 
   useEffect(() => {
     getOnboardingStatus()
@@ -220,71 +222,80 @@ function OnboardingPage() {
     (step === 2 && selectedModules.length > 0) ||
     step === 3;
 
-  async function handleActivate() {
+  async function ensureCompany() {
+    const user = getStoredUser();
+    if (!user) {
+      throw new Error("Sesi login tidak ditemukan. Silakan login ulang.");
+    }
+
+    if (existingCompanyId) {
+      return { companyId: existingCompanyId, user };
+    }
+
+    saveOnboardingMeta({ bizType, employees, industry });
+    const companyPayload: CreateCompanyRequest = {
+      user_id: user.id,
+      code: generateCompanyCode(companyName),
+      name: companyName.trim(),
+      country: "Indonesia",
+      currency_code: "IDR",
+      timezone: "Asia/Jakarta",
+      business_type: bizType,
+      employee_count: parseInt(employees, 10) || 0,
+      industry,
+    };
+
+    const { ok, data } = await createCompany(companyPayload);
+    if (!ok || !data?.company) {
+      throw new Error(data?.message ?? "Gagal membuat perusahaan. Coba lagi.");
+    }
+
+    if (data.token) setAuthToken(data.token);
+    setStoredUser({ ...user, company_id: data.company.id });
+    setExistingCompanyId(data.company.id);
+    return { companyId: data.company.id, user };
+  }
+
+  async function handleStartTrial() {
     setSubmitError(null);
-    setSubmitting(true);
+    setSubmitMode("trial");
 
     try {
-      const user = getStoredUser();
-      if (!user) {
-        setSubmitError("Sesi login tidak ditemukan. Silakan login ulang.");
-        setSubmitting(false);
-        return;
+      await ensureCompany();
+      const result = await startFreeTrial();
+      if (!result.ok || !result.data?.is_active) {
+        throw new Error(result.message ?? "Trial tidak dapat diaktifkan. Coba lagi.");
       }
+      navigate({ to: "/dashboard" });
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "Terjadi kesalahan tidak terduga.");
+    } finally {
+      setSubmitMode(null);
+    }
+  }
 
-      let activeCompanyId = existingCompanyId;
+  async function handleCheckout() {
+    setSubmitError(null);
+    setSubmitMode("checkout");
 
-      if (!activeCompanyId) {
-        // Simpan di localStorage sebagai cadangan sisi client
-        saveOnboardingMeta({ bizType, employees, industry });
+    try {
+      const { companyId, user } = await ensureCompany();
 
-        // 1. Buat company baru
-        const companyPayload: CreateCompanyRequest = {
-          user_id: user.id,
-          code: generateCompanyCode(companyName),
-          name: companyName.trim(),
-          country: "Indonesia",
-          currency_code: "IDR",
-          timezone: "Asia/Jakarta",
-          business_type: bizType,
-          employee_count: parseInt(employees, 10) || 0,
-          industry,
-        };
-
-        const { ok: companyOk, data: companyData } = await createCompany(companyPayload);
-
-        if (!companyOk || !companyData?.company) {
-          setSubmitError(companyData?.message ?? "Gagal membuat perusahaan. Coba lagi.");
-          setSubmitting(false);
-          return;
-        }
-
-        // Token baru dari backend sudah berisi company_id, supaya request
-        // berikutnya (createCheckout) terautentikasi dengan company yang benar.
-        if (companyData.token) {
-          setAuthToken(companyData.token);
-        }
-        setStoredUser({ ...user, company_id: companyData.company.id });
-        activeCompanyId = companyData.company.id;
-      }
-
-      // 2. Buat checkout dari modul yang dipilih.
       const { ok: checkoutOk, data: checkoutData } = await createCheckout({
-        company_id: activeCompanyId,
+        company_id: companyId,
         user_id: user.id,
         module_keys: selectedModules,
       });
 
       if (!checkoutOk || !checkoutData?.checkout) {
-        setSubmitError(checkoutData?.message ?? "Gagal membuat checkout. Coba lagi.");
-        setSubmitting(false);
-        return;
+        throw new Error(checkoutData?.message ?? "Gagal membuat checkout. Coba lagi.");
       }
 
       navigate({ to: "/checkout", search: { id: checkoutData.checkout.id } });
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Terjadi kesalahan tidak terduga.");
-      setSubmitting(false);
+    } finally {
+      setSubmitMode(null);
     }
   }
 
@@ -473,21 +484,34 @@ function OnboardingPage() {
                 {/* STEP 3 — Rekomendasi & Konfirmasi */}
                 {step === 3 && (
                   <>
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="h-5 w-5 text-primary" />
-                      <Badge variant="secondary" className="rounded-full">
-                        AI Recommendation
-                      </Badge>
-                    </div>
+                    <Badge className="rounded-full bg-primary text-primary-foreground">
+                      14 hari gratis
+                    </Badge>
                     <h2 className="mt-4 font-display text-2xl font-bold md:text-3xl">
-                      Rekomendasi paket untuk Anda
+                      Coba seluruh Siarpi lebih dulu
                     </h2>
                     <p className="mt-2 text-muted-foreground">
-                      Berdasarkan {selectedModules.length} modul dipilih untuk{" "}
-                      {companyName || "perusahaan Anda"}.
+                      Semua modul aktif selama 14 hari. Tidak perlu kartu kredit dan tidak ada
+                      tagihan otomatis saat trial berakhir.
                     </p>
 
-                    <Card className="mt-6 rounded-2xl border-2 border-primary bg-gradient-subtle p-6 shadow-soft">
+                    <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                      {[
+                        [ShieldCheck, "Tanpa kartu kredit"],
+                        [Sparkles, "Semua modul terbuka"],
+                        [CalendarClock, "Berakhir otomatis"],
+                      ].map(([Icon, label]) => (
+                        <div
+                          key={label as string}
+                          className="flex items-center gap-3 rounded-xl border border-border bg-background p-3 text-sm font-medium"
+                        >
+                          <Icon className="h-5 w-5 text-primary" />
+                          {label as string}
+                        </div>
+                      ))}
+                    </div>
+
+                    <Card className="mt-6 rounded-2xl border border-border bg-muted/30 p-6 shadow-none">
                       <div className="flex items-center justify-between">
                         <div>
                           <div className="text-sm text-muted-foreground">Paket disarankan</div>
@@ -498,7 +522,7 @@ function OnboardingPage() {
                         </Badge>
                       </div>
                       <div className="mt-6">
-                        <div className="text-sm text-muted-foreground">Estimasi total</div>
+                        <div className="text-sm text-muted-foreground">Estimasi setelah trial</div>
                         <div className="mt-1">
                           <span className="font-display text-4xl font-bold">
                             {formatIDR(totalPrice)}
@@ -552,21 +576,28 @@ function OnboardingPage() {
                   Lanjut <ArrowRight className="ml-1 h-4 w-4" />
                 </Button>
               ) : (
-                <Button
-                  onClick={handleActivate}
-                  disabled={!canNext || submitting}
-                  className="bg-gradient-primary text-primary-foreground shadow-soft hover:shadow-glow"
-                >
-                  {submitting ? (
-                    <>
-                      <Loader2 className="mr-1 h-4 w-4 animate-spin" /> Memproses...
-                    </>
-                  ) : (
-                    <>
-                      Lanjut ke Checkout <ArrowRight className="ml-1 h-4 w-4" />
-                    </>
-                  )}
-                </Button>
+                <div className="flex flex-col-reverse gap-2 sm:flex-row">
+                  <Button
+                    variant="outline"
+                    onClick={handleCheckout}
+                    disabled={!canNext || submitting}
+                  >
+                    {submitMode === "checkout" && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
+                    Langsung berlangganan
+                  </Button>
+                  <Button
+                    onClick={handleStartTrial}
+                    disabled={!canNext || submitting}
+                    className="bg-gradient-primary text-primary-foreground shadow-soft hover:shadow-glow"
+                  >
+                    {submitMode === "trial" ? (
+                      <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Rocket className="mr-1 h-4 w-4" />
+                    )}
+                    Mulai trial 14 hari
+                  </Button>
+                </div>
               )}
             </div>
           </Card>

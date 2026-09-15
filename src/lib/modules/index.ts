@@ -7,7 +7,6 @@ import { project } from "./project";
 import { crm } from "./crm";
 import { absensi } from "./absensi";
 import { invoice } from "./invoice";
-import { pos } from "./pos";
 
 export const moduleDetails: Record<string, ModuleDetail> = {
   hr,
@@ -18,7 +17,6 @@ export const moduleDetails: Record<string, ModuleDetail> = {
   crm,
   absensi,
   invoice,
-  pos,
 };
 
 export {

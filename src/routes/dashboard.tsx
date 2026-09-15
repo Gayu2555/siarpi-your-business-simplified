@@ -9,13 +9,76 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, Layers, Plus, Building2, ChevronDown, ExternalLink } from "lucide-react";
+import {
+  Loader2,
+  Layers,
+  Plus,
+  Building2,
+  ChevronDown,
+  ExternalLink,
+  CalendarClock,
+  ArrowRight,
+  Mail,
+  MessageCircle,
+  X,
+} from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { createHandoffCode } from "@/lib/auth-api";
+import { getFreeTrialStatus, type TrialStatus } from "@/lib/trial-api";
 
 // Bisa ditimpa lewat VITE_MAIN_APP_URL supaya alur handoff bisa diuji ke
 // aplikasi utama yang jalan lokal, bukan selalu ke produksi.
 const MAIN_APP_URL = import.meta.env.VITE_MAIN_APP_URL || "https://app.siarpi.com";
+const SIARPI_WHATSAPP_NUMBER = "6281387895911";
+const SIARPI_CONTACT_EMAIL = "contacts@siarpi.com";
+
+function useTrialCountdown(endsAt?: string) {
+  const [remainingMs, setRemainingMs] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!endsAt) {
+      setRemainingMs(null);
+      return;
+    }
+
+    const endTime = new Date(endsAt).getTime();
+    if (!Number.isFinite(endTime)) {
+      setRemainingMs(null);
+      return;
+    }
+
+    let intervalId: number | undefined;
+    const updateCountdown = () => {
+      const nextRemaining = Math.max(0, endTime - Date.now());
+      setRemainingMs(nextRemaining);
+      if (nextRemaining === 0 && intervalId !== undefined) {
+        window.clearInterval(intervalId);
+      }
+    };
+
+    updateCountdown();
+    if (endTime > Date.now()) {
+      intervalId = window.setInterval(updateCountdown, 1_000);
+    }
+
+    return () => {
+      if (intervalId !== undefined) window.clearInterval(intervalId);
+    };
+  }, [endsAt]);
+
+  return remainingMs;
+}
+
+function formatTrialCountdown(remainingMs: number) {
+  const totalSeconds = Math.max(0, Math.floor(remainingMs / 1_000));
+  const days = Math.floor(totalSeconds / 86_400);
+  const hours = Math.floor((totalSeconds % 86_400) / 3_600);
+  const minutes = Math.floor((totalSeconds % 3_600) / 60);
+  const seconds = totalSeconds % 60;
+  const clock = [hours, minutes, seconds].map((value) => String(value).padStart(2, "0")).join(":");
+
+  return `${days} hari ${clock}`;
+}
 
 export const Route = createFileRoute("/dashboard")({
   beforeLoad: async () => {
@@ -33,6 +96,7 @@ export const Route = createFileRoute("/dashboard")({
 function DashboardPage() {
   const user = getStoredUser();
   const name = getDisplayName(user);
+  const companyId = user?.company_id;
 
   const [modulesResponse, setModulesResponse] = useState<CompanyModulesResponse | null>(null);
   const [companyName, setCompanyName] = useState<string>("");
@@ -40,6 +104,17 @@ function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [openingApp, setOpeningApp] = useState(false);
+  const [trial, setTrial] = useState<TrialStatus | null>(null);
+  const [trialBannerDismissed, setTrialBannerDismissed] = useState(false);
+  const trialRemainingMs = useTrialCountdown(trial?.is_active ? trial.ends_at : undefined);
+  const trialBannerKey = trial?.ends_at
+    ? `siarpi:trial-banner:${companyId ?? "company"}:${trial.ends_at}`
+    : null;
+  const requester = name ? `Saya ${name}` : "Saya";
+  const companyContext = companyName ? ` dari ${companyName}` : "";
+  const offerMessage = `${requester}${companyContext} sedang menggunakan trial Siarpi Business dan ingin meminta penawaran berlangganan. Mohon dibantu rekomendasi modul atau paket, rincian harga, dan langkah aktivasinya. Terima kasih.`;
+  const whatsappOfferUrl = `https://wa.me/${SIARPI_WHATSAPP_NUMBER}?text=${encodeURIComponent(`Halo Tim Siarpi, ${offerMessage}`)}`;
+  const emailOfferUrl = `mailto:${SIARPI_CONTACT_EMAIL}?subject=${encodeURIComponent(`Permintaan Penawaran Siarpi${companyName ? ` - ${companyName}` : ""}`)}&body=${encodeURIComponent(`Halo Tim Siarpi,\n\n${offerMessage}\n\nSalam,\n${name || "Calon pelanggan"}`)}`;
 
   // Pindah ke app.siarpi.com TANPA menempelkan JWT di URL. Yang dikirim cuma
   // kode sekali-pakai berumur 60 detik; aplikasi tujuan yang menukarnya jadi
@@ -91,9 +166,17 @@ function DashboardPage() {
         setLoading(false);
       });
 
+    getFreeTrialStatus()
+      .then(({ ok, data }) => {
+        if (ok && data) setTrial(data);
+      })
+      .catch((err) => {
+        console.error("Gagal memuat status trial:", err);
+      });
+
     // Fetch company name
-    if (user?.company_id) {
-      apiFetch<{ success: boolean; company?: { name: string } }>(`/companies/${user.company_id}`)
+    if (companyId) {
+      apiFetch<{ success: boolean; company?: { name: string } }>(`/companies/${companyId}`)
         .then(({ ok, data }) => {
           if (ok && data?.success && data.company) {
             setCompanyName(data.company.name);
@@ -103,7 +186,34 @@ function DashboardPage() {
           console.error("Gagal memuat detail perusahaan:", err);
         });
     }
-  }, []);
+  }, [companyId]);
+
+  useEffect(() => {
+    if (!trialBannerKey) {
+      setTrialBannerDismissed(false);
+      return;
+    }
+    setTrialBannerDismissed(window.sessionStorage.getItem(trialBannerKey) === "dismissed");
+  }, [trialBannerKey]);
+
+  useEffect(() => {
+    if (trialRemainingMs !== 0 || !trial?.is_active) return;
+
+    getFreeTrialStatus()
+      .then(({ ok, data }) => {
+        if (ok && data) setTrial(data);
+      })
+      .catch((err) => {
+        console.error("Gagal memperbarui status trial:", err);
+      });
+  }, [trialRemainingMs, trial?.is_active]);
+
+  function dismissTrialBanner() {
+    if (trialBannerKey) {
+      window.sessionStorage.setItem(trialBannerKey, "dismissed");
+    }
+    setTrialBannerDismissed(true);
+  }
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -143,6 +253,84 @@ function DashboardPage() {
               Kelola dan jalankan modul bisnis Siarpi Anda dari satu dashboard terpusat.
             </p>
           </div>
+
+          {trial?.is_active && !trialBannerDismissed && (
+            <div className="relative mb-8 flex flex-col gap-4 border-y border-primary/20 bg-primary/5 px-5 py-4 pr-12 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex items-start gap-3">
+                <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground">
+                  <CalendarClock className="h-5 w-5" />
+                </span>
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-semibold text-foreground">Trial Business aktif</p>
+                    <Badge
+                      variant="secondary"
+                      className="min-w-[9.75rem] justify-center font-mono tabular-nums"
+                      title="Hari, jam, menit, dan detik tersisa"
+                    >
+                      {trialRemainingMs === null
+                        ? `${trial.days_remaining} hari tersisa`
+                        : formatTrialCountdown(trialRemainingMs)}
+                    </Badge>
+                  </div>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Semua modul dapat dipakai sampai{" "}
+                    {trial.ends_at
+                      ? new Intl.DateTimeFormat("id-ID", { dateStyle: "long" }).format(
+                          new Date(trial.ends_at),
+                        )
+                      : "masa trial berakhir"}
+                    .
+                  </p>
+                </div>
+              </div>
+              <div className="flex shrink-0 flex-wrap items-center gap-2">
+                <Button
+                  asChild
+                  className="bg-emerald-600 font-semibold text-white hover:bg-emerald-700"
+                >
+                  <a href={whatsappOfferUrl} target="_blank" rel="noopener noreferrer">
+                    <MessageCircle className="mr-1 h-4 w-4" /> WhatsApp
+                  </a>
+                </Button>
+                <Button asChild variant="outline" className="font-semibold">
+                  <a href={emailOfferUrl}>
+                    <Mail className="mr-1 h-4 w-4" /> Email penawaran
+                  </a>
+                </Button>
+                <Button asChild variant="ghost" className="font-semibold">
+                  <Link to="/modular">
+                    Pilih paket <ArrowRight className="ml-1 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+              <button
+                type="button"
+                onClick={dismissTrialBanner}
+                className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-background/80 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label="Tutup pemberitahuan trial"
+                title="Tutup"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+
+          {trial?.status === "expired" && (
+            <div className="mb-8 flex flex-col gap-4 border-y border-amber-300 bg-amber-50 px-5 py-4 text-amber-950 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="font-semibold">Trial 14 hari telah berakhir</p>
+                <p className="mt-1 text-sm text-amber-900/80">
+                  Pilih modul yang dibutuhkan agar tim dapat melanjutkan pekerjaan.
+                </p>
+              </div>
+              <Button asChild className="shrink-0">
+                <Link to="/modular">
+                  Lihat paket <ArrowRight className="ml-1 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          )}
 
           {loading ? (
             <div className="flex h-64 items-center justify-center">

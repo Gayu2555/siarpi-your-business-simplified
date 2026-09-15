@@ -90,8 +90,8 @@ export const finance: ModuleDetail = {
       a: "Ya, terintegrasi langsung dengan API Kurs Transaksi & JISDOR Bank Indonesia real-time.",
     },
     {
-      q: "Bisa dipadukan dengan modul POS / Sales?",
-      a: "Tentu! Setiap penjualan di POS atau Invoice akan otomatis memposting entri kas & piutang ke modul Finance.",
+      q: "Bisa dipadukan dengan alur Sales dan Invoice?",
+      a: "Tentu. Setiap invoice penjualan dapat terhubung ke pencatatan kas dan piutang di modul Finance.",
     },
   ],
 };

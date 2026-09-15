@@ -5,11 +5,12 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { ConsultationCtaSection } from "@/components/site/ConsultationCtaSection";
 import { modules, getModuleIcon } from "@/lib/modules";
 import { formatIDR } from "@/lib/utils";
 import { fetchCatalogModules, type ApiModule } from "@/lib/modules-api";
 import { resolvePhosphorIcon } from "@/lib/icon-resolver";
-import { moduleDetails, type Testimonial } from "@/lib/module-details";
+import { moduleDetails, type ModuleDetail, type Testimonial } from "@/lib/module-details";
 import {
   Accordion,
   AccordionContent,
@@ -156,7 +157,16 @@ export const Route = createFileRoute("/modules/$moduleId")({
 });
 
 function ModulePage() {
-  const { module: m, detail: d } = Route.useLoaderData() as any;
+  const { module: m, detail: d } = Route.useLoaderData() as unknown as {
+    module: {
+      id: string;
+      name: string;
+      iconName: string;
+      description: string;
+      price: number;
+    };
+    detail: ModuleDetail;
+  };
 
   const renderIcon = (iconName: string, className = "h-7 w-7") => {
     if (iconName && iconName.startsWith("i-ph-")) {
@@ -339,6 +349,9 @@ function ModulePage() {
             </div>
           </div>
         </section>
+
+        {/* DISKUSIKAN DENGAN TIM SIARPI */}
+        <ConsultationCtaSection context={m.name} />
 
         {/* CTA BOTTOM SECTION */}
         <section className="bg-gradient-primary py-20 text-primary-foreground md:py-28">

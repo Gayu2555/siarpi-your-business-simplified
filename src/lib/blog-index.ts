@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // blog-index.ts — menyatukan DUA sumber artikel jadi satu daftar.
 //
-//   1. articlesRegistry (lib/articles.ts) — 3 artikel bawaan yang di-hardcode,
+//   1. articlesRegistry (lib/articles.ts) — artikel bawaan terstruktur,
 //      formatnya terstruktur (section/callout/FAQ) dan sudah punya nilai SEO
 //      di URL /artikel/{slug}. Sengaja TIDAK dimigrasikan.
 //   2. Blog CMS di MongoDB Atlas — artikel Markdown yang ditulis lewat

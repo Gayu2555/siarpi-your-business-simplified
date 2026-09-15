@@ -39,7 +39,7 @@ function validateBlogSearch(search: Record<string, unknown>): BlogSearch {
 }
 
 const META_DESCRIPTION =
-  "Panduan praktis, tips akuntansi, dan studi kasus seputar pembukuan, pajak, HR, dan operasional bisnis dari tim Siarpi.";
+  "Panduan memilih ERP, harga software bisnis, akuntansi, HR, inventory, CRM, dan operasional untuk membantu perusahaan mengambil keputusan lebih tepat.";
 
 export const Route = createFileRoute("/blog")({
   staleTime: 60_000,
@@ -81,7 +81,14 @@ export const Route = createFileRoute("/blog")({
       links: [
         ...paginationLinks("/blog", page, totalPages),
         ...(leadImage
-          ? [{ rel: "preload", as: "image" as const, href: leadImage, fetchPriority: "high" as const }]
+          ? [
+              {
+                rel: "preload",
+                as: "image" as const,
+                href: leadImage,
+                fetchPriority: "high" as const,
+              },
+            ]
           : []),
       ],
       scripts: [
@@ -275,13 +282,7 @@ function BlogIndexPage() {
   );
 }
 
-function ArticleCard({
-  item,
-  prioritizeImage,
-}: {
-  item: BlogIndexItem;
-  prioritizeImage: boolean;
-}) {
+function ArticleCard({ item, prioritizeImage }: { item: BlogIndexItem; prioritizeImage: boolean }) {
   return (
     <div>
       <Link to="/artikel/$slug" params={{ slug: item.slug }} className="group block h-full">

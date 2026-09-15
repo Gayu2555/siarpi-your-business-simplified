@@ -26,8 +26,11 @@ import {
   AlertCircle,
   CheckCircle2,
   MessageCircle,
+  ExternalLink,
+  Sparkles,
 } from "lucide-react";
 import { articlesRegistry, type ArticleData } from "@/lib/articles";
+import { vendorCatalog, type VendorCatalogEntry } from "@/lib/vendor-catalog";
 import { formatIDR } from "@/lib/utils";
 import {
   absoluteMediaUrl,
@@ -57,6 +60,49 @@ const loadCmsArticleView = () => import("@/components/blog/CmsArticleView");
 const LazyCmsArticleView = lazy(() =>
   loadCmsArticleView().then((module) => ({ default: module.CmsArticleView })),
 );
+
+function VendorVisual({ vendor, name }: { vendor?: VendorCatalogEntry; name: string }) {
+  const [failed, setFailed] = useState(false);
+
+  if (!vendor || failed) {
+    return (
+      <div className="flex aspect-video w-full items-center justify-center rounded-md border border-border/70 bg-muted px-6 text-center font-display text-base font-bold text-foreground">
+        {name}
+      </div>
+    );
+  }
+
+  return (
+    <a
+      href={vendor.productUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group relative block aspect-video overflow-hidden rounded-md border border-border/70 bg-white"
+      aria-label={`Buka situs resmi ${name}`}
+    >
+      <img
+        src={vendor.imageUrl}
+        alt={vendor.imageAlt}
+        loading="lazy"
+        decoding="async"
+        width={640}
+        height={360}
+        onError={() => setFailed(true)}
+        className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+      />
+      <span className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded bg-background/95 px-2 py-1 text-[10px] font-semibold text-foreground shadow-sm">
+        Situs resmi <ExternalLink className="h-3 w-3" />
+      </span>
+    </a>
+  );
+}
+
+function vendorAnchor(name: string) {
+  return `vendor-${name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "")}`;
+}
 
 export const Route = createFileRoute("/artikel/$slug")({
   staleTime: 60_000,
@@ -159,7 +205,7 @@ export const Route = createFileRoute("/artikel/$slug")({
           Artikel yang Anda cari tidak tersedia atau telah dipindahkan.
         </p>
         <Button asChild className="mt-6 bg-gradient-primary text-primary-foreground font-semibold">
-          <Link to="/studi-kasus">Kembali ke Panduan Bisnis</Link>
+          <Link to="/blog">Kembali ke Blog</Link>
         </Button>
       </main>
       <Footer />
@@ -254,7 +300,14 @@ function BuiltInArticleReader({ article }: { article: ArticleData }) {
     setTimeout(() => setCopiedLink(false), 2500);
   };
 
-  const otherArticles = Object.values(articlesRegistry).filter((a) => a.slug !== article.slug);
+  const otherArticles = Object.values(articlesRegistry)
+    .filter((item) => item.slug !== article.slug)
+    .sort((left, right) => {
+      const leftDate = parseIndonesianDate(left.publishedDate);
+      const rightDate = parseIndonesianDate(right.publishedDate);
+      return Date.parse(rightDate ?? "") - Date.parse(leftDate ?? "");
+    })
+    .slice(0, 4);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -275,10 +328,10 @@ function BuiltInArticleReader({ article }: { article: ArticleData }) {
             <div className="mx-auto max-w-4xl space-y-6">
               {/* Back Link */}
               <Link
-                to="/studi-kasus"
+                to="/blog"
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
               >
-                <ArrowLeft className="h-3.5 w-3.5" /> Panduan & Artikel Bisnis
+                <ArrowLeft className="h-3.5 w-3.5" /> Kembali ke Blog
               </Link>
 
               <div className="space-y-3">
@@ -356,17 +409,31 @@ function BuiltInArticleReader({ article }: { article: ArticleData }) {
 
                 <nav className="space-y-1.5 text-xs">
                   {article.sections.map((sec) => (
-                    <a
-                      key={sec.id}
-                      href={`#${sec.id}`}
-                      className={`block py-1.5 px-3 rounded-lg font-medium transition-all ${
-                        activeSection === sec.id
-                          ? "bg-primary/10 text-primary font-bold border-l-2 border-primary"
-                          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                      }`}
-                    >
-                      {sec.heading}
-                    </a>
+                    <div key={sec.id}>
+                      <a
+                        href={`#${sec.id}`}
+                        className={`block rounded-lg px-3 py-1.5 font-medium transition-all ${
+                          activeSection === sec.id
+                            ? "border-l-2 border-primary bg-primary/10 font-bold text-primary"
+                            : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                        }`}
+                      >
+                        {sec.heading}
+                      </a>
+                      {sec.vendorProfiles && sec.vendorProfiles.length > 0 && (
+                        <div className="ml-3 mt-1 max-h-72 space-y-0.5 overflow-y-auto border-l border-border/70 pl-2">
+                          {sec.vendorProfiles.map((vendor, index) => (
+                            <a
+                              key={vendor.name}
+                              href={`#${vendorAnchor(vendor.name)}`}
+                              className="block px-2 py-1.5 leading-snug text-muted-foreground transition-colors hover:text-primary"
+                            >
+                              {index + 1}. {vendor.name}
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   ))}
                   {article.faq && article.faq.length > 0 && (
                     <a
@@ -374,6 +441,22 @@ function BuiltInArticleReader({ article }: { article: ArticleData }) {
                       className="block py-1.5 px-3 rounded-lg font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50"
                     >
                       Pertanyaan Sering Diajukan (FAQ)
+                    </a>
+                  )}
+                  {article.sources && article.sources.length > 0 && (
+                    <a
+                      href="#sources-section"
+                      className="block rounded-lg px-3 py-1.5 font-medium text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
+                    >
+                      Referensi resmi
+                    </a>
+                  )}
+                  {article.siarpiOffer && (
+                    <a
+                      href="#siarpi-offer"
+                      className="block rounded-lg px-3 py-1.5 font-medium text-primary transition-colors hover:bg-primary/10"
+                    >
+                      Pertimbangkan Siarpi
                     </a>
                   )}
                 </nav>
@@ -411,6 +494,25 @@ function BuiltInArticleReader({ article }: { article: ArticleData }) {
                     {sec.heading}
                   </h2>
 
+                  {sec.image && (
+                    <figure className="space-y-2">
+                      <div className="overflow-hidden rounded-md border border-border/70 bg-white">
+                        <img
+                          src={sec.image.src}
+                          alt={sec.image.alt}
+                          loading="lazy"
+                          decoding="async"
+                          className="h-auto w-full object-contain"
+                        />
+                      </div>
+                      {sec.image.caption && (
+                        <figcaption className="text-xs text-muted-foreground">
+                          {sec.image.caption}
+                        </figcaption>
+                      )}
+                    </figure>
+                  )}
+
                   {sec.paragraphs.map((p, idx) => (
                     <p
                       key={idx}
@@ -446,6 +548,85 @@ function BuiltInArticleReader({ article }: { article: ArticleData }) {
                     </ul>
                   )}
 
+                  {sec.vendorProfiles && sec.vendorProfiles.length > 0 && (
+                    <ol className="my-5 divide-y divide-border/70 border-y border-border/70">
+                      {sec.vendorProfiles.map((vendor, index) => {
+                        const catalogEntry = vendorCatalog[vendor.name];
+
+                        return (
+                          <li
+                            key={vendor.name}
+                            id={vendorAnchor(vendor.name)}
+                            className="scroll-mt-28 py-9"
+                          >
+                            <h3 className="mb-5 font-display text-xl font-bold text-foreground md:text-2xl">
+                              {index + 1}. {vendor.name}
+                            </h3>
+
+                            <VendorVisual vendor={catalogEntry} name={vendor.name} />
+
+                            <div className="mt-6">
+                              <div className="space-y-5 text-sm leading-relaxed text-muted-foreground md:text-base">
+                                <div>
+                                  <h4 className="text-xs font-bold uppercase text-foreground">
+                                    Tentang produk
+                                  </h4>
+                                  <p className="mt-1">{vendor.description}</p>
+                                </div>
+
+                                {catalogEntry && (
+                                  <div>
+                                    <h4 className="text-xs font-bold uppercase text-foreground">
+                                      Tentang perusahaan
+                                    </h4>
+                                    <p className="mt-1">{catalogEntry.companyDescription}</p>
+                                  </div>
+                                )}
+                              </div>
+
+                              {catalogEntry && (
+                                <div className="mt-5">
+                                  <h4 className="text-xs font-bold uppercase text-foreground">
+                                    Fitur utama
+                                  </h4>
+                                  <ul className="mt-2 flex flex-wrap gap-2">
+                                    {catalogEntry.features.map((feature) => (
+                                      <li
+                                        key={feature}
+                                        className="rounded-md border border-border/70 bg-muted/50 px-2.5 py-1 text-xs font-medium text-foreground"
+                                      >
+                                        {feature}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+
+                              <dl className="mt-5 grid gap-4 border-t border-border/60 pt-4 text-sm md:grid-cols-2">
+                                <div>
+                                  <dt className="text-xs font-bold uppercase text-foreground">
+                                    Kelebihan utama
+                                  </dt>
+                                  <dd className="mt-1 leading-relaxed text-muted-foreground">
+                                    {vendor.strengths.join("; ")}
+                                  </dd>
+                                </div>
+                                <div>
+                                  <dt className="text-xs font-bold uppercase text-foreground">
+                                    Cocok untuk
+                                  </dt>
+                                  <dd className="mt-1 leading-relaxed text-muted-foreground">
+                                    {vendor.bestFor}
+                                  </dd>
+                                </div>
+                              </dl>
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ol>
+                  )}
+
                   {/* Key Takeaway Box */}
                   {sec.keyTakeaway && (
                     <div className="rounded-xl border border-border/80 bg-muted/40 p-4 text-xs md:text-sm font-semibold text-foreground flex items-start gap-2.5">
@@ -460,6 +641,82 @@ function BuiltInArticleReader({ article }: { article: ArticleData }) {
                   )}
                 </section>
               ))}
+
+              {article.siarpiOffer && (
+                <section
+                  id="siarpi-offer"
+                  className="scroll-mt-28 border-y border-primary/25 bg-primary/5 px-5 py-7 md:px-7"
+                >
+                  <div className="flex items-center gap-2 text-xs font-bold uppercase text-primary">
+                    <Sparkles className="h-4 w-4" /> Alternatif dari Siarpi
+                  </div>
+                  <h2 className="mt-3 font-display text-xl font-bold text-foreground md:text-2xl">
+                    {article.siarpiOffer.heading}
+                  </h2>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                    {article.siarpiOffer.description}
+                  </p>
+                  <ul className="mt-5 grid gap-3 sm:grid-cols-3">
+                    {article.siarpiOffer.bullets.map((benefit) => (
+                      <li key={benefit} className="flex items-start gap-2 text-xs text-foreground">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                        <span>{benefit}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    <Button
+                      asChild
+                      className="bg-gradient-primary font-semibold text-primary-foreground"
+                    >
+                      <Link to="/onboarding">
+                        Uji dengan Data Contoh <ArrowRight className="ml-1.5 h-4 w-4" />
+                      </Link>
+                    </Button>
+                    <Button asChild variant="outline" className="font-semibold">
+                      <Link to="/modular">Bandingkan Modul & Harga</Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="font-semibold text-emerald-700">
+                      <a href={waUrl} target="_blank" rel="noopener noreferrer">
+                        <MessageCircle className="mr-1.5 h-4 w-4" /> Tanya Tim Siarpi
+                      </a>
+                    </Button>
+                  </div>
+                  <p className="mt-3 text-[11px] text-muted-foreground">
+                    Tanpa kartu kredit dan tidak ada tagihan otomatis setelah masa trial berakhir.
+                  </p>
+                </section>
+              )}
+
+              {article.sources && article.sources.length > 0 && (
+                <section
+                  id="sources-section"
+                  className="scroll-mt-28 space-y-4 border-t border-border/60 pt-6"
+                >
+                  <h2 className="flex items-center gap-2 font-display text-xl font-bold text-foreground">
+                    <ExternalLink className="h-5 w-5 text-primary" /> Referensi Resmi
+                  </h2>
+                  <p className="text-xs leading-relaxed text-muted-foreground md:text-sm">
+                    Informasi produk dapat berubah. Periksa kembali kemampuan, ketersediaan, dan
+                    ketentuan terbaru langsung pada situs resmi masing-masing penyedia.
+                  </p>
+                  <ul className="grid gap-2 sm:grid-cols-2">
+                    {article.sources.map((source) => (
+                      <li key={source.url}>
+                        <a
+                          href={source.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex h-full items-center justify-between gap-3 rounded-xl border border-border/80 bg-card px-4 py-3 text-xs font-semibold text-foreground transition-colors hover:border-primary/40 hover:text-primary"
+                        >
+                          <span>{source.label}</span>
+                          <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
 
               {/* IN-ARTICLE INTERACTIVE CALCULATOR WIDGET */}
               <div className="my-8 rounded-2xl border border-border/80 bg-card p-6 shadow-soft space-y-4">

@@ -1,9 +1,27 @@
+import { additionalArticles } from "@/lib/additional-articles";
+import { accountingComparisonArticle } from "@/lib/accounting-comparison-article";
+import { erpComparisonArticle } from "@/lib/erp-comparison-article";
+import { hrComparisonArticle } from "@/lib/hr-comparison-article";
+import { readinessArticles } from "@/lib/readiness-articles";
+import { salesArticles } from "@/lib/sales-articles";
+
 export interface ArticleSection {
   id: string;
   heading: string;
   paragraphs: string[];
+  image?: {
+    src: string;
+    alt: string;
+    caption?: string;
+  };
   callout?: { type: "info" | "warning" | "success"; text: string };
   bullets?: string[];
+  vendorProfiles?: {
+    name: string;
+    description: string;
+    strengths: string[];
+    bestFor: string;
+  }[];
   keyTakeaway?: string;
 }
 
@@ -18,9 +36,21 @@ export interface ArticleData {
   summary: string;
   sections: ArticleSection[];
   faq: { q: string; a: string }[];
+  sources?: { label: string; url: string }[];
+  siarpiOffer?: {
+    heading: string;
+    description: string;
+    bullets: string[];
+  };
 }
 
 export const articlesRegistry: Record<string, ArticleData> = {
+  ...readinessArticles,
+  ...hrComparisonArticle,
+  ...accountingComparisonArticle,
+  ...erpComparisonArticle,
+  ...salesArticles,
+  ...additionalArticles,
   "transisi-pembukuan-digital": {
     slug: "transisi-pembukuan-digital",
     title:

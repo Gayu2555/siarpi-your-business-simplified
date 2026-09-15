@@ -34,7 +34,7 @@ const CSP = [
   "object-src 'none'",
 ].join("; ");
 
-function withSecurityHeaders(response: Response): Response {
+function withSecurityHeaders(response: Response, pathname = ""): Response {
   const headers = new Headers(response.headers);
 
   // HSTS tanpa includeSubDomains SENGAJA: direktif itu berlaku untuk SEMUA
@@ -57,6 +57,16 @@ function withSecurityHeaders(response: Response): Response {
   // Fonts. Pantau pelanggarannya di console/report, baru ganti header ini ke
   // "Content-Security-Policy" kalau sudah bersih.
   headers.set("Content-Security-Policy-Report-Only", CSP);
+
+  const contentType = headers.get("Content-Type") ?? "";
+  if (contentType.includes("text/html")) {
+    // HTML selalu harus direvalidasi. Kalau HTML lama menunjuk hash asset dari
+    // deployment sebelumnya, browser akan meminta file yang sudah tidak ada.
+    headers.set("Cache-Control", "no-cache, no-store, must-revalidate");
+  } else if (pathname.startsWith("/assets/") && response.ok) {
+    // Nama asset Vite mengandung content hash, jadi aman disimpan permanen.
+    headers.set("Cache-Control", "public, max-age=31536000, immutable");
+  }
 
   return new Response(response.body, {
     status: response.status,
@@ -100,8 +110,20 @@ const STATIC_PATHS = [
 
 // Artikel bawaan di src/lib/articles.ts. Ditulis ulang di sini (bukan
 // di-import) supaya bundel Worker tidak ikut menarik seluruh isi artikelnya
-// hanya demi 3 slug.
+// hanya demi daftar slug.
 const BUILT_IN_ARTICLE_SLUGS = [
+  "5-tanda-usaha-butuh-software-akuntansi",
+  "5-tanda-perusahaan-butuh-software-hr",
+  "10-software-hr-terbaik-indonesia-2026",
+  "10-software-akuntansi-terbaik-indonesia-2026",
+  "10-software-erp-terbaik-indonesia-2026",
+  "harga-software-erp-indonesia-2026",
+  "erp-modular-vs-suite",
+  "checklist-memilih-software-erp",
+  "tanda-bisnis-butuh-erp",
+  "sop-stock-opname-multi-gudang",
+  "checklist-payroll-bulanan",
+  "membangun-pipeline-crm-b2b",
   "transisi-pembukuan-digital",
   "rumus-kas-usaha-harian",
   "otomatisasi-efaktur-ppn",
@@ -201,13 +223,31 @@ export default {
     const { pathname } = new URL(request.url);
 
     if (pathname === "/robots.txt") {
-      return withSecurityHeaders(robotsTxt());
+      return withSecurityHeaders(robotsTxt(), pathname);
     }
     if (pathname === "/sitemap.xml") {
-      return withSecurityHeaders(await sitemapXml());
+      return withSecurityHeaders(await sitemapXml(), pathname);
     }
 
     const response = await handler(...args);
-    return withSecurityHeaders(response);
+    const contentType = response.headers.get("Content-Type") ?? "";
+
+    // Static asset yang tidak ditemukan tidak boleh jatuh ke SSR document.
+    // Browser menolak HTML sebagai CSS/JS dan error aslinya jadi tersamarkan
+    // sebagai MIME mismatch.
+    if (pathname.startsWith("/assets/") && contentType.includes("text/html")) {
+      return withSecurityHeaders(
+        new Response("Asset not found", {
+          status: 404,
+          headers: {
+            "Content-Type": "text/plain; charset=utf-8",
+            "Cache-Control": "no-store",
+          },
+        }),
+        pathname,
+      );
+    }
+
+    return withSecurityHeaders(response, pathname);
   },
 };
