@@ -37,6 +37,38 @@ export const payroll = {
       title: "Slip Gaji Digital (PDF/Email)",
       desc: "Cetak slip gaji siap pakai atau kirimkan via portal karyawan.",
     },
+    {
+      title: "Struktur Gaji Fleksibel",
+      desc: "Atur komponen pendapatan dan potongan sesuai kebijakan perusahaan.",
+    },
+    {
+      title: "Input Gaji Sekali Jalan",
+      desc: "Tambahkan earning atau deduction khusus untuk karyawan dan periode tertentu.",
+    },
+    {
+      title: "THR Otomatis",
+      desc: "Buat batch THR, hitung nilai prorata, dan koreksi item sebelum diproses.",
+    },
+    {
+      title: "Potongan Kehadiran",
+      desc: "Gunakan data keterlambatan dan unpaid leave sebagai referensi perhitungan payroll.",
+    },
+    {
+      title: "Reimbursement dalam Payroll",
+      desc: "Masukkan reimbursement yang disetujui dan belum dibayar ke periode penggajian.",
+    },
+    {
+      title: "Jenis Potongan Kustom",
+      desc: "Buat aturan potongan perusahaan dan tetapkan kepada karyawan yang relevan.",
+    },
+    {
+      title: "Sumber Dana Kasbon",
+      desc: "Kelola sumber dana kasbon secara mandiri atau hubungkan dengan akun Finance.",
+    },
+    {
+      title: "Jurnal Payroll Otomatis",
+      desc: "Posting beban gaji, kewajiban, dan pembayaran ke Finance saat periode dibayar.",
+    },
   ],
   mockup: {
     title: "Dashboard Payroll & Penggajian",

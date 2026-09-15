@@ -7,7 +7,7 @@
 import { apiFetch } from "@/lib/api";
 
 const PUBLIC_CATALOG_TIMEOUT_MS = 5_000;
-const UNRELEASED_MODULE_KEYS = new Set(["pos"]);
+const UNRELEASED_MODULE_KEYS = new Set(["pos", "project", "todo", "analytics"]);
 
 export function isReleasedModule(moduleKey: string): boolean {
   return !UNRELEASED_MODULE_KEYS.has(moduleKey.trim().toLowerCase());

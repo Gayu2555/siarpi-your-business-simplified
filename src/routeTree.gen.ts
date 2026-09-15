@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TentangRouteImport } from './routes/tentang'
 import { Route as StudiKasusRouteImport } from './routes/studi-kasus'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
@@ -31,6 +32,11 @@ import { Route as HrSubSubIdRouteImport } from './routes/hr-sub.$subId'
 import { Route as FinanceSubSubIdRouteImport } from './routes/finance-sub.$subId'
 import { Route as ArtikelSlugRouteImport } from './routes/artikel.$slug'
 
+const TentangRoute = TentangRouteImport.update({
+  id: '/tentang',
+  path: '/tentang',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StudiKasusRoute = StudiKasusRouteImport.update({
   id: '/studi-kasus',
   path: '/studi-kasus',
@@ -154,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/roadmap': typeof RoadmapRoute
   '/settings': typeof SettingsRoute
   '/studi-kasus': typeof StudiKasusRoute
+  '/tentang': typeof TentangRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/finance-sub/$subId': typeof FinanceSubSubIdRoute
   '/hr-sub/$subId': typeof HrSubSubIdRoute
@@ -177,6 +184,7 @@ export interface FileRoutesByTo {
   '/roadmap': typeof RoadmapRoute
   '/settings': typeof SettingsRoute
   '/studi-kasus': typeof StudiKasusRoute
+  '/tentang': typeof TentangRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/finance-sub/$subId': typeof FinanceSubSubIdRoute
   '/hr-sub/$subId': typeof HrSubSubIdRoute
@@ -201,6 +209,7 @@ export interface FileRoutesById {
   '/roadmap': typeof RoadmapRoute
   '/settings': typeof SettingsRoute
   '/studi-kasus': typeof StudiKasusRoute
+  '/tentang': typeof TentangRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/finance-sub/$subId': typeof FinanceSubSubIdRoute
   '/hr-sub/$subId': typeof HrSubSubIdRoute
@@ -226,6 +235,7 @@ export interface FileRouteTypes {
     | '/roadmap'
     | '/settings'
     | '/studi-kasus'
+    | '/tentang'
     | '/artikel/$slug'
     | '/finance-sub/$subId'
     | '/hr-sub/$subId'
@@ -249,6 +259,7 @@ export interface FileRouteTypes {
     | '/roadmap'
     | '/settings'
     | '/studi-kasus'
+    | '/tentang'
     | '/artikel/$slug'
     | '/finance-sub/$subId'
     | '/hr-sub/$subId'
@@ -272,6 +283,7 @@ export interface FileRouteTypes {
     | '/roadmap'
     | '/settings'
     | '/studi-kasus'
+    | '/tentang'
     | '/artikel/$slug'
     | '/finance-sub/$subId'
     | '/hr-sub/$subId'
@@ -296,6 +308,7 @@ export interface RootRouteChildren {
   RoadmapRoute: typeof RoadmapRoute
   SettingsRoute: typeof SettingsRoute
   StudiKasusRoute: typeof StudiKasusRoute
+  TentangRoute: typeof TentangRoute
   ArtikelSlugRoute: typeof ArtikelSlugRoute
   FinanceSubSubIdRoute: typeof FinanceSubSubIdRoute
   HrSubSubIdRoute: typeof HrSubSubIdRoute
@@ -305,6 +318,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/tentang': {
+      id: '/tentang'
+      path: '/tentang'
+      fullPath: '/tentang'
+      preLoaderRoute: typeof TentangRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/studi-kasus': {
       id: '/studi-kasus'
       path: '/studi-kasus'
@@ -472,6 +492,7 @@ const rootRouteChildren: RootRouteChildren = {
   RoadmapRoute: RoadmapRoute,
   SettingsRoute: SettingsRoute,
   StudiKasusRoute: StudiKasusRoute,
+  TentangRoute: TentangRoute,
   ArtikelSlugRoute: ArtikelSlugRoute,
   FinanceSubSubIdRoute: FinanceSubSubIdRoute,
   HrSubSubIdRoute: HrSubSubIdRoute,

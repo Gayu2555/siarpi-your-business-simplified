@@ -6,13 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { ConsultationCtaSection } from "@/components/site/ConsultationCtaSection";
-import {
-  fetchCatalogModules,
-  fetchSuites,
-  type ApiModule,
-  type SuiteWithPlans,
-} from "@/lib/modules-api";
-import { formatIDR } from "@/lib/utils";
+import { fetchCatalogModules, type ApiModule } from "@/lib/modules-api";
 import { resolvePhosphorIcon, resolveLucideIcon } from "@/lib/icon-resolver";
 import { useState, useEffect } from "react";
 import {
@@ -31,9 +25,8 @@ import {
   Puzzle,
   Quote,
   Users,
-  Crown,
 } from "lucide-react";
-import dashboardImg from "@/assets/dashboard-preview.jpg";
+import financeApImg from "@/assets/finance-ap.png";
 
 // Fallback modules — plain data tanpa React components, dipakai saat API tidak tersedia
 const FALLBACK_MODULES: ApiModule[] = [
@@ -98,16 +91,31 @@ const FALLBACK_MODULES: ApiModule[] = [
     is_listed: true,
   },
   {
-    key: "project",
-    name: "Project",
-    label: "Project",
-    description: "Manajemen proyek tim",
-    icon: "i-ph-columns-fill",
-    bg_color: "bg-orange-100",
-    icon_color: "text-orange-600",
-    hover_color: "orange",
+    key: "procurement",
+    name: "Procurement",
+    label: "Procurement",
+    description: "Pengadaan, tender, PO, dan vendor",
+    icon: "i-ph-shopping-bag-fill",
+    bg_color: "bg-emerald-100",
+    icon_color: "text-emerald-600",
+    hover_color: "emerald",
     route: "",
-    suite_key: "growth",
+    suite_key: "commerce",
+    price: 59000,
+    is_core: false,
+    is_listed: true,
+  },
+  {
+    key: "production",
+    name: "Production",
+    label: "Production",
+    description: "BOM, pesanan produksi, dan HPP",
+    icon: "i-ph-factory-fill",
+    bg_color: "bg-violet-100",
+    icon_color: "text-violet-600",
+    hover_color: "violet",
+    route: "",
+    suite_key: "commerce",
     price: 59000,
     is_core: false,
     is_listed: true,
@@ -158,17 +166,17 @@ const FALLBACK_MODULES: ApiModule[] = [
     is_listed: true,
   },
   {
-    key: "analytics",
-    name: "Analytics",
-    label: "Analytics",
-    description: "Dashboard & insight",
-    icon: "i-ph-chart-line-fill",
-    bg_color: "bg-teal-100",
-    icon_color: "text-teal-600",
-    hover_color: "teal",
+    key: "employee_portal",
+    name: "Employee Portal",
+    label: "Employee Portal",
+    description: "Layanan mandiri untuk karyawan",
+    icon: "i-ph-identification-badge-fill",
+    bg_color: "bg-cyan-100",
+    icon_color: "text-cyan-600",
+    hover_color: "cyan",
     route: "",
-    suite_key: "growth",
-    price: 89000,
+    suite_key: "talents",
+    price: 29000,
     is_core: false,
     is_listed: true,
   },
@@ -178,7 +186,7 @@ export const Route = createFileRoute("/")({
   head: () => {
     const metaTitle = "Siarpi | All in One Management System & Business Operating System";
     const metaDesc =
-      "Business Operating System (BOS) lengkap untuk mengontrol seluruh operasional bisnis Anda: Finance, HR & Payroll, Inventory, CRM, dan Analytics. Aktifkan modul yang Anda butuhkan saja mulai Rp 39.000/bulan!";
+      "Business Operating System (BOS) lengkap untuk mengontrol seluruh operasional bisnis Anda: Finance, HR & Payroll, Inventory, Procurement, Production, dan CRM.";
     const ogImage = "/dashboard-preview.jpg";
     const keywords = [
       "siarpi all in one management system",
@@ -206,13 +214,6 @@ export const Route = createFileRoute("/")({
       name: "Siarpi Enterprise ERP",
       operatingSystem: "Web, Android, iOS, Windows, macOS",
       applicationCategory: "BusinessApplication",
-      offers: {
-        "@type": "AggregateOffer",
-        priceCurrency: "IDR",
-        lowPrice: "39000",
-        highPrice: "99000",
-        offerCount: "9",
-      },
       aggregateRating: {
         "@type": "AggregateRating",
         ratingValue: "4.9",
@@ -273,8 +274,8 @@ export const Route = createFileRoute("/")({
 const benefits = [
   {
     iconName: "Zap",
-    title: "Bayar yang Dipakai Aja",
-    desc: "Beli modul sesuai kebutuhan bisnis Anda. Mulai dari Rp 39.000/bulan tanpa biaya paketan mahal.",
+    title: "Aktifkan yang Dibutuhkan",
+    desc: "Mulai dari modul yang paling relevan lalu perluas sistem mengikuti pertumbuhan bisnis Anda.",
   },
   {
     iconName: "RefreshCw",
@@ -405,20 +406,11 @@ function LandingPage() {
   const [apiModules, setApiModules] = useState<ApiModule[] | null>(null);
   const [modulesLoading, setModulesLoading] = useState(true);
 
-  // ── Suites (paket) dari API ──
-  const [suites, setSuites] = useState<SuiteWithPlans[] | null>(null);
-  const [suitesLoading, setSuitesLoading] = useState(true);
-
   useEffect(() => {
     fetchCatalogModules()
       .then((data) => setApiModules(data.length > 0 ? data : null))
       .catch(() => setApiModules(null))
       .finally(() => setModulesLoading(false));
-
-    fetchSuites()
-      .then((data) => setSuites(data.length > 0 ? data : null))
-      .catch(() => setSuites(null))
-      .finally(() => setSuitesLoading(false));
   }, []);
 
   // Gunakan data API kalau tersedia, fallback ke plain data tanpa React components
@@ -469,7 +461,7 @@ function LandingPage() {
                   {
                     icon: Layers,
                     color: "amber",
-                    text: "Business Operating System Terpadu: Kontrol Keuangan, Payroll, HR, Stok, & Proyek dari satu dasbor pusat.",
+                    text: "Business Operating System Terpadu: Kontrol Keuangan, Payroll, HR, Stok, Pengadaan, dan Produksi dari satu dasbor pusat.",
                   },
                   {
                     icon: RefreshCw,
@@ -479,7 +471,7 @@ function LandingPage() {
                   {
                     icon: Puzzle,
                     color: "blue",
-                    text: "Beli Ketengan Sesuai Kebutuhan: Aktifkan modul yang dibutuhkan saja mulai Rp 39.000/bulan.",
+                    text: "Modular Sesuai Kebutuhan: Aktifkan hanya fungsi yang relevan untuk tahap bisnis Anda.",
                   },
                 ].map((b) => (
                   <li key={b.text} className="flex items-center gap-3">
@@ -525,16 +517,16 @@ function LandingPage() {
               <div className="absolute -inset-6 bg-gradient-primary opacity-25 blur-3xl" />
 
               <img
-                src={dashboardImg}
-                alt="Dashboard preview Siarpi"
-                width={1600}
-                height={1024}
+                src={financeApImg}
+                alt="Tampilan nyata dashboard Hutang Usaha Finance Siarpi"
+                width={1858}
+                height={824}
                 fetchPriority="high"
                 decoding="async"
-                className="relative rounded-2xl border border-border shadow-elegant"
+                className="relative w-full rounded-2xl border border-border bg-background object-contain shadow-elegant"
               />
 
-              {/* Floating: Beli Ketengan (top-right) */}
+              {/* Floating: Modular (top-right) */}
               <motion.div
                 initial={{ opacity: 0, x: 20, y: -10 }}
                 animate={{ opacity: 1, x: 0, y: 0 }}
@@ -544,7 +536,7 @@ function LandingPage() {
                 <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/15 text-primary">
                   <Puzzle className="h-3.5 w-3.5" />
                 </span>
-                <span className="text-sm font-semibold">Beli Ketengan</span>
+                <span className="text-sm font-semibold">Modular & Fleksibel</span>
               </motion.div>
 
               {/* Floating: Zero Training (bottom-left) */}
@@ -652,9 +644,8 @@ function LandingPage() {
                             {m.description}
                           </p>
                         )}
-                        <div className="mt-auto text-xs font-medium text-primary">
-                          {formatIDR(m.price)}
-                          <span className="text-muted-foreground">/bln</span>
+                        <div className="mt-auto inline-flex items-center pt-2 text-xs font-medium text-primary">
+                          Jelajahi fitur <ArrowRight className="ml-1 h-3.5 w-3.5" />
                         </div>
                       </Card>
                     </Link>
@@ -665,7 +656,7 @@ function LandingPage() {
 
         <div className="mt-8 text-center">
           <Link to="/modular" className="text-sm font-medium text-primary hover:underline">
-            Lihat semua modul & harga →
+            Bandingkan paket dan modul →
           </Link>
         </div>
       </section>
@@ -741,170 +732,6 @@ function LandingPage() {
               );
             })}
           </div>
-        </div>
-      </section>
-
-      {/* PRICING — Paket Suite dari API */}
-      <section className="container mx-auto px-4 py-20 md:px-6 md:py-28">
-        <div className="mx-auto max-w-2xl text-center">
-          <Badge variant="outline" className="mb-4 rounded-full">
-            Harga
-          </Badge>
-          <h2 className="font-display text-3xl font-bold md:text-5xl">Pilih paket yang sesuai</h2>
-          <p className="mt-4 text-muted-foreground">
-            Tanpa kartu kredit. Bayar dengan metode lokal Indonesia.
-          </p>
-        </div>
-
-        {suitesLoading ? (
-          <div className="mt-12 grid gap-6 lg:grid-cols-3">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div
-                key={i}
-                className="h-72 animate-pulse rounded-3xl border border-border bg-muted/40"
-              />
-            ))}
-          </div>
-        ) : suites ? (
-          <div className="mt-12 space-y-16">
-            {suites.map((suite) => {
-              const isAllAccess = suite.plans.some((p) => p.is_all_access);
-              const suiteIcon = resolvePhosphorIcon(suite.icon);
-              return (
-                <div key={suite.key}>
-                  <div className="mb-6 flex items-center gap-3">
-                    <div
-                      className={`flex h-10 w-10 items-center justify-center rounded-xl bg-${suite.color}-100`}
-                    >
-                      <suiteIcon.Icon
-                        weight={suiteIcon.weight}
-                        className={`h-5 w-5 text-${suite.color}-600`}
-                      />
-                    </div>
-                    <div>
-                      <h3 className="font-display text-xl font-bold">{suite.name}</h3>
-                      {suite.tagline && (
-                        <p className="text-sm text-muted-foreground">{suite.tagline}</p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div
-                    className={`grid gap-6 ${suite.plans.length === 1 ? "max-w-sm" : suite.plans.length === 2 ? "lg:grid-cols-2 max-w-2xl" : "lg:grid-cols-3"}`}
-                  >
-                    {suite.plans.map((plan, i) => {
-                      const isPro =
-                        i === Math.floor(suite.plans.length / 2) && suite.plans.length > 1;
-                      const isUnlimitedSeats = plan.included_seats === -1;
-                      const isUnlimitedModules = plan.module_quota === -1 || plan.is_all_access;
-                      return (
-                        <motion.div
-                          key={plan.key}
-                          initial={{ opacity: 0, y: 20 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          viewport={{ once: true }}
-                          transition={{ duration: 0.4, delay: i * 0.08 }}
-                          className={isPro ? "lg:-translate-y-3" : ""}
-                        >
-                          <Card
-                            className={`relative flex h-full flex-col rounded-3xl p-8 transition-all ${
-                              isPro
-                                ? "border-2 border-primary bg-gradient-subtle shadow-elegant"
-                                : "border-border hover:shadow-card"
-                            }`}
-                          >
-                            {isPro && (
-                              <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-primary text-primary-foreground shadow-soft">
-                                <Star className="mr-1 h-3 w-3 fill-current" /> Paling Populer
-                              </Badge>
-                            )}
-                            {isAllAccess && (
-                              <Badge className="absolute -top-3 right-4 rounded-full bg-amber-500 text-white shadow-soft">
-                                <Crown className="mr-1 h-3 w-3" /> All Access
-                              </Badge>
-                            )}
-                            <h4 className="font-display text-xl font-bold">{plan.name}</h4>
-                            {plan.description && (
-                              <p className="mt-1 text-sm text-muted-foreground">
-                                {plan.description}
-                              </p>
-                            )}
-                            <div className="mt-6">
-                              <span className="font-display text-4xl font-bold">
-                                {formatIDR(plan.base_price)}
-                              </span>
-                              <span className="text-muted-foreground">/bulan</span>
-                            </div>
-                            <ul className="mt-6 flex-1 space-y-2.5">
-                              <li className="flex items-center gap-2 text-sm">
-                                <Check className="h-4 w-4 shrink-0 text-primary" />
-                                {isUnlimitedModules
-                                  ? "Semua modul included"
-                                  : `${plan.module_quota} modul pilihan`}
-                              </li>
-                              <li className="flex items-center gap-2 text-sm">
-                                <Check className="h-4 w-4 shrink-0 text-primary" />
-                                {isUnlimitedSeats
-                                  ? "Unlimited user"
-                                  : `Hingga ${plan.included_seats} user`}
-                                {plan.price_per_seat > 0 && (
-                                  <span className="text-xs text-muted-foreground">
-                                    (+{formatIDR(plan.price_per_seat)}/user tambahan)
-                                  </span>
-                                )}
-                              </li>
-                              {(suite.modules ?? []).slice(0, 4).map((m) => {
-                                const mIcon = resolvePhosphorIcon(m.icon);
-                                return (
-                                  <li
-                                    key={m.key}
-                                    className="flex items-center gap-2 text-sm text-muted-foreground"
-                                  >
-                                    <mIcon.Icon
-                                      weight={mIcon.weight}
-                                      className={`h-4 w-4 shrink-0 ${m.icon_color}`}
-                                    />
-                                    {m.name}
-                                  </li>
-                                );
-                              })}
-                              {(suite.modules ?? []).length > 4 && (
-                                <li className="pl-6 text-xs text-muted-foreground">
-                                  +{(suite.modules ?? []).length - 4} modul lainnya
-                                </li>
-                              )}
-                            </ul>
-                            <Button
-                              asChild
-                              className={`mt-8 ${isPro ? "bg-gradient-primary text-primary-foreground shadow-soft hover:shadow-glow" : ""}`}
-                              variant={isPro ? "default" : "outline"}
-                            >
-                              <Link to="/onboarding">Mulai dengan {plan.name}</Link>
-                            </Button>
-                          </Card>
-                        </motion.div>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <p className="mt-12 text-center text-muted-foreground">
-            Gagal memuat paket. Coba{" "}
-            <button onClick={() => window.location.reload()} className="text-primary underline">
-              refresh
-            </button>
-            .
-          </p>
-        )}
-
-        <div className="mt-10 text-center text-sm text-muted-foreground">
-          Mau beli per modul saja?{" "}
-          <Link to="/modular" className="font-medium text-primary hover:underline">
-            Lihat harga ketengan →
-          </Link>
         </div>
       </section>
 

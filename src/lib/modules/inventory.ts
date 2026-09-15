@@ -10,10 +10,40 @@ export const inventory: ModuleDetail = {
     "Stock opname kilat dengan barcode scanner",
   ],
   features: [
-    { title: "Multi Gudang", desc: "Kelola stok di banyak lokasi dengan transfer mudah." },
-    { title: "Auto Reorder", desc: "Notifikasi otomatis saat stok mendekati batas minimum." },
-    { title: "Barcode & SKU", desc: "Scan barcode untuk input/output cepat & akurat." },
-    { title: "Stock Opname", desc: "Audit fisik vs sistem dengan selisih otomatis." },
+    {
+      title: "Master Produk",
+      desc: "Kelola identitas, kategori, SKU, dan informasi dasar setiap barang.",
+    },
+    {
+      title: "Stok Real-Time",
+      desc: "Pantau jumlah dan posisi persediaan berdasarkan transaksi yang tercatat.",
+    },
+    {
+      title: "Multi Gudang & Bin",
+      desc: "Kelola stok di beberapa gudang hingga lokasi penyimpanan yang lebih spesifik.",
+    },
+    {
+      title: "Transfer Antar-Gudang",
+      desc: "Pindahkan persediaan antar lokasi dengan riwayat pergerakan yang jelas.",
+    },
+    { title: "Penerimaan Barang", desc: "Catat barang masuk beserta jumlah aktual yang diterima." },
+    {
+      title: "Penyesuaian Stok",
+      desc: "Koreksi selisih persediaan dengan alasan dan jejak perubahan.",
+    },
+    {
+      title: "Stock Opname",
+      desc: "Bandingkan stok fisik dengan sistem dan dokumentasikan hasil hitung.",
+    },
+    {
+      title: "Pelacakan Kedaluwarsa",
+      desc: "Pantau tanggal kedaluwarsa untuk membantu prioritas penggunaan stok.",
+    },
+    { title: "Forecast & Restock", desc: "Tinjau kebutuhan stok dan rekomendasi pengadaan ulang." },
+    {
+      title: "Laporan Persediaan",
+      desc: "Analisis posisi stok serta riwayat barang masuk, keluar, dan berpindah.",
+    },
   ],
   mockup: {
     title: "Stok Real-time",
@@ -47,9 +77,12 @@ export const inventory: ModuleDetail = {
   ],
   faq: [
     {
-      q: "Bisa konek ke marketplace?",
-      a: "Ya, sinkronisasi dengan Tokopedia, Shopee, dan Lazada.",
+      q: "Apakah dapat mengelola lebih dari satu gudang?",
+      a: "Ya. Stok dapat dipantau per gudang dan lokasi penyimpanan, termasuk transfer antar-gudang.",
     },
-    { q: "Mendukung barcode scanner?", a: "Ya, USB scanner & kamera HP via aplikasi mobile." },
+    {
+      q: "Apakah tersedia stock opname?",
+      a: "Ya. Tim dapat mencatat hasil hitung fisik dan meninjau selisih terhadap stok sistem.",
+    },
   ],
 };

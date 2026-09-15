@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Check } from "lucide-react";
-import { formatIDR } from "@/lib/utils";
 
 interface ModuleHeroSectionProps {
   module: {
@@ -60,12 +59,7 @@ export function ModuleHeroSection({ module: m, detail: d, renderIcon }: ModuleHe
         </div>
       )}
 
-      {/* Pricing & Call-to-Action Buttons */}
-      <div className="mt-8 flex flex-wrap items-center gap-6">
-        <div>
-          <div className="font-display text-3xl font-bold">{formatIDR(m.price)}</div>
-          <div className="text-xs text-muted-foreground">per bulan</div>
-        </div>
+      <div className="mt-8 flex flex-wrap items-center gap-3">
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button
             size="lg"
@@ -77,7 +71,7 @@ export function ModuleHeroSection({ module: m, detail: d, renderIcon }: ModuleHe
             </Link>
           </Button>
           <Button size="lg" variant="outline" asChild>
-            <Link to="/modular">Tambah ke Paket</Link>
+            <Link to="/modular">Lihat Pricing</Link>
           </Button>
         </div>
       </div>

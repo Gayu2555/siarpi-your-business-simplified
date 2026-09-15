@@ -32,6 +32,30 @@ export const finance: ModuleDetail = {
       title: "Bebas Pusing Pajak & Valuta",
       desc: "Hitung PPN/PPh otomatis dan pantau kurs valuta asing BI real-time untuk transaksi internasional.",
     },
+    {
+      title: "Chart of Accounts Fleksibel",
+      desc: "Susun akun keuangan, saldo awal, penomoran, dan periode pembukuan sesuai kebutuhan bisnis.",
+    },
+    {
+      title: "Jurnal & Buku Besar",
+      desc: "Kelola jurnal umum, penyesuaian, pembalik, buku besar, dan neraca saldo.",
+    },
+    {
+      title: "Piutang & Hutang Usaha",
+      desc: "Pantau invoice, pembayaran, retur, uang muka, aging, dan subledger pelanggan atau vendor.",
+    },
+    {
+      title: "Budget & Cost Center",
+      desc: "Bandingkan anggaran dengan realisasi berdasarkan akun dan pusat biaya.",
+    },
+    {
+      title: "Manajemen Aset Tetap",
+      desc: "Kelola perolehan, mutasi, depresiasi, revaluasi, impairment, hingga pelepasan aset.",
+    },
+    {
+      title: "Rekonsiliasi Keuangan",
+      desc: "Cocokkan kas, bank, dan pencatatan pajak untuk menemukan selisih lebih cepat.",
+    },
   ],
   mockup: {
     title: "Tampilan Dashboard Finance Siarpi",

@@ -32,8 +32,13 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link to="/tentang" className="hover:text-foreground">
+                  Tentang Siarpi
+                </Link>
+              </li>
+              <li>
                 <Link to="/modular" className="hover:text-foreground">
-                  Beli Ketengan
+                  Pricing
                 </Link>
               </li>
               <li>
@@ -48,13 +53,13 @@ export function Footer() {
             <h4 className="font-display text-sm font-semibold">Harga</h4>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
               <li>
-                <Link to="/" className="hover:text-foreground">
-                  Paket
+                <Link to="/modular" className="hover:text-foreground">
+                  Paket Suite
                 </Link>
               </li>
               <li>
                 <Link to="/modular" className="hover:text-foreground">
-                  Modular
+                  Modul Satuan
                 </Link>
               </li>
               <li>

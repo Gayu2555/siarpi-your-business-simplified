@@ -3,17 +3,42 @@ import type { ModuleDetail } from "./types";
 export const absensi: ModuleDetail = {
   tagline: "Kehadiran karyawan akurat, dari mana saja",
   longDescription:
-    "Absensi via face recognition, GPS, atau QR code. Cocok untuk WFO, WFH, dan tim lapangan.",
+    "Catat waktu kerja, lokasi, jadwal, koreksi kehadiran, dan lembur dalam alur yang terhubung untuk tim kantor maupun lapangan.",
   keyBenefits: [
-    "Absensi akurat anti-titip absen dengan Face Recognition AI",
-    "Validasi lokasi kerja karyawan dengan GPS Geofencing",
-    "Perhitungan jam kerja, shift, & lembur otomatis",
+    "Catat clock-in dan clock-out dengan bukti kehadiran",
+    "Kelola jadwal, shift, koreksi, dan lembur secara terpusat",
+    "Dapatkan rekap kehadiran bulanan yang siap ditinjau",
   ],
   features: [
-    { title: "Face Recognition", desc: "Selfie + AI untuk verifikasi identitas anti-titip absen." },
-    { title: "GPS & Geofence", desc: "Validasi lokasi sesuai area kerja yang ditentukan." },
-    { title: "Shift & Roster", desc: "Atur jadwal shift kompleks dengan rotasi otomatis." },
-    { title: "Lembur Otomatis", desc: "Hitung overtime sesuai aturan perusahaan." },
+    { title: "Clock-In & Clock-Out", desc: "Catat waktu mulai dan selesai kerja setiap karyawan." },
+    {
+      title: "Bukti & Lokasi Kehadiran",
+      desc: "Simpan informasi pendukung kehadiran untuk membantu proses verifikasi.",
+    },
+    {
+      title: "Jadwal & Shift",
+      desc: "Atur kalender kerja, jadwal, shift, dan penugasan karyawan.",
+    },
+    {
+      title: "Override Jadwal",
+      desc: "Tangani perubahan jadwal tertentu tanpa mengubah pola utama.",
+    },
+    {
+      title: "Koreksi Kehadiran",
+      desc: "Ajukan dan proses koreksi data waktu kerja yang tidak sesuai.",
+    },
+    {
+      title: "Manajemen Lembur",
+      desc: "Kelola aturan, pengajuan, penugasan, dan persetujuan lembur.",
+    },
+    {
+      title: "Rekap Bulanan",
+      desc: "Tinjau kehadiran, keterlambatan, dan waktu kerja dalam periode bulanan.",
+    },
+    {
+      title: "Laporan Absensi",
+      desc: "Gunakan laporan untuk evaluasi kedisiplinan dan kebutuhan payroll.",
+    },
   ],
   mockup: {
     title: "Absensi Hari Ini",
@@ -46,7 +71,13 @@ export const absensi: ModuleDetail = {
     },
   ],
   faq: [
-    { q: "Apakah bisa offline?", a: "Ya, data tersimpan lokal & sync saat online." },
-    { q: "Bagaimana dengan WFH?", a: "Mendukung absensi WFH dengan validasi foto & timestamp." },
+    {
+      q: "Apakah kesalahan absensi dapat diperbaiki?",
+      a: "Ya. Karyawan atau admin dapat menggunakan alur koreksi yang kemudian ditinjau oleh pihak berwenang.",
+    },
+    {
+      q: "Apakah data dapat digunakan Payroll?",
+      a: "Ya. Rekap kehadiran disediakan sebagai referensi dalam proses penggajian.",
+    },
   ],
 };

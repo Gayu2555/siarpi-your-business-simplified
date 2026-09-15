@@ -16,6 +16,8 @@ import { createStartHandler, defaultStreamHandler } from "@tanstack/react-start/
 
 const handler = createStartHandler(defaultStreamHandler);
 
+const developmentConnections = import.meta.env.DEV ? " ws://localhost:* ws://127.0.0.1:*" : "";
+
 // Sumber eksternal yang benar-benar dipakai halaman ini. Kalau nanti ada
 // script/asset pihak ketiga baru, daftarnya HARUS ikut diperbarui.
 const CSP = [
@@ -27,7 +29,7 @@ const CSP = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com data:",
   "img-src 'self' data: blob: https:",
-  "connect-src 'self' https://api.siarpi.com https://www.google-analytics.com https://*.clarity.ms https://*.google-analytics.com",
+  `connect-src 'self' https://api.siarpi.com https://www.google-analytics.com https://*.clarity.ms https://*.google-analytics.com${developmentConnections}`,
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",

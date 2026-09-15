@@ -3,11 +3,12 @@ import {
   Wallet,
   LineChart,
   Package,
-  Briefcase,
   HeartHandshake,
   Clock,
   FileText,
-  BarChart3,
+  Factory,
+  ShoppingBag,
+  ContactRound,
   type LucideIcon,
 } from "lucide-react";
 
@@ -27,11 +28,12 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   Wallet,
   LineChart,
   Package,
-  Briefcase,
   HeartHandshake,
   Clock,
   FileText,
-  BarChart3,
+  Factory,
+  ShoppingBag,
+  ContactRound,
 };
 
 export const modules = [
@@ -64,10 +66,17 @@ export const modules = [
     price: 69000,
   },
   {
-    id: "project",
-    name: "Project",
-    iconName: "Briefcase",
-    description: "Manajemen proyek tim",
+    id: "procurement",
+    name: "Procurement",
+    iconName: "ShoppingBag",
+    description: "Pengadaan, tender, PO, dan vendor",
+    price: 59000,
+  },
+  {
+    id: "production",
+    name: "Production",
+    iconName: "Factory",
+    description: "BOM, pesanan produksi, dan HPP",
     price: 59000,
   },
   {
@@ -92,11 +101,11 @@ export const modules = [
     price: 49000,
   },
   {
-    id: "analytics",
-    name: "Analytics",
-    iconName: "BarChart3",
-    description: "Dashboard & insight",
-    price: 89000,
+    id: "employee_portal",
+    name: "Employee Portal",
+    iconName: "ContactRound",
+    description: "Layanan mandiri untuk karyawan",
+    price: 29000,
   },
 ] as const;
 

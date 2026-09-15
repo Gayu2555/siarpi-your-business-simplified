@@ -38,30 +38,19 @@ export const Route = createFileRoute("/modules/$moduleId")({
 
     // High-converting Sales Copywriting & Targeted SEO Keywords
     const metaTitle = `Software ${m.name} Terbaik Indonesia | ${d.tagline} | Siarpi ERP`;
-    const metaDesc = `Software ${m.name} Siarpi: ${d.tagline}. Otomatiskan pembukuan, laporan Laba/Rugi, arus kas real-time, piutang AR, hutang AP, pajak e-Faktur, & rekonsiliasi bank. Coba gratis 14 hari tanpa kartu kredit!`;
+    const metaDesc = `Software ${m.name} Siarpi: ${d.tagline}. ${d.longDescription} Coba gratis 14 hari tanpa kartu kredit.`;
     const ogImage = d.mockup?.images?.[0] || d.mockup?.image || "/dashboard-preview.jpg";
+    const featureKeywords = d.features
+      .slice(0, 8)
+      .map((feature) => `${feature.title.toLowerCase()} siarpi`);
     const keywords = [
       `software ${m.name.toLowerCase()} indonesia`,
       `aplikasi ${m.name.toLowerCase()} bisnis`,
-      `software akuntansi`,
-      `software akuntansi terbaik`,
-      `software keuangan`,
-      `software keuangan perusahaan`,
-      `aplikasi keuangan usaha`,
-      `aplikasi pembukuan usaha`,
-      `software pembukuan gratis`,
-      `program akuntansi indonesia`,
-      `sistem akuntansi perusahaan`,
-      `software neraca dan laba rugi`,
-      `software kas dan bank`,
+      `modul ${m.name.toLowerCase()} ERP`,
+      `${m.name.toLowerCase()} untuk perusahaan`,
       `sistem erp indonesia`,
-      `modul finance erp`,
-      `laporan keuangan otomatis`,
-      `rekonsiliasi bank otomatis`,
-      `software piutang ar`,
-      `software hutang ap`,
-      `efaktur pajak otomatis`,
       `siarpi erp indonesia`,
+      ...featureKeywords,
     ].join(", ");
 
     const jsonLd = {
@@ -70,12 +59,6 @@ export const Route = createFileRoute("/modules/$moduleId")({
       name: `Siarpi ERP — Modul ${m.name}`,
       operatingSystem: "Web, Windows, macOS, Linux, Android, iOS",
       applicationCategory: "BusinessApplication",
-      offers: {
-        "@type": "Offer",
-        price: String(m.price),
-        priceCurrency: "IDR",
-        availability: "https://schema.org/InStock",
-      },
       aggregateRating: {
         "@type": "AggregateRating",
         ratingValue: "4.9",
@@ -215,57 +198,59 @@ function ModulePage() {
         <ModuleSubModulesSection moduleId={m.id} moduleName={m.name} />
 
         {/* TESTIMONIALS SECTION */}
-        <section className="bg-muted/30 py-20 md:py-28">
-          <div className="container mx-auto px-4 md:px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.5 }}
-              className="mx-auto max-w-2xl text-center"
-            >
-              <Badge variant="outline" className="mb-4 rounded-full">
-                Testimoni
-              </Badge>
-              <h2 className="font-display text-3xl font-bold md:text-5xl">
-                Dipercaya oleh bisnis Indonesia
-              </h2>
-            </motion.div>
+        {d.testimonials.length > 0 && (
+          <section className="bg-muted/30 py-20 md:py-28">
+            <div className="container mx-auto px-4 md:px-6">
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.5 }}
+                className="mx-auto max-w-2xl text-center"
+              >
+                <Badge variant="outline" className="mb-4 rounded-full">
+                  Testimoni
+                </Badge>
+                <h2 className="font-display text-3xl font-bold md:text-5xl">
+                  Dipercaya oleh bisnis Indonesia
+                </h2>
+              </motion.div>
 
-            <div className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-2">
-              {(d?.testimonials ?? []).map((t: Testimonial, i: number) => (
-                <motion.div
-                  key={t.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-60px" }}
-                  transition={{ duration: 0.4, delay: i * 0.1 }}
-                >
-                  <Card className="relative h-full rounded-2xl border-border p-8 shadow-soft">
-                    <Quote className="absolute right-6 top-6 h-8 w-8 text-primary/20" />
-                    <div className="flex gap-0.5">
-                      {Array.from({ length: t.rating }).map((_, idx) => (
-                        <Star key={idx} className="h-4 w-4 fill-primary text-primary" />
-                      ))}
-                    </div>
-                    <p className="mt-4 text-base italic text-foreground/90">"{t.quote}"</p>
-                    <div className="mt-6 flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-primary font-display font-bold text-primary-foreground">
-                        {t.name[0]}
+              <div className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-2">
+                {(d?.testimonials ?? []).map((t: Testimonial, i: number) => (
+                  <motion.div
+                    key={t.name}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-60px" }}
+                    transition={{ duration: 0.4, delay: i * 0.1 }}
+                  >
+                    <Card className="relative h-full rounded-2xl border-border p-8 shadow-soft">
+                      <Quote className="absolute right-6 top-6 h-8 w-8 text-primary/20" />
+                      <div className="flex gap-0.5">
+                        {Array.from({ length: t.rating }).map((_, idx) => (
+                          <Star key={idx} className="h-4 w-4 fill-primary text-primary" />
+                        ))}
                       </div>
-                      <div>
-                        <div className="font-display text-sm font-semibold">{t.name}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {t.role} • {t.company}
+                      <p className="mt-4 text-base italic text-foreground/90">"{t.quote}"</p>
+                      <div className="mt-6 flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-primary font-display font-bold text-primary-foreground">
+                          {t.name[0]}
+                        </div>
+                        <div>
+                          <div className="font-display text-sm font-semibold">{t.name}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {t.role} • {t.company}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Card>
-                </motion.div>
-              ))}
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* FAQ SECTION */}
         <section className="container mx-auto px-4 py-20 md:px-6 md:py-28">

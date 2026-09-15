@@ -1,19 +1,56 @@
 import type { ModuleDetail } from "./types";
 
 export const invoice: ModuleDetail = {
-  tagline: "Tagih pelanggan otomatis, terima bayaran cepat",
+  tagline: "Kelola invoice dan tagihan tanpa kehilangan jatuh tempo",
   longDescription:
-    "Buat invoice profesional dalam hitungan detik, kirim via email/WhatsApp, dan terima pembayaran via transfer/QRIS/VA.",
+    "Buat invoice penjualan dan tagihan pembelian, kelola pembayaran, retur, uang muka, serta pantau posisi piutang dan hutang dalam satu alur.",
   keyBenefits: [
-    "Buat & kirim invoice profesional via WhatsApp/Email 1 klik",
-    "Terima pembayaran instan via QRIS, Virtual Account, & Bank",
-    "Reminder penagihan otomatis untuk piutang tepat waktu",
+    "Buat invoice penjualan dan tagihan pembelian dengan data yang konsisten",
+    "Pantau status pembayaran dan tanggal jatuh tempo",
+    "Tinjau aging piutang dan hutang untuk menjaga arus kas",
   ],
   features: [
-    { title: "Template Cantik", desc: "Invoice profesional dengan logo & branding Anda." },
-    { title: "Recurring Invoice", desc: "Tagihan berlangganan otomatis tiap periode." },
-    { title: "Payment Link", desc: "Pelanggan bayar via QRIS/VA langsung dari invoice." },
-    { title: "Reminder Otomatis", desc: "Follow-up tagihan jatuh tempo via email & WA." },
+    {
+      title: "Invoice Penjualan",
+      desc: "Buat tagihan pelanggan dengan item, jumlah, harga, pajak, dan diskon.",
+    },
+    {
+      title: "Tagihan Pembelian",
+      desc: "Catat kewajiban kepada vendor beserta detail transaksi dan jatuh tempo.",
+    },
+    {
+      title: "Draft & Finalisasi",
+      desc: "Siapkan transaksi sebagai draft sebelum diterbitkan menjadi dokumen resmi.",
+    },
+    {
+      title: "Pelanggan & Vendor",
+      desc: "Gunakan data pihak terkait secara konsisten pada setiap transaksi.",
+    },
+    {
+      title: "Pajak & Diskon",
+      desc: "Terapkan komponen pajak dan diskon pada item atau dokumen transaksi.",
+    },
+    {
+      title: "Uang Muka",
+      desc: "Catat down payment pelanggan atau vendor dan hubungkan ke transaksi terkait.",
+    },
+    {
+      title: "Penerimaan Pembayaran",
+      desc: "Catat pembayaran piutang dan perbarui saldo invoice pelanggan.",
+    },
+    { title: "Pembayaran Vendor", desc: "Kelola pelunasan hutang berdasarkan tagihan pembelian." },
+    {
+      title: "Retur & Koreksi",
+      desc: "Dokumentasikan retur penjualan maupun pembelian yang memengaruhi saldo.",
+    },
+    {
+      title: "Status & Jatuh Tempo",
+      desc: "Pantau transaksi lunas, belum lunas, dan melewati jatuh tempo.",
+    },
+    {
+      title: "Aging Piutang & Hutang",
+      desc: "Kelompokkan saldo berdasarkan umur untuk menentukan prioritas tindak lanjut.",
+    },
   ],
   mockup: {
     title: "Invoice Bulan Ini",
@@ -47,9 +84,12 @@ export const invoice: ModuleDetail = {
   ],
   faq: [
     {
-      q: "Bisa kirim invoice via WhatsApp?",
-      a: "Ya, satu klik untuk kirim PDF + payment link via WA.",
+      q: "Apakah Invoice mendukung transaksi penjualan dan pembelian?",
+      a: "Ya. Modul mencakup invoice pelanggan serta pencatatan tagihan dari vendor.",
     },
-    { q: "Mendukung mata uang asing?", a: "Ya, multi-currency dengan kurs auto-update." },
+    {
+      q: "Apakah pembayaran dapat dilacak?",
+      a: "Ya. Pembayaran dicatat terhadap invoice sehingga status dan sisa saldo dapat dipantau.",
+    },
   ],
 };

@@ -15,8 +15,9 @@ import {
 const navLinks = [
   { to: "/", label: "Beranda" },
   { to: "/studi-kasus", label: "Studi Kasus" },
+  { to: "/tentang", label: "Tentang" },
   { to: "/blog", label: "Blog" },
-  { to: "/modular", label: "Beli Ketengan" },
+  { to: "/modular", label: "Pricing" },
   { to: "/komparasi", label: "Komparasi" },
   { to: "/roadmap", label: "Roadmap" },
 ] as const;
@@ -91,11 +92,11 @@ export function Header() {
           {showAccount ? (
             <details className="group relative">
               <summary className="flex cursor-pointer list-none items-center gap-2 rounded-full border border-border py-1 pl-1 pr-3 transition-colors hover:bg-muted [&::-webkit-details-marker]:hidden">
-                  <UserAvatar user={user} />
-                  <span className="max-w-[120px] truncate text-sm font-medium">
-                    {getDisplayName(user)}
-                  </span>
-                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground transition-transform group-open:rotate-180" />
+                <UserAvatar user={user} />
+                <span className="max-w-[120px] truncate text-sm font-medium">
+                  {getDisplayName(user)}
+                </span>
+                <ChevronDown className="h-3.5 w-3.5 text-muted-foreground transition-transform group-open:rotate-180" />
               </summary>
               <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-64 rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-lg">
                 <div className="px-2 py-1.5 font-normal">
@@ -114,8 +115,8 @@ export function Header() {
                   to="/dashboard"
                   className="flex items-center rounded-lg px-2 py-1.5 text-sm outline-none hover:bg-muted"
                 >
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                    Dashboard
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  Dashboard
                 </Link>
                 <div className="my-1 h-px bg-border" />
                 <button

@@ -38,6 +38,38 @@ export const hr = {
       title: "Manajemen Shift & Lembur",
       desc: "Pengaturan roster jam kerja fleksibel dan pengajuan lembur terintegrasi.",
     },
+    {
+      title: "Departemen & Struktur Organisasi",
+      desc: "Susun departemen, jabatan, hierarki, dan hubungan pelaporan karyawan.",
+    },
+    {
+      title: "Onboarding & Offboarding",
+      desc: "Gunakan checklist terstruktur saat karyawan bergabung atau meninggalkan perusahaan.",
+    },
+    {
+      title: "Kontrak & Dokumen Karyawan",
+      desc: "Kelola jenis kontrak, template, sertifikat, surat peringatan, dan riwayat pekerjaan.",
+    },
+    {
+      title: "Reimbursement",
+      desc: "Proses pengajuan penggantian biaya dengan status dan alur persetujuan yang jelas.",
+    },
+    {
+      title: "Skill Matrix",
+      desc: "Petakan kompetensi karyawan dan kebutuhan kemampuan untuk setiap jabatan.",
+    },
+    {
+      title: "Succession Planning",
+      desc: "Identifikasi kandidat pengganti dan nilai kesiapan untuk posisi penting.",
+    },
+    {
+      title: "Aset Karyawan",
+      desc: "Dokumentasikan aset perusahaan yang sedang digunakan oleh setiap karyawan.",
+    },
+    {
+      title: "Laporan SDM",
+      desc: "Tinjau komposisi tenaga kerja, kehadiran, cuti, dan aktivitas HR dalam satu tempat.",
+    },
   ],
   mockup: {
     title: "Dashboard Manajemen SDM & HR",

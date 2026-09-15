@@ -6,14 +6,47 @@ export const crm: ModuleDetail = {
     "Pipeline penjualan visual, otomatisasi follow-up, dan riwayat lengkap interaksi pelanggan.",
   keyBenefits: [
     "Pantau pipeline penjualan visual dari lead hingga closing",
-    "Kirim follow-up otomatis via Email & WhatsApp",
-    "Riwayat pelanggan 360° dalam satu tampilan terpadu",
+    "Kelola aktivitas, tugas, email, dan jadwal follow-up sales",
+    "Riwayat pelanggan 360 derajat dalam satu tampilan terpadu",
   ],
   features: [
-    { title: "Sales Pipeline", desc: "Visual deal stages dari lead hingga closing." },
-    { title: "Email & WhatsApp", desc: "Kirim broadcast & follow-up langsung dari CRM." },
-    { title: "Customer 360°", desc: "Riwayat pembelian, tiket, dan komunikasi dalam satu view." },
-    { title: "Sales Analytics", desc: "Conversion rate, sales velocity, dan forecast." },
+    {
+      title: "Database Pelanggan",
+      desc: "Satukan perusahaan, pelanggan, dan kontak dalam data yang terstruktur.",
+    },
+    {
+      title: "Customer 360 Derajat",
+      desc: "Lihat profil, kontak, deal, tugas, dan komunikasi pelanggan dalam satu tampilan.",
+    },
+    {
+      title: "Lead & Prospek",
+      desc: "Kelola prospek baru dan ubah lead yang memenuhi syarat menjadi deal.",
+    },
+    {
+      title: "Sales Pipeline",
+      desc: "Pantau deal berdasarkan stage penjualan yang dapat disesuaikan.",
+    },
+    {
+      title: "Status Won & Lost",
+      desc: "Dokumentasikan hasil deal beserta alasan untuk evaluasi penjualan.",
+    },
+    {
+      title: "Price Book",
+      desc: "Susun daftar harga dan gunakan produk sebagai line item dalam deal.",
+    },
+    {
+      title: "Tugas & Follow-Up",
+      desc: "Buat tugas, status khusus, tenggat, dan pengingat tindak lanjut.",
+    },
+    {
+      title: "Email & Catatan",
+      desc: "Dokumentasikan komunikasi dan kirim email melalui koneksi Gmail atau Outlook.",
+    },
+    { title: "Jadwal Meeting", desc: "Buat agenda pertemuan yang terhubung dengan aktivitas CRM." },
+    {
+      title: "Target & Laporan Sales",
+      desc: "Pantau target, aktivitas pipeline, dan performa penjualan tim.",
+    },
   ],
   mockup: {
     title: "Sales Pipeline",
@@ -46,7 +79,13 @@ export const crm: ModuleDetail = {
     },
   ],
   faq: [
-    { q: "Bisa kirim WhatsApp blast?", a: "Ya, terintegrasi dengan WhatsApp Business API." },
-    { q: "Ada mobile app untuk sales?", a: "Ya, sales bisa update deal langsung dari lapangan." },
+    {
+      q: "Apakah stage pipeline bisa disesuaikan?",
+      a: "Ya. Pipeline dan stage penjualan dapat dikonfigurasi sesuai proses sales perusahaan.",
+    },
+    {
+      q: "Apakah email dapat dikirim dari CRM?",
+      a: "Ya. Pengiriman email tersedia melalui akun Gmail atau Outlook yang terhubung.",
+    },
   ],
 };

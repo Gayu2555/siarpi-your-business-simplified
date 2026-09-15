@@ -7,27 +7,20 @@ import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { ConsultationCtaSection } from "@/components/site/ConsultationCtaSection";
+import { SuitePricingSection } from "@/components/pricing/SuitePricingSection";
 import { fetchCatalogModules, type ApiModule } from "@/lib/modules-api";
 import { formatIDR } from "@/lib/utils";
 import { resolvePhosphorIcon } from "@/lib/icon-resolver";
-import {
-  Plus,
-  Check,
-  ShoppingCart,
-  Trash2,
-  ArrowRight,
-  X,
-  Loader2,
-} from "lucide-react";
+import { Plus, Check, ShoppingCart, Trash2, ArrowRight, X, Loader2 } from "lucide-react";
 import { isAuthenticated, getStoredUser } from "@/lib/auth";
 import { getOnboardingStatus } from "@/lib/company-api";
 import { createCheckout } from "@/lib/checkout-api";
 
 export const Route = createFileRoute("/modular")({
   head: () => {
-    const title = "Harga Modul Satuan & Beli Ketengan | Siarpi ERP";
+    const title = "Pricing Siarpi | Paket Suite & Modul Satuan";
     const description =
-      "Pilih dan beli modul bisnis sesuai kebutuhan usaha Anda mulai Rp 39.000/bulan. Tanpa paketan mahal, tanpa biaya tersembunyi.";
+      "Bandingkan paket suite dan susun modul Siarpi sesuai kebutuhan bisnis dengan rincian harga yang transparan.";
     const keywords =
       "harga software akuntansi, aplikasi pembukuan murah, beli modul erp, software kasir murah, harga aplikasi keuangan, siarpi modular";
     const ogImage = "/dashboard-preview.jpg";
@@ -130,13 +123,29 @@ function ModularPage() {
       <main className="container mx-auto flex-1 px-4 py-16 md:px-6 md:py-20">
         <div className="mx-auto max-w-2xl text-center">
           <Badge variant="outline" className="mb-4 rounded-full">
-            Modular Pricing
+            Pricing Siarpi
           </Badge>
           <h1 className="font-display text-4xl font-bold md:text-5xl">
-            Beli <span className="text-gradient-primary">Ketengan</span>
+            Harga transparan, <span className="text-gradient-primary">pilihan tetap fleksibel</span>
           </h1>
           <p className="mt-4 text-muted-foreground">
-            Tidak wajib beli paket. Pilih modul yang Anda butuhkan, bayar sesuai pakai.
+            Gunakan paket suite untuk alur lintas divisi atau susun modul satuan sesuai prioritas
+            bisnis Anda.
+          </p>
+        </div>
+
+        <SuitePricingSection />
+
+        <div id="modul-satuan" className="mx-auto mt-24 max-w-2xl scroll-mt-24 text-center">
+          <Badge variant="outline" className="mb-4 rounded-full">
+            Modul Satuan
+          </Badge>
+          <h2 className="font-display text-3xl font-bold md:text-4xl">
+            Bayar hanya untuk modul yang digunakan
+          </h2>
+          <p className="mt-3 text-muted-foreground">
+            Pilih beberapa modul, lihat total bulanan secara langsung, lalu lanjutkan saat susunan
+            Anda sudah sesuai.
           </p>
         </div>
 
