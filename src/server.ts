@@ -98,18 +98,94 @@ const API_BASE_URL = (
   import.meta.env.VITE_API_BASE_URL?.trim() || "https://api.siarpi.com"
 ).replace(/\/+$/, "");
 
+type SitemapEntry = {
+  path: string;
+  priority: string;
+  changefreq: "daily" | "weekly" | "monthly";
+  lastmod?: string;
+};
+
+const MODULE_IDS = [
+  "finance",
+  "inventory",
+  "procurement",
+  "production",
+  "crm",
+  "absensi",
+  "invoice",
+  "employee_portal",
+];
+
+const FINANCE_SUBMODULE_IDS = [
+  "jurnal",
+  "kas-bank",
+  "piutang-ar",
+  "hutang-ap",
+  "aset-tetap",
+  "pajak",
+  "kurs-valuta",
+  "budget",
+  "laporan",
+  "pengaturan",
+];
+
+const HR_SUBMODULE_IDS = [
+  "karyawan",
+  "absensi",
+  "cuti",
+  "lembur",
+  "shift",
+  "reimbursement",
+  "departemen",
+  "jabatan",
+  "hierarki",
+  "payroll",
+];
+
+const PAYROLL_SUBMODULE_IDS = [
+  "payroll",
+  "pay-run",
+  "payslips",
+  "kasbon",
+  "jenis-potongan",
+  "configuration",
+  "pengaturan",
+  "journal-mapping",
+];
+
 // Halaman publik yang tidak berubah-ubah. Halaman ber-auth (/dashboard,
 // /checkout, /payment, /settings, /login, /register, /onboarding) SENGAJA
 // tidak dimasukkan — tidak ada gunanya di indeks.
-const STATIC_PATHS = [
+const STATIC_PATHS: SitemapEntry[] = [
   { path: "/", priority: "1.0", changefreq: "weekly" },
   { path: "/blog", priority: "0.9", changefreq: "daily" },
   { path: "/studi-kasus", priority: "0.8", changefreq: "monthly" },
   { path: "/modular", priority: "0.8", changefreq: "monthly" },
   { path: "/komparasi", priority: "0.7", changefreq: "monthly" },
+  { path: "/tentang", priority: "0.7", changefreq: "monthly" },
   { path: "/roadmap", priority: "0.6", changefreq: "monthly" },
   { path: "/hr", priority: "0.8", changefreq: "monthly" },
   { path: "/payroll", priority: "0.8", changefreq: "monthly" },
+  ...MODULE_IDS.map((id) => ({
+    path: `/modules/${id}`,
+    priority: "0.8",
+    changefreq: "monthly" as const,
+  })),
+  ...FINANCE_SUBMODULE_IDS.map((id) => ({
+    path: `/finance-sub/${id}`,
+    priority: "0.7",
+    changefreq: "monthly" as const,
+  })),
+  ...HR_SUBMODULE_IDS.map((id) => ({
+    path: `/hr-sub/${id}`,
+    priority: "0.7",
+    changefreq: "monthly" as const,
+  })),
+  ...PAYROLL_SUBMODULE_IDS.map((id) => ({
+    path: `/payroll-sub/${id}`,
+    priority: "0.7",
+    changefreq: "monthly" as const,
+  })),
 ];
 
 // Artikel bawaan di src/lib/articles.ts. Ditulis ulang di sini (bukan
@@ -141,6 +217,12 @@ function xmlEscape(value: string): string {
     .replace(/"/g, "&quot;");
 }
 
+function validLastModified(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+  const timestamp = Date.parse(value);
+  return Number.isNaN(timestamp) ? undefined : new Date(timestamp).toISOString();
+}
+
 function robotsTxt(): Response {
   const body = [
     "User-agent: *",
@@ -151,6 +233,9 @@ function robotsTxt(): Response {
     "Disallow: /payment",
     "Disallow: /onboarding",
     "Disallow: /settings",
+    "Disallow: /login",
+    "Disallow: /register",
+    "Disallow: /forgot-password",
     "",
     `Sitemap: ${SITE_URL}/sitemap.xml`,
     "",
@@ -165,46 +250,62 @@ function robotsTxt(): Response {
 }
 
 async function sitemapXml(): Promise<Response> {
-  const entries = STATIC_PATHS.map(
-    (item) => `  <url>
-    <loc>${SITE_URL}${item.path}</loc>
-    <changefreq>${item.changefreq}</changefreq>
-    <priority>${item.priority}</priority>
-  </url>`,
-  );
+  const sitemapEntries: SitemapEntry[] = [...STATIC_PATHS];
 
   for (const slug of BUILT_IN_ARTICLE_SLUGS) {
-    entries.push(`  <url>
-    <loc>${SITE_URL}/artikel/${slug}</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>`);
+    sitemapEntries.push({
+      path: `/artikel/${slug}`,
+      changefreq: "monthly",
+      priority: "0.7",
+    });
   }
 
   // Artikel CMS. Kalau API sedang tidak bisa dihubungi, sitemap TETAP terbit
   // berisi halaman statis — jangan sampai crawler menerima 500 dan berhenti
   // mengindeks seluruh situs gara-gara blog sedang bermasalah.
   try {
-    const response = await fetch(`${API_BASE_URL}/public/blogs?page=1&page_size=100`, {
-      signal: AbortSignal.timeout(5000),
-    });
-    if (response.ok) {
+    const signal = AbortSignal.timeout(5000);
+    const pageSize = 100;
+    for (let page = 1; page <= 50; page += 1) {
+      const response = await fetch(
+        `${API_BASE_URL}/public/blogs?page=${page}&page_size=${pageSize}`,
+        { signal },
+      );
+      if (!response.ok) break;
+
       const payload = (await response.json()) as {
         posts?: { slug?: string; updated_at?: string }[] | null;
+        total_items?: number;
       };
-      for (const post of payload.posts ?? []) {
+      const posts = payload.posts ?? [];
+      for (const post of posts) {
         if (!post.slug) continue;
-        const lastmod = post.updated_at ? `\n    <lastmod>${post.updated_at}</lastmod>` : "";
-        entries.push(`  <url>
-    <loc>${SITE_URL}/artikel/${xmlEscape(post.slug)}</loc>${lastmod}
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>`);
+        sitemapEntries.push({
+          path: `/artikel/${encodeURIComponent(post.slug)}`,
+          lastmod: validLastModified(post.updated_at),
+          changefreq: "monthly",
+          priority: "0.7",
+        });
       }
+
+      const totalItems = payload.total_items ?? posts.length;
+      if (posts.length < pageSize || page * pageSize >= totalItems) break;
     }
   } catch {
     // Sengaja diabaikan — lihat komentar di atas.
   }
+
+  const uniqueEntries = Array.from(
+    new Map(sitemapEntries.map((entry) => [entry.path, entry])).values(),
+  );
+  const entries = uniqueEntries.map((item) => {
+    const lastmod = item.lastmod ? `\n    <lastmod>${xmlEscape(item.lastmod)}</lastmod>` : "";
+    return `  <url>
+    <loc>${SITE_URL}${xmlEscape(item.path)}</loc>${lastmod}
+    <changefreq>${item.changefreq}</changefreq>
+    <priority>${item.priority}</priority>
+  </url>`;
+  });
 
   const body = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
