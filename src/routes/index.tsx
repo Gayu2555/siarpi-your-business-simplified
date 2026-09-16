@@ -319,7 +319,7 @@ const caseStudies = [
     challenge:
       "Pengadaan, produksi, anggaran proyek, dan laporan manajemen sulit dikonsolidasikan.",
     result: "Fokus hasil: keputusan lintas unit memakai data operasional yang lebih utuh.",
-    modules: ["Procurement", "Production", "Analytics"],
+    modules: ["Procurement", "Production", "Finance"],
   },
 ];
 
@@ -370,7 +370,7 @@ const testimonials = [
   },
   {
     quote:
-      "Tim 15 orang bisa sinkron tanpa meeting harian. Project Management Siarpi bikin kami hemat banyak waktu.",
+      "Tim 15 orang bisa sinkron tanpa meeting harian. Alur kerja Siarpi bikin kami hemat banyak waktu.",
     name: "Arif Hidayat",
     role: "Project Manager",
     company: "Studio Kreatif",

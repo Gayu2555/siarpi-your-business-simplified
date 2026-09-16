@@ -315,9 +315,9 @@ const scaleGuidesData: Record<"umkm" | "smb" | "enterprise", ScaleGuide> = {
         reason: "Konsolidasi laporan holding, multi-currency BI JISDOR, & e-Faktur DJP.",
       },
       {
-        id: "project",
-        name: "Modul Project & Budgeting",
-        reason: "Monitoring variance budget vs actual per unit bisnis & proyek.",
+        id: "production",
+        name: "Modul Production Enterprise",
+        reason: "Kendalikan BOM, pesanan produksi, pemakaian bahan, dan HPP lintas unit.",
       },
       {
         id: "payroll",
@@ -325,9 +325,9 @@ const scaleGuidesData: Record<"umkm" | "smb" | "enterprise", ScaleGuide> = {
         reason: "Transfer penggajian massal ratusan/ribuan staf via integrasi bank.",
       },
       {
-        id: "analytics",
-        name: "Modul Executive Analytics",
-        reason: "Visualisasi laporan kesehatan finansial holding untuk direksi.",
+        id: "crm",
+        name: "Modul CRM Enterprise",
+        reason: "Satukan pipeline, aktivitas penjualan, dan histori pelanggan antar-unit.",
       },
     ],
     implementationSteps: [

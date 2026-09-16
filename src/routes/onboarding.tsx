@@ -87,13 +87,6 @@ const modules = [
     price: 69000,
   },
   {
-    id: "project",
-    name: "Project",
-    description: "Manajemen proyek tim",
-    icon: "i-ph-columns-fill",
-    price: 59000,
-  },
-  {
     id: "crm",
     name: "CRM",
     description: "Kelola pelanggan & leads",
@@ -113,13 +106,6 @@ const modules = [
     description: "Tagihan & pembayaran",
     icon: "i-ph-receipt-fill",
     price: 49000,
-  },
-  {
-    id: "analytics",
-    name: "Analytics",
-    description: "Dashboard & insight",
-    icon: "i-ph-chart-line-fill",
-    price: 89000,
   },
 ];
 
@@ -161,10 +147,12 @@ function OnboardingPage() {
       if (saved) {
         localStorage.removeItem("siarpi_cart");
         const savedModules = JSON.parse(saved);
+        const releasedModuleKeys = new Set(modules.map((module) => module.id));
         return Array.isArray(savedModules)
           ? savedModules.filter(
               (moduleKey: unknown): moduleKey is string =>
-                typeof moduleKey === "string" && moduleKey.toLowerCase() !== "pos",
+                typeof moduleKey === "string" &&
+                releasedModuleKeys.has(moduleKey.trim().toLowerCase()),
             )
           : [];
       }
@@ -491,8 +479,8 @@ function OnboardingPage() {
                       Coba seluruh Siarpi lebih dulu
                     </h2>
                     <p className="mt-2 text-muted-foreground">
-                      Semua modul aktif selama 14 hari. Tidak perlu kartu kredit dan tidak ada
-                      tagihan otomatis saat trial berakhir.
+                      Semua modul yang tersedia aktif selama 14 hari. Tidak perlu kartu kredit dan
+                      tidak ada tagihan otomatis saat trial berakhir.
                     </p>
 
                     <div className="mt-6 grid gap-3 sm:grid-cols-3">

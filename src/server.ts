@@ -94,7 +94,9 @@ const SITE_URL = "https://siarpi.com";
 // env Worker: VITE_* adalah variabel build-time dan tidak pernah muncul di
 // argumen kedua fetch(). Salah ambil sumber = sitemap selalu jatuh ke fallback
 // dan artikel CMS tidak pernah masuk.
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://api.siarpi.com";
+const API_BASE_URL = (
+  import.meta.env.VITE_API_BASE_URL?.trim() || "https://api.siarpi.com"
+).replace(/\/+$/, "");
 
 // Halaman publik yang tidak berubah-ubah. Halaman ber-auth (/dashboard,
 // /checkout, /payment, /settings, /login, /register, /onboarding) SENGAJA

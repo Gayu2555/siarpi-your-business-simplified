@@ -1,15 +1,8 @@
-// Base URL untuk BelajarAPI / siarpi-backend.
-//
-// Bisa ditimpa lewat VITE_API_BASE_URL (mis. isi .env.local dengan
-// VITE_API_BASE_URL=http://localhost:4000) supaya `npm run dev` tidak
-// menembak database PRODUKSI -- yang sebelumnya terjadi karena nilai ini
-// dipaku ke api.siarpi.com tanpa jalan keluar apa pun.
-//
-// Development memakai backend lokal agar route yang belum masuk deployment
-// produksi tidak menyebabkan 404/CORS. Nilai eksplisit selalu diprioritaskan.
+// Seluruh build memakai API production secara default. Environment khusus
+// tetap dapat memilih endpoint lain secara eksplisit melalui VITE_API_BASE_URL.
 export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ||
-  (import.meta.env.DEV ? "http://localhost:4000" : "https://api.siarpi.com");
+  import.meta.env.VITE_API_BASE_URL?.trim().replace(/\/+$/, "") ||
+  "https://api.siarpi.com";
 
 export function apiUrl(path: string): string {
   return `${API_BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;

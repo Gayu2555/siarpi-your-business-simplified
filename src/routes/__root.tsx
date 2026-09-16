@@ -40,7 +40,7 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          "Siarpi adalah All in One Management System & Business Operating System (BOS) lengkap untuk mengontrol seluruh divisi bisnis Anda: Finance, HR & Payroll, Inventory, CRM, dan Analytics.",
+          "Siarpi adalah All in One Management System & Business Operating System (BOS) untuk mengontrol Finance, HR & Payroll, Inventory, Procurement, Production, dan CRM.",
       },
       {
         name: "keywords",
@@ -63,6 +63,7 @@ export const Route = createRootRoute({
       { name: "twitter:site", content: "@Siarpi" },
     ],
     links: [
+      { rel: "icon", type: "image/x-icon", href: "/siarpi-icon.ico?v=1" },
       { rel: "stylesheet", href: appCss },
     ],
   }),

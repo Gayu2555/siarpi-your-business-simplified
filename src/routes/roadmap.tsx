@@ -27,7 +27,7 @@ const items: Record<Status, { title: string; desc: string; progress?: number }[]
       progress: 80,
     },
     {
-      title: "Dashboard Analytics",
+      title: "Dashboard KPI Lintas Modul",
       desc: "Visualisasi KPI real-time untuk semua modul.",
       progress: 65,
     },
