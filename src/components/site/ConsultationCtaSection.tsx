@@ -99,7 +99,7 @@ export function ConsultationCtaSection({
   if (variant === "card") {
     return (
       <div
-        className={`rounded-3xl border border-border/80 bg-gradient-to-b from-card to-muted/30 p-8 shadow-soft md:p-10 ${className}`}
+        className={`rounded-3xl border border-primary/20 bg-primary/[0.045] p-8 shadow-soft md:p-10 ${className}`}
       >
         {content}
       </div>
@@ -107,7 +107,7 @@ export function ConsultationCtaSection({
   }
 
   return (
-    <section className={`border-y border-border/80 bg-muted/25 py-12 md:py-16 ${className}`}>
+    <section className={`border-y border-primary/20 bg-primary/[0.045] py-12 md:py-16 ${className}`}>
       {content}
     </section>
   );

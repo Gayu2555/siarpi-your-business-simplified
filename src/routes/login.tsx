@@ -427,7 +427,7 @@ function LoginPage() {
               Kebijakan Privasi
             </Link>{" "}
             &{" "}
-            <Link to="/" className="underline hover:text-foreground">
+            <Link to="/terms" className="underline hover:text-foreground">
               Ketentuan Penggunaan
             </Link>{" "}
             Siarpi.

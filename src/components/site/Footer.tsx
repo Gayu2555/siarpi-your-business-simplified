@@ -110,8 +110,11 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 border-t border-border pt-6 text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} Siarpi. All rights reserved.
+        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row">
+          <span>&copy; {new Date().getFullYear()} Siarpi. All rights reserved.</span>
+          <Link to="/terms" className="transition-colors hover:text-foreground">
+            Ketentuan Layanan
+          </Link>
         </div>
       </div>
     </footer>

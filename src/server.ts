@@ -163,6 +163,7 @@ const STATIC_PATHS: SitemapEntry[] = [
   { path: "/modular", priority: "0.8", changefreq: "monthly" },
   { path: "/komparasi", priority: "0.7", changefreq: "monthly" },
   { path: "/tentang", priority: "0.7", changefreq: "monthly" },
+  { path: "/terms", priority: "0.4", changefreq: "monthly" },
   { path: "/roadmap", priority: "0.6", changefreq: "monthly" },
   { path: "/hr", priority: "0.8", changefreq: "monthly" },
   { path: "/payroll", priority: "0.8", changefreq: "monthly" },

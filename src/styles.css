@@ -50,20 +50,20 @@
   --font-display: "Plus Jakarta Sans", system-ui, sans-serif;
   --font-body: "Inter", system-ui, sans-serif;
 
-  --shadow-soft: 0 4px 20px -4px oklch(0.7 0.18 75 / 0.15);
-  --shadow-glow: 0 10px 40px -10px oklch(0.75 0.2 70 / 0.4);
+  --shadow-soft: 0 4px 20px -4px oklch(0.62 0.18 62 / 0.18);
+  --shadow-glow: 0 10px 40px -10px oklch(0.65 0.2 62 / 0.38);
   --shadow-card: 0 2px 12px -4px oklch(0.2 0 0 / 0.08);
-  --shadow-elegant: 0 20px 50px -20px oklch(0.7 0.18 75 / 0.25);
+  --shadow-elegant: 0 20px 50px -20px oklch(0.62 0.18 62 / 0.28);
 
-  --gradient-primary: linear-gradient(135deg, oklch(0.78 0.18 75), oklch(0.72 0.21 55));
-  --gradient-subtle: linear-gradient(180deg, oklch(0.99 0.01 80), oklch(1 0 0));
-  --gradient-hero: radial-gradient(ellipse at top, oklch(0.96 0.08 85 / 0.6), transparent 60%);
+  --gradient-primary: linear-gradient(135deg, oklch(0.65 0.18 68), oklch(0.58 0.19 52));
+  --gradient-subtle: oklch(0.98 0.022 84);
+  --gradient-hero: transparent;
 }
 
 :root {
   --radius: 0.875rem;
 
-  --background: oklch(1 0 0);
+  --background: oklch(0.992 0.006 82);
   --foreground: oklch(0.18 0.01 60);
 
   --card: oklch(1 0 0);
@@ -73,25 +73,25 @@
   --popover-foreground: oklch(0.18 0.01 60);
 
   /* Amber primary */
-  --primary: oklch(0.76 0.18 70);
-  --primary-foreground: oklch(0.18 0.02 60);
-  --primary-glow: oklch(0.85 0.16 85);
+  --primary: oklch(0.6 0.18 58);
+  --primary-foreground: oklch(1 0 0);
+  --primary-glow: oklch(0.78 0.16 78);
 
-  --secondary: oklch(0.97 0.01 80);
+  --secondary: oklch(0.97 0.018 82);
   --secondary-foreground: oklch(0.2 0.01 60);
 
-  --muted: oklch(0.96 0.005 80);
+  --muted: oklch(0.965 0.014 82);
   --muted-foreground: oklch(0.5 0.01 60);
 
-  --accent: oklch(0.95 0.05 85);
-  --accent-foreground: oklch(0.25 0.05 70);
+  --accent: oklch(0.94 0.052 80);
+  --accent-foreground: oklch(0.32 0.08 55);
 
   --destructive: oklch(0.6 0.22 25);
   --destructive-foreground: oklch(1 0 0);
 
-  --border: oklch(0.92 0.01 80);
-  --input: oklch(0.94 0.01 80);
-  --ring: oklch(0.76 0.18 70);
+  --border: oklch(0.9 0.024 78);
+  --input: oklch(0.92 0.022 78);
+  --ring: oklch(0.6 0.18 58);
 
   --chart-1: oklch(0.76 0.18 70);
   --chart-2: oklch(0.85 0.16 85);
@@ -99,14 +99,14 @@
   --chart-4: oklch(0.5 0.05 60);
   --chart-5: oklch(0.3 0.02 60);
 
-  --sidebar: oklch(0.99 0.005 80);
+  --sidebar: oklch(0.98 0.014 82);
   --sidebar-foreground: oklch(0.2 0.01 60);
-  --sidebar-primary: oklch(0.76 0.18 70);
-  --sidebar-primary-foreground: oklch(0.18 0.02 60);
-  --sidebar-accent: oklch(0.96 0.02 80);
+  --sidebar-primary: oklch(0.6 0.18 58);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.95 0.035 80);
   --sidebar-accent-foreground: oklch(0.25 0.05 70);
-  --sidebar-border: oklch(0.92 0.01 80);
-  --sidebar-ring: oklch(0.76 0.18 70);
+  --sidebar-border: oklch(0.9 0.024 78);
+  --sidebar-ring: oklch(0.6 0.18 58);
 }
 
 .dark {
@@ -116,9 +116,9 @@
   --card-foreground: oklch(0.98 0.005 80);
   --popover: oklch(0.2 0.01 60);
   --popover-foreground: oklch(0.98 0.005 80);
-  --primary: oklch(0.78 0.18 75);
-  --primary-foreground: oklch(0.18 0.02 60);
-  --primary-glow: oklch(0.85 0.16 85);
+  --primary: oklch(0.68 0.17 70);
+  --primary-foreground: oklch(1 0 0);
+  --primary-glow: oklch(0.78 0.16 78);
   --secondary: oklch(0.25 0.01 60);
   --secondary-foreground: oklch(0.98 0.005 80);
   --muted: oklch(0.25 0.01 60);
@@ -137,8 +137,8 @@
   --chart-5: oklch(0.4 0.02 60);
   --sidebar: oklch(0.18 0.01 60);
   --sidebar-foreground: oklch(0.98 0.005 80);
-  --sidebar-primary: oklch(0.78 0.18 75);
-  --sidebar-primary-foreground: oklch(0.18 0.02 60);
+  --sidebar-primary: oklch(0.68 0.17 70);
+  --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent: oklch(0.25 0.01 60);
   --sidebar-accent-foreground: oklch(0.98 0.005 80);
   --sidebar-border: oklch(1 0 0 / 10%);
@@ -170,6 +170,7 @@
 @layer utilities {
   .bg-gradient-primary {
     background: var(--gradient-primary);
+    color: var(--color-primary-foreground);
   }
   .bg-gradient-subtle {
     background: var(--gradient-subtle);

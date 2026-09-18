@@ -871,7 +871,7 @@ function LandingPage() {
           <Button
             size="lg"
             asChild
-            className="mt-8 bg-background text-foreground hover:bg-background/90"
+            className="mt-8 bg-foreground text-white hover:bg-foreground/90"
           >
             <Link to="/onboarding">
               Mulai Sekarang <ArrowRight className="ml-1 h-4 w-4" />
