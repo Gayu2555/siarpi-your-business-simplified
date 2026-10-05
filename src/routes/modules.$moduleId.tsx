@@ -10,14 +10,15 @@ import { modules, getModuleIcon } from "@/lib/modules";
 import { formatIDR } from "@/lib/utils";
 import { fetchCatalogModules, type ApiModule } from "@/lib/modules-api";
 import { resolvePhosphorIcon } from "@/lib/icon-resolver";
-import { moduleDetails, type ModuleDetail, type Testimonial } from "@/lib/module-details";
+import { moduleDetails, type ModuleDetail } from "@/lib/module-details";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ArrowRight, ArrowLeft, Star, Quote } from "lucide-react";
+import { ArrowRight, ArrowLeft } from "lucide-react";
+import { ProductOfferSection } from "@/components/site/ProductOfferSection";
 
 // Modular Component Imports
 import { ModuleHeroSection } from "@/components/modules/ModuleHeroSection";
@@ -57,13 +58,13 @@ export const Route = createFileRoute("/modules/$moduleId")({
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       name: `Siarpi ERP — Modul ${m.name}`,
-      operatingSystem: "Web, Windows, macOS, Linux, Android, iOS",
+      // aggregateRating 4.9/1280 dihapus: tidak ada sumber ulasan yang bisa
+      // diaudit, dan Google menolaknya kalau tidak ada Review nyata on-page.
+      // `offers` juga sengaja tidak dipasang -- harga modul datang dari katalog,
+      // jadi nilai tetap akan basi begitu harga berubah. Masuk lagi setelah
+      // harga ter-render di SSR.
+      operatingSystem: "Web, Windows, macOS",
       applicationCategory: "BusinessApplication",
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: "4.9",
-        ratingCount: "1280",
-      },
       description: metaDesc,
     };
 
@@ -197,60 +198,8 @@ function ModulePage() {
         {/* SUB-MODULES SHOWCASE FOR HR, PAYROLL, FINANCE */}
         <ModuleSubModulesSection moduleId={m.id} moduleName={m.name} />
 
-        {/* TESTIMONIALS SECTION */}
-        {d.testimonials.length > 0 && (
-          <section className="bg-muted/30 py-20 md:py-28">
-            <div className="container mx-auto px-4 md:px-6">
-              <motion.div
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.5 }}
-                className="mx-auto max-w-2xl text-center"
-              >
-                <Badge variant="outline" className="mb-4 rounded-full">
-                  Testimoni
-                </Badge>
-                <h2 className="font-display text-3xl font-bold md:text-5xl">
-                  Dipercaya oleh bisnis Indonesia
-                </h2>
-              </motion.div>
-
-              <div className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-2">
-                {(d?.testimonials ?? []).map((t: Testimonial, i: number) => (
-                  <motion.div
-                    key={t.name}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-60px" }}
-                    transition={{ duration: 0.4, delay: i * 0.1 }}
-                  >
-                    <Card className="relative h-full rounded-2xl border-border p-8 shadow-soft">
-                      <Quote className="absolute right-6 top-6 h-8 w-8 text-primary/20" />
-                      <div className="flex gap-0.5">
-                        {Array.from({ length: t.rating }).map((_, idx) => (
-                          <Star key={idx} className="h-4 w-4 fill-primary text-primary" />
-                        ))}
-                      </div>
-                      <p className="mt-4 text-base italic text-foreground/90">"{t.quote}"</p>
-                      <div className="mt-6 flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-primary font-display font-bold text-primary-foreground">
-                          {t.name[0]}
-                        </div>
-                        <div>
-                          <div className="font-display text-sm font-semibold">{t.name}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {t.role} • {t.company}
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
+        {/* PENAWARAN PRODUK — pengganti testimoni fiktif di lib/modules/*.ts */}
+        <ProductOfferSection moduleName={m.name} />
 
         {/* FAQ SECTION */}
         <section className="container mx-auto px-4 py-20 md:px-6 md:py-28">

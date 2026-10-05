@@ -1,8 +1,7 @@
 // Seluruh build memakai API production secara default. Environment khusus
 // tetap dapat memilih endpoint lain secara eksplisit melalui VITE_API_BASE_URL.
 export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL?.trim().replace(/\/+$/, "") ||
-  "https://api.siarpi.com";
+  import.meta.env.VITE_API_BASE_URL?.trim().replace(/\/+$/, "") || "https://api.siarpi.com";
 
 export function apiUrl(path: string): string {
   return `${API_BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
@@ -13,7 +12,12 @@ export interface ApiFetchOptions extends RequestInit {
   auth?: boolean;
 }
 
-// Generic fetch wrapper — auto attach Authorization header kalau ada token
+// Generic fetch wrapper — auto attach Authorization header kalau ada token.
+// Default T = any disengaja: sebagian pemanggil tidak menentukan tipe dan
+// mengandalkan optional chaining di data; memaksa unknown akan mematahkan
+// 20+ call site tanpa menambah keamanan.
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function apiFetch<T = any>(
   path: string,
   options: ApiFetchOptions = {},
@@ -22,8 +26,7 @@ export async function apiFetch<T = any>(
   const token = typeof window !== "undefined" ? localStorage.getItem("siarpi_token") : null;
 
   const headers = new Headers(requestOptions.headers);
-  const isFormData =
-    typeof FormData !== "undefined" && requestOptions.body instanceof FormData;
+  const isFormData = typeof FormData !== "undefined" && requestOptions.body instanceof FormData;
 
   if (requestOptions.body != null && !isFormData && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
@@ -42,12 +45,11 @@ export async function apiFetch<T = any>(
     localStorage.removeItem("siarpi_user");
   }
 
-  let data: any = null;
+  let data: T | null = null;
   try {
     data = await res.json();
   } catch {
     // response kosong / bukan JSON
   }
-
-  return { ok: res.ok, status: res.status, data };
+  return { ok: res.ok, status: res.status, data: data as T };
 }

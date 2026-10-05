@@ -11,6 +11,8 @@ import { getCheckout, selectPaymentMethod, type Checkout } from "@/lib/checkout-
 import {
   chargePayment,
   getPaymentStatus,
+  resolveStatus,
+  hostedPaymentLink,
   SUCCESS_STATUSES,
   FAILED_STATUSES,
   type ChargeResponse,
@@ -26,6 +28,7 @@ import {
   ArrowLeft,
   Copy,
   Check,
+  ExternalLink,
 } from "lucide-react";
 
 import { guardOnboardingRoute } from "@/lib/onboarding-guard";
@@ -56,9 +59,15 @@ const methods: {
   { id: "qris", label: "QRIS", icon: QrCode, group: "instant" },
   { id: "gopay", label: "GoPay", icon: Smartphone, group: "instant" },
   { id: "bca", label: "BCA Virtual Account", icon: Building2, group: "va" },
+  { id: "mandiri", label: "Mandiri Virtual Account", icon: Building2, group: "va" },
   { id: "bni", label: "BNI Virtual Account", icon: Building2, group: "va" },
   { id: "bri", label: "BRI Virtual Account", icon: Building2, group: "va" },
   { id: "permata", label: "Permata Virtual Account", icon: Building2, group: "va" },
+  { id: "cimb", label: "CIMB Virtual Account", icon: Building2, group: "va" },
+  { id: "danamon", label: "Danamon Virtual Account", icon: Building2, group: "va" },
+  { id: "maybank", label: "Maybank Virtual Account", icon: Building2, group: "va" },
+  { id: "bsm", label: "Bank Sahabat Sampoerna Virtual Account", icon: Building2, group: "va" },
+  { id: "doku", label: "DOKU Virtual Account", icon: Building2, group: "va" },
 ];
 
 type Phase = "select" | "processing" | "awaiting" | "success" | "failed";
@@ -76,6 +85,24 @@ function PaymentPage() {
   const [copied, setCopied] = useState(false);
 
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Mayar = hosted page tanpa detail inline. Midtrans QRIS/GoPay punya
+  // deeplink_url juga, tapi selalu bareng qr_code_url, jadi helper-nya
+  // hanya mengembalikan link untuk Mayar.
+  const hostedLink = hostedPaymentLink(chargeResult);
+
+  // Backend yang menentukan metode mana yang benar-benar bisa diproses.
+  // DOKU Direct API hanya bisa membuat Virtual Account, jadi QRIS/GoPay tidak
+  // punya endpoint dan akan ditolak 400 kalau tetap ditampilkan.
+  //
+  // payment_methods kosong = backend tidak membatasi (Midtrans/Mayar), jadi
+  // semua metode ditampilkan seperti sebelumnya.
+  const allowedMethods = checkout?.payment_methods;
+  const visibleMethods = allowedMethods?.length
+    ? methods.filter((m) => allowedMethods.includes(m.id))
+    : methods;
+  const instantMethods = visibleMethods.filter((m) => m.group === "instant");
+  const vaMethods = visibleMethods.filter((m) => m.group === "va");
 
   useEffect(() => {
     getCheckout(checkout_id)
@@ -104,9 +131,14 @@ function PaymentPage() {
   function startPolling(orderId: string) {
     pollRef.current = setInterval(async () => {
       const { ok, data } = await getPaymentStatus(orderId);
-      if (!ok || !data?.data?.transaction_status) return;
+      if (!ok) return;
 
-      const status = data.data.transaction_status;
+      // resolveStatus (bukan data.data?.transaction_status) karena branch
+      // Mayar di backend mengembalikan payment_status di root — akses langsung
+      // ke .data.transaction_status selalu undefined di provider itu, jadi
+      // pollingnya diam-diam tidak pernah berhenti.
+      const status = resolveStatus(data);
+      if (!status) return;
 
       if (SUCCESS_STATUSES.includes(status)) {
         if (pollRef.current) clearInterval(pollRef.current);
@@ -229,67 +261,75 @@ function PaymentPage() {
                   </p>
 
                   <div className="mt-6 space-y-2">
-                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                      Instan
-                    </p>
-                    <div className="grid gap-2 sm:grid-cols-2">
-                      {methods
-                        .filter((m) => m.group === "instant")
-                        .map((m) => (
-                          <button
-                            key={m.id}
-                            type="button"
-                            onClick={() => setSelectedMethod(m.id)}
-                            className={`flex items-center gap-3 rounded-xl border-2 p-3.5 text-left transition-all ${
-                              selectedMethod === m.id
-                                ? "border-primary bg-accent/50"
-                                : "border-border hover:border-primary/40"
-                            }`}
-                          >
-                            <div
-                              className={`flex h-9 w-9 items-center justify-center rounded-lg ${
+                    {instantMethods.length > 0 && (
+                      <>
+                        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                          Instan
+                        </p>
+                        <div className="grid gap-2 sm:grid-cols-2">
+                          {instantMethods.map((m) => (
+                            <button
+                              key={m.id}
+                              type="button"
+                              onClick={() => setSelectedMethod(m.id)}
+                              className={`flex items-center gap-3 rounded-xl border-2 p-3.5 text-left transition-all ${
                                 selectedMethod === m.id
-                                  ? "bg-gradient-primary text-primary-foreground"
-                                  : "bg-muted"
+                                  ? "border-primary bg-accent/50"
+                                  : "border-border hover:border-primary/40"
                               }`}
                             >
-                              <m.icon className="h-4 w-4" />
-                            </div>
-                            <span className="text-sm font-medium">{m.label}</span>
-                          </button>
-                        ))}
-                    </div>
+                              <div
+                                className={`flex h-9 w-9 items-center justify-center rounded-lg ${
+                                  selectedMethod === m.id
+                                    ? "bg-gradient-primary text-primary-foreground"
+                                    : "bg-muted"
+                                }`}
+                              >
+                                <m.icon className="h-4 w-4" />
+                              </div>
+                              <span className="text-sm font-medium">{m.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
 
-                    <p className="pt-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                      Virtual Account
-                    </p>
-                    <div className="grid gap-2 sm:grid-cols-2">
-                      {methods
-                        .filter((m) => m.group === "va")
-                        .map((m) => (
-                          <button
-                            key={m.id}
-                            type="button"
-                            onClick={() => setSelectedMethod(m.id)}
-                            className={`flex items-center gap-3 rounded-xl border-2 p-3.5 text-left transition-all ${
-                              selectedMethod === m.id
-                                ? "border-primary bg-accent/50"
-                                : "border-border hover:border-primary/40"
-                            }`}
-                          >
-                            <div
-                              className={`flex h-9 w-9 items-center justify-center rounded-lg ${
+                    {vaMethods.length > 0 && (
+                      <>
+                        <p
+                          className={`text-xs font-medium uppercase tracking-wide text-muted-foreground ${
+                            instantMethods.length > 0 ? "pt-3" : ""
+                          }`}
+                        >
+                          Virtual Account
+                        </p>
+                        <div className="grid gap-2 sm:grid-cols-2">
+                          {vaMethods.map((m) => (
+                            <button
+                              key={m.id}
+                              type="button"
+                              onClick={() => setSelectedMethod(m.id)}
+                              className={`flex items-center gap-3 rounded-xl border-2 p-3.5 text-left transition-all ${
                                 selectedMethod === m.id
-                                  ? "bg-gradient-primary text-primary-foreground"
-                                  : "bg-muted"
+                                  ? "border-primary bg-accent/50"
+                                  : "border-border hover:border-primary/40"
                               }`}
                             >
-                              <m.icon className="h-4 w-4" />
-                            </div>
-                            <span className="text-sm font-medium">{m.label}</span>
-                          </button>
-                        ))}
-                    </div>
+                              <div
+                                className={`flex h-9 w-9 items-center justify-center rounded-lg ${
+                                  selectedMethod === m.id
+                                    ? "bg-gradient-primary text-primary-foreground"
+                                    : "bg-muted"
+                                }`}
+                              >
+                                <m.icon className="h-4 w-4" />
+                              </div>
+                              <span className="text-sm font-medium">{m.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   {error && (
@@ -317,15 +357,45 @@ function PaymentPage() {
                 </div>
               )}
 
-              {/* ── AWAITING (QR / VA number ditampilkan) ──────────────── */}
+              {/* ── AWAITING (QR / VA / hosted page) ────────────────── */}
               {phase === "awaiting" && chargeResult && (
                 <div className="text-center">
                   <Badge variant="secondary" className="rounded-full">
                     Menunggu Pembayaran
                   </Badge>
                   <h1 className="mt-4 font-display text-xl font-bold">
-                    {chargeResult.qr_code_url ? "Scan QR Code" : "Transfer ke Virtual Account"}
+                    {hostedLink
+                      ? "Selesaikan Pembayaran"
+                      : chargeResult.qr_code_url
+                        ? "Scan QR Code"
+                        : chargeResult.bill_key
+                          ? "Transfer via Mandiri"
+                          : "Transfer ke Virtual Account"}
                   </h1>
+
+                  {/* Mayar tidak pernah mengirim VA/QR -- dia hanya memberi
+                      satu hosted page. Tanpa blok ini, seluruh kartu di bawah
+                      ini kosong: judulnya tetap bilang "Transfer ke Virtual
+                      Account" padahal tidak ada nomor untuk ditransfer, dan
+                      tidak ada jalan untuk membayar sama sekali. */}
+                  {hostedLink && (
+                    <div className="mt-6 rounded-2xl border border-border bg-muted/40 p-6">
+                      <p className="text-sm text-muted-foreground">
+                        Kamu akan diarahkan ke halaman pembayaran untuk menyelesaikan transaksi.
+                        Jangan tutup tab ini sebelum pembayaran dikonfirmasi.
+                      </p>
+                      <Button
+                        asChild
+                        size="lg"
+                        className="mt-5 w-full bg-gradient-primary text-primary-foreground shadow-soft hover:shadow-glow"
+                      >
+                        <a href={hostedLink} target="_blank" rel="noopener noreferrer">
+                          Buka Halaman Pembayaran
+                          <ExternalLink className="ml-2 h-4 w-4" />
+                        </a>
+                      </Button>
+                    </div>
+                  )}
 
                   {chargeResult.qr_code_url && (
                     <img
@@ -373,11 +443,15 @@ function PaymentPage() {
 
                   <div className="mt-6 flex items-center justify-center gap-2 text-sm text-muted-foreground">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Menunggu konfirmasi pembayaran...
+                    {hostedLink
+                      ? "Menunggu pembayaran di halaman gateway..."
+                      : "Menunggu konfirmasi pembayaran..."}
                   </div>
 
                   <p className="mt-2 text-xs text-muted-foreground">
-                    Halaman ini akan otomatis update setelah pembayaran terkonfirmasi.
+                    {hostedLink
+                      ? "Halaman ini tetap terbuka dan akan otomatis diperbarui setelah pembayaran terkonfirmasi. Kalau sudah membayar, kembali ke tab ini."
+                      : "Halaman ini akan otomatis update setelah pembayaran terkonfirmasi."}
                   </p>
                 </div>
               )}

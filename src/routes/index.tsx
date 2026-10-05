@@ -11,7 +11,6 @@ import { resolvePhosphorIcon, resolveLucideIcon } from "@/lib/icon-resolver";
 import { useState, useEffect } from "react";
 import {
   Check,
-  Star,
   ArrowRight,
   Zap,
   Layers,
@@ -19,11 +18,9 @@ import {
   GraduationCap,
   CreditCard,
   Building2,
-  Smartphone,
   QrCode,
   Palette,
   Puzzle,
-  Quote,
   Users,
 } from "lucide-react";
 import financeApImg from "@/assets/finance-ap.png";
@@ -208,17 +205,16 @@ export const Route = createFileRoute("/")({
       description: metaDesc,
     };
 
+    // Sengaja tanpa aggregateRating: angka 4.9/2500 belum punya sumber yang
+    // bisa diaudit, dan Google menolak AggregateRating yang tidak didukung
+    // ulasan nyata on-page. `offers` baru ditambahkan begitu harga katalog ikut
+    // ter-render di SSR, supaya data terstruktur tetap valid.
     const softwareJsonLd = {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       name: "Siarpi Enterprise ERP",
-      operatingSystem: "Web, Android, iOS, Windows, macOS",
+      operatingSystem: "Web, Windows, macOS",
       applicationCategory: "BusinessApplication",
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: "4.9",
-        ratingCount: "2500",
-      },
     };
 
     const organizationJsonLd = {
@@ -323,82 +319,70 @@ const caseStudies = [
   },
 ];
 
+// Kanal yang benar-benar diaktifkan backend saat ini: QRIS lewat Midtrans
+// (GATEWAY_QRIS) dan Virtual Account lewat DOKU (DOKU_VA_METHODS). Daftar
+// lengkap selalu mengikuti konfigurasi dan dirender di halaman pembayaran.
 const payments = [
-  { iconName: "Building2", label: "Transfer Bank" },
-  { iconName: "CreditCard", label: "Virtual Account" },
   { iconName: "QrCode", label: "QRIS" },
-  { iconName: "Smartphone", label: "E-Wallet" },
+  { iconName: "CreditCard", label: "Virtual Account Bank" },
+  { iconName: "RefreshCw", label: "Langganan bulanan" },
+  { iconName: "Check", label: "Modul aktif otomatis" },
 ];
 
-// Pelanggan yang sudah memakai Siarpi (logo bar — pakai inisial sebagai placeholder)
-const clients = [
-  { name: "Kopi Kenangan Lokal", initial: "KK" },
-  { name: "PT Maju Bersama", initial: "MB" },
-  { name: "Toko Sembako Berkah", initial: "SB" },
-  { name: "Studio Kreatif", initial: "SK" },
-  { name: "PT Sinar Abadi", initial: "SA" },
-  { name: "Boutique Anggun", initial: "BA" },
-  { name: "Warung Bakso Mantap", initial: "WB" },
-  { name: "Digital Agency", initial: "DA" },
-];
-
-// Feedback / testimoni dari pelanggan nyata yang sudah pakai Siarpi
-const testimonials = [
+// Penawaran produk -- setiap butir bisa ditunjuk langsung ke alur produk atau
+// S&TT, bukan angka sosial-proof (jumlah pelanggan, rating agregat, testimoni).
+// Sumber: routes/onboarding.tsx (trial all-access), routes/terms.tsx §04
+// (uji coba 14 hari), aktivasi modul otomatis setelah payment settlement.
+const productOffers = [
   {
-    quote:
-      "Onboarding karyawan baru sekarang cuma 1 hari. Dulu bisa seminggu lebih. Tim HR saya akhirnya bisa fokus ke hal strategis.",
-    name: "Rina Wijaya",
-    role: "HR Manager",
-    company: "PT Maju Bersama",
-    rating: 5,
+    icon: Check,
+    title: "14 hari semua fitur kebuka",
+    desc: "Coba semua modul gratis, tanpa kartu kredit. Habis waktunya berhenti sendiri, tidak ada tagihan diam-diam.",
   },
   {
-    quote:
-      "Payroll yang dulu makan 3 hari sekarang selesai 30 menit. Pajak & BPJS auto-hitung. Game changer untuk tim finance kami.",
-    name: "Linda Kusuma",
-    role: "Finance Director",
-    company: "PT Sinar Abadi",
-    rating: 5,
+    icon: Puzzle,
+    title: "Bayar per modul",
+    desc: "Ambil hanya yang kamu pakai sekarang. Total biayanya langsung kelihatan sebelum kamu bayar.",
   },
   {
-    quote:
-      "Stok masuk dan keluar sekarang lebih mudah dilacak. Tim kami tidak lagi menghabiskan waktu untuk rekap manual setiap hari.",
-    name: "Pak Bambang",
-    role: "Owner",
-    company: "Warung Bakso Mantap",
-    rating: 5,
+    icon: QrCode,
+    title: "QRIS & Virtual Account",
+    desc: "Bayar pakai QRIS dari aplikasi bank atau e-wallet favoritmu. Begitu lunas, modulmu langsung aktif.",
   },
   {
-    quote:
-      "Tim 15 orang bisa sinkron tanpa meeting harian. Alur kerja Siarpi bikin kami hemat banyak waktu.",
-    name: "Arif Hidayat",
-    role: "Project Manager",
-    company: "Studio Kreatif",
-    rating: 5,
-  },
-  {
-    quote:
-      "Conversion rate naik 40% sejak pakai pipeline visual CRM. Follow-up otomatis menghemat 2 jam per hari per sales.",
-    name: "Reza Pratama",
-    role: "Sales Director",
-    company: "PT Solusi B2B",
-    rating: 5,
-  },
-  {
-    quote:
-      "Tim kecil saya bisa kelola 50+ karyawan tanpa perlu admin HR khusus. Bayar pun pakai QRIS, gampang banget.",
-    name: "Doni Saputra",
-    role: "Founder",
-    company: "Kopi Kenangan Lokal",
-    rating: 5,
+    icon: GraduationCap,
+    title: "Dibantu memilih modul",
+    desc: "Belum yakin mulai dari mana? Ceritakan bisnismu lewat WhatsApp atau email, tim kami bantu pilihkan kombinasi modulnya.",
   },
 ];
 
-const stats = [
-  { value: "500+", label: "Bisnis Aktif" },
-  { value: "50.000+", label: "Karyawan Dikelola" },
-  { value: "4.9/5", label: "Rating Pelanggan" },
-  { value: "99.9%", label: "Uptime SLA" },
+// Langkah nyata di form onboarding (routes/onboarding.tsx) -- dipakai untuk
+// mengganti blok testimoni yang sebelumnya memakai nama pelanggan fiktif.
+const gettingStarted = [
+  {
+    step: "01",
+    icon: Building2,
+    title: "Isi profil perusahaan",
+    desc: "Nama usaha, bidang, dan jumlah karyawan — cukup itu dulu untuk mulai.",
+  },
+  {
+    step: "02",
+    icon: Puzzle,
+    title: "Tandai modul yang dibutuhkan",
+    desc: "Finance, HR, Payroll, Inventory, Procurement, Production, atau CRM. Bisa ditambah lagi nanti.",
+  },
+  {
+    step: "03",
+    icon: Zap,
+    title: "Coba gratis atau langsung berlangganan",
+    desc: "Gratis 14 hari tanpa pembayaran apa pun, atau langsung berlangganan kalau sudah yakin. Estimasi biayanya kelihatan sebelum kamu memutuskan.",
+  },
+  {
+    step: "04",
+    icon: Check,
+    title: "Sistem langsung terpakai",
+    desc: "Transaksi, stok, dan dokumen bisa langsung diinput dari dasbor. Pembayaran lunas, modul aktif.",
+  },
 ];
 
 function LandingPage() {
@@ -735,97 +719,103 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* TRUSTED BY — logo bar pelanggan */}
+      {/* PENAWARAN — apa yang kamu dapat, tanpa klaim jumlah pelanggan/rating */}
       <section className="border-y border-border bg-background py-14">
         <div className="container mx-auto px-4 md:px-6">
-          <p className="text-center text-sm font-medium uppercase tracking-wider text-muted-foreground">
-            Dipercaya oleh 500+ bisnis di Indonesia
-          </p>
-          <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-8">
-            {clients.map((c, i) => (
-              <motion.div
-                key={c.name}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.3, delay: i * 0.04 }}
-                className="flex flex-col items-center gap-2 opacity-70 transition-opacity hover:opacity-100"
-              >
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-muted/40 font-display text-sm font-bold text-foreground/70">
-                  {c.initial}
-                </div>
-                <span className="text-center text-[11px] text-muted-foreground line-clamp-1">
-                  {c.name}
-                </span>
-              </motion.div>
-            ))}
+          <div className="mx-auto max-w-2xl text-center">
+            <Badge variant="outline" className="mb-4 rounded-full">
+              <Check className="mr-1 h-3 w-3" /> Yang Kamu Dapat
+            </Badge>
+            <h2 className="font-display text-3xl font-bold md:text-4xl">
+              Mulai tanpa biaya awal{" "}
+              <span className="text-gradient-primary">dan tanpa kartu kredit</span>
+            </h2>
+            <p className="mt-4 text-muted-foreground">
+              Semua ini bisa kamu coba langsung, hari ini juga.
+            </p>
           </div>
-
-          {/* Stats bar */}
-          <div className="mx-auto mt-12 grid max-w-4xl grid-cols-2 gap-6 rounded-2xl border border-border bg-muted/30 p-6 md:grid-cols-4 md:p-8">
-            {stats.map((s) => (
-              <div key={s.label} className="text-center">
-                <div className="font-display text-2xl font-bold text-gradient-primary md:text-3xl">
-                  {s.value}
-                </div>
-                <div className="mt-1 text-xs text-muted-foreground md:text-sm">{s.label}</div>
-              </div>
-            ))}
+          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {productOffers.map((offer, i) => {
+              const OIcon = offer.icon;
+              return (
+                <motion.div
+                  key={offer.title}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.35, delay: i * 0.06 }}
+                >
+                  <Card className="h-full rounded-2xl border-border p-6 transition-shadow hover:shadow-card">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                      <OIcon className="h-5 w-5" />
+                    </span>
+                    <h3 className="mt-4 font-display text-base font-semibold">{offer.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                      {offer.desc}
+                    </p>
+                  </Card>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* TESTIMONIALS — feedback pelanggan */}
+      {/* CARA MEMULAI — alur nyata onboarding, pengganti blok testimoni fiktif */}
       <section className="container mx-auto px-4 py-20 md:px-6 md:py-28">
         <div className="mx-auto max-w-2xl text-center">
           <Badge variant="outline" className="mb-4 rounded-full">
-            <Users className="mr-1 h-3 w-3" /> Feedback Pelanggan
+            <Users className="mr-1 h-3 w-3" /> Cara Memulai
           </Badge>
           <h2 className="font-display text-3xl font-bold md:text-5xl">
-            Apa kata mereka <span className="text-gradient-primary">tentang Siarpi</span>
+            Dari daftar sampai <span className="text-gradient-primary">sistem jalan</span>
           </h2>
           <p className="mt-4 text-muted-foreground">
-            Cerita nyata dari pemilik bisnis & manajer yang sudah merasakan dampaknya.
+            Empat langkah singkat, dan sistemmu bisa langsung dipakai.
           </p>
         </div>
 
-        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {testimonials.map((t, i) => (
-            <motion.div
-              key={t.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: i * 0.08 }}
-            >
-              <Card className="flex h-full flex-col rounded-2xl border-border p-6 transition-shadow hover:shadow-card">
-                <Quote className="h-7 w-7 text-primary/40" />
-                <div className="mt-3 flex gap-0.5">
-                  {Array.from({ length: t.rating }).map((_, idx) => (
-                    <Star key={idx} className="h-4 w-4 fill-primary text-primary" />
-                  ))}
-                </div>
-                <p className="mt-4 flex-1 text-sm leading-relaxed text-foreground/85">
-                  &ldquo;{t.quote}&rdquo;
-                </p>
-                <div className="mt-6 flex items-center gap-3 border-t border-border pt-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-primary font-display text-sm font-bold text-primary-foreground">
-                    {t.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .slice(0, 2)
-                      .join("")}
+        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {gettingStarted.map((stage, i) => {
+            const SIcon = stage.icon;
+            return (
+              <motion.div
+                key={stage.step}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.08 }}
+              >
+                <Card className="flex h-full flex-col rounded-2xl border-border p-6 transition-shadow hover:shadow-card">
+                  <div className="flex items-center justify-between">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground shadow-soft">
+                      <SIcon className="h-5 w-5" />
+                    </span>
+                    <span className="font-display text-2xl font-bold text-primary/25">
+                      {stage.step}
+                    </span>
                   </div>
-                  <div>
-                    <div className="text-sm font-semibold">{t.name}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {t.role} · {t.company}
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-          ))}
+                  <h3 className="mt-4 font-display text-lg font-semibold">{stage.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{stage.desc}</p>
+                </Card>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        <div className="mt-10 text-center">
+          <Button
+            size="lg"
+            asChild
+            className="bg-gradient-primary text-primary-foreground shadow-elegant hover:shadow-glow"
+          >
+            <Link to="/onboarding">
+              Mulai trial 14 hari <ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
+          </Button>
+          <p className="mt-3 text-xs text-muted-foreground">
+            Tanpa kartu kredit. Trial berakhir otomatis.
+          </p>
         </div>
       </section>
 
@@ -837,7 +827,8 @@ function LandingPage() {
               Bayar mudah <span className="text-gradient-primary">tanpa kartu kredit</span>
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Semua metode pembayaran Indonesia didukung.
+              Bayar pakai QRIS dari aplikasi bank atau e-wallet favoritmu, bisa juga lewat Virtual
+              Account bank. Pilih yang paling gampang di halaman pembayaran.
             </p>
           </div>
           <div className="mx-auto mt-10 grid max-w-3xl grid-cols-2 gap-4 md:grid-cols-4">

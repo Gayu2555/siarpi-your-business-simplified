@@ -25,11 +25,15 @@ const CSP = [
   // 'unsafe-inline' masih diperlukan: __root.tsx menyisipkan snippet gtag &
   // Clarity lewat dangerouslySetInnerHTML, dan TanStack Start menuliskan
   // script hidrasi inline. Menghapusnya butuh migrasi ke nonce lebih dulu.
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.clarity.ms https://*.clarity.ms",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.clarity.ms https://*.clarity.ms https://accounts.google.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com data:",
   "img-src 'self' data: blob: https:",
   `connect-src 'self' https://api.siarpi.com https://www.google-analytics.com https://*.clarity.ms https://*.google-analytics.com${developmentConnections}`,
+  // Tombol "Lanjutkan dengan Google" dirender Google sebagai iframe dari
+  // accounts.google.com. Tanpa frame-src ini, CSP (saat enforcing) memblokir
+  // tombolnya; hari ini masih report-only jadi cuma tercatat di console.
+  "frame-src 'self' https://accounts.google.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",

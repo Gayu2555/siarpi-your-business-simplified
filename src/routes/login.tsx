@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { apiUrl } from "@/lib/api";
 import { setAuthToken, setStoredUser, type SiarpiUser } from "@/lib/auth";
-import { verifyLogin2FA, type AuthResponse } from "@/lib/auth-api";
+import { loginWithGoogle, verifyLogin2FA, type AuthResponse } from "@/lib/auth-api";
 import { optionalSearchString } from "@/lib/search-params";
 import {
   Eye,
@@ -49,20 +49,58 @@ export const Route = createFileRoute("/login")({
 
 // ── SSO options ───────────────────────────────────────────────────────────────
 //
-// BELUM ADA satu pun yang terimplementasi -- onClick-nya dulu berisi
-// `// TODO` kosong, jadi tombolnya bisa diklik dan TIDAK terjadi apa-apa.
-// Di halaman login, tombol yang diam saat diklik terbaca sebagai aplikasi
-// rusak, bukan fitur yang belum siap. Sampai alurnya benar-benar ada,
-// tombolnya ditampilkan dalam keadaan nonaktif + label "Segera": desainnya
-// tetap, tapi tidak lagi menjanjikan sesuatu yang tidak bisa ditepati.
+// Google SUDAH jalan: entri "google" dirender sebagai tombol resmi Google
+// Identity Services (bukan <button> generik di bawah) — lihat blok GIS di
+// LoginPage dan loginWithGoogle di auth-api.ts. Client ID dibaca dari
+// VITE_GOOGLE_CLIENT_ID saat build; kalau kosong (atau script Google gagal
+// dimuat), entri ini jatuh ke tampilan "Segera" seperti metode lain.
+//
+// Sisanya BELUM terimplementasi. Tombol yang diam saat diklik terbaca sebagai
+// aplikasi rusak, bukan fitur yang belum siap — jadi sampai alurnya
+// benar-benar ada, mereka tampil nonaktif + label "Segera": desainnya tetap,
+// tapi tidak menjanjikan sesuatu yang tidak bisa ditepati.
 //
 // Kalau salah satunya sudah jalan, hapus `soon: true` pada entri itu dan
-// isi handler-nya di `handleSsoClick`.
+// isi handler-nya.
+
+// Client ID OAuth Google (Web application). Publik by design — terlihat di
+// bundle JS dan di konfigurasi Google Cloud. Harus sama dengan
+// GOOGLE_CLIENT_ID di backend (backend memvalidasi audience ID token).
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim() || "";
+
+// Tipe minimal Google Identity Services — cuma bagian yang dipakai halaman
+// ini. Script accounts.google.com/gsi/client tidak punya deklarasi bawaan.
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        id: {
+          initialize: (config: {
+            client_id: string;
+            callback: (response: { credential?: string }) => void;
+          }) => void;
+          renderButton: (
+            parent: HTMLElement,
+            options: {
+              type?: string;
+              theme?: string;
+              size?: string;
+              text?: string;
+              shape?: string;
+              width?: number;
+            },
+          ) => void;
+        };
+      };
+    };
+  }
+}
+
 const ssoOptions: { id: string; label: string; icon: typeof Chrome; soon: boolean }[] = [
   {
     id: "google",
     label: "Lanjutkan dengan Google",
-    icon: Chrome, // placeholder — swap with Google SVG kalau ada
+    icon: Chrome, // cuma dipakai saat fallback "Segera" (client ID belum diset / script gagal)
     soon: true,
   },
   {
@@ -101,6 +139,65 @@ function LoginPage() {
   // password diganti form kode — sesi BELUM terbit sampai kode benar.
   const [pendingToken, setPendingToken] = useState<string | null>(null);
   const [twoFactorCode, setTwoFactorCode] = useState("");
+
+  // ── Google Identity Services ────────────────────────────────────────────
+  // Tombol resmi Google dirender script gsi/client ke dalam div (iframe yang
+  // dikelola Google, bukan styling kita). Div dipasang lewat callback ref +
+  // state supaya effect jalan ulang ketika div di-remount — misalnya setelah
+  // user batal dari langkah 2FA dan kembali ke form login.
+  const [googleBtnEl, setGoogleBtnEl] = useState<HTMLDivElement | null>(null);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [googleScriptFailed, setGoogleScriptFailed] = useState(false);
+
+  // Callback GIS didaftarkan sekali saat script load; ref ini memastikan
+  // yang dipanggil selalu handler dari render terbaru, bukan closure basi.
+  const googleHandlerRef = useRef<(credential: string) => void>(() => {});
+  useEffect(() => {
+    googleHandlerRef.current = (credential: string) => {
+      void handleGoogleCredential(credential);
+    };
+  });
+
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID || !googleBtnEl) return;
+    let cancelled = false;
+
+    const init = () => {
+      if (cancelled || !window.google) return;
+      window.google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: (resp) => {
+          if (resp.credential) googleHandlerRef.current(resp.credential);
+        },
+      });
+      // Kosongkan dulu — re-init (StrictMode / remount) tidak boleh
+      // menumpuk tombol ganda di div yang sama.
+      googleBtnEl.innerHTML = "";
+      window.google.accounts.id.renderButton(googleBtnEl, {
+        type: "standard",
+        theme: "outline",
+        size: "large",
+        text: "continue_with",
+        shape: "pill",
+        width: Math.min(googleBtnEl.offsetWidth || 320, 400),
+      });
+    };
+
+    if (window.google) {
+      init();
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    script.onload = init;
+    script.onerror = () => setGoogleScriptFailed(true);
+    document.head.appendChild(script);
+    return () => {
+      cancelled = true;
+    };
+  }, [googleBtnEl]);
 
   const canSubmit = email.trim().length > 0 && password.length >= 6;
 
@@ -199,6 +296,29 @@ function LoginPage() {
     setTwoFactorCode("");
     setPassword("");
     setError(null);
+  }
+
+  // Dipanggil Google Identity Services dengan ID token setelah user memilih
+  // akun Google-nya. Backend yang memverifikasi token itu ke Google — di
+  // sini token tidak didecode sama sekali.
+  async function handleGoogleCredential(credential: string) {
+    setError(null);
+    setGoogleLoading(true);
+    try {
+      const { ok, data } = await loginWithGoogle(credential);
+      if (!ok || !data) {
+        setError(data?.message ?? "Gagal masuk dengan Google. Coba lagi.");
+        return;
+      }
+      // Backend membalas token + user persis seperti login password —
+      // termasuk untuk akun yang baru dibuat otomatis dari profil Google,
+      // jika emailnya belum terdaftar.
+      completeLogin(data);
+    } catch {
+      setError("Tidak bisa terhubung ke server. Cek koneksi Anda.");
+    } finally {
+      setGoogleLoading(false);
+    }
   }
 
   return (
@@ -390,23 +510,37 @@ function LoginPage() {
 
                 {/* SSO options */}
                 <div className="space-y-2.5">
-                  {ssoOptions.map((opt) => (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      disabled={opt.soon}
-                      title={opt.soon ? "Metode ini belum tersedia" : undefined}
-                      className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted/50 disabled:cursor-not-allowed disabled:bg-muted/30 disabled:text-muted-foreground disabled:hover:bg-muted/30"
-                    >
-                      <opt.icon className="h-4 w-4 text-muted-foreground" />
-                      {opt.label}
-                      {opt.soon && (
-                        <span className="ml-1 rounded-full border border-border bg-background px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                          Segera
-                        </span>
-                      )}
-                    </button>
-                  ))}
+                  {ssoOptions.map((opt) =>
+                    opt.id === "google" && GOOGLE_CLIENT_ID && !googleScriptFailed ? (
+                      // Wadah tombol resmi Google — kontennya dirender script
+                      // gsi/client (lihat useEffect di atas). min-h menjaga
+                      // layout agar tidak melompat saat tombol selesai dimuat.
+                      <div key={opt.id} className="relative min-h-[44px] w-full">
+                        {googleLoading && (
+                          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-background/80">
+                            <span className="h-5 w-5 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+                          </div>
+                        )}
+                        <div ref={setGoogleBtnEl} className="flex w-full justify-center" />
+                      </div>
+                    ) : (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        disabled={opt.soon}
+                        title={opt.soon ? "Metode ini belum tersedia" : undefined}
+                        className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted/50 disabled:cursor-not-allowed disabled:bg-muted/30 disabled:text-muted-foreground disabled:hover:bg-muted/30"
+                      >
+                        <opt.icon className="h-4 w-4 text-muted-foreground" />
+                        {opt.label}
+                        {opt.soon && (
+                          <span className="ml-1 rounded-full border border-border bg-background px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                            Segera
+                          </span>
+                        )}
+                      </button>
+                    ),
+                  )}
                 </div>
 
                 {/* Register link */}

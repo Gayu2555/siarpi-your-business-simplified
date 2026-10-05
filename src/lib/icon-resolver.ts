@@ -125,6 +125,7 @@ export function resolvePhosphorIcon(iconClass?: string | null): {
 
 import {
   Building2,
+  Check,
   Circle,
   CreditCard,
   GraduationCap,
@@ -140,6 +141,7 @@ import {
 // daftarnya sendiri di lib/modules/registry.ts.
 const LUCIDE_ICONS: Record<string, LucideIcon> = {
   Building2,
+  Check,
   Circle,
   CreditCard,
   GraduationCap,

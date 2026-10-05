@@ -103,13 +103,13 @@ export function BusinessSolutionsSection() {
                     <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-sky-100 text-sky-600 shadow-2xs">
                       <Check className="h-3.5 w-3.5 stroke-[3]" />
                     </div>
-                    <span>Rekonsiliasi kas & mutasi bank tanpa selisih & anti-error</span>
+                    <span>Rekonsiliasi kas & mutasi bank dengan pencatatan selisih yang jelas</span>
                   </div>
                   <div className="flex items-center gap-3 text-xs font-medium text-foreground/90">
                     <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-sky-100 text-sky-600 shadow-2xs">
                       <Check className="h-3.5 w-3.5 stroke-[3]" />
                     </div>
-                    <span>Tutup buku bulanan 10x lebih cepat secara otomatis</span>
+                    <span>Tutup buku bulanan dari satu alur jurnal & laporan</span>
                   </div>
                 </motion.div>
               ) : (
@@ -143,19 +143,20 @@ export function BusinessSolutionsSection() {
               )}
             </AnimatePresence>
 
-            {/* Compact Metric Highlight Pill */}
+            {/* Capability highlight -- angka akurasi/uptime 99.9% & 100% dihapus
+                karena tidak ada pengukuran atau SLA yang mendasarinya. */}
             <div className="pt-2 flex items-center gap-4 text-xs text-muted-foreground border-t border-border/60">
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-sky-100 text-sky-600 font-extrabold font-display dark:bg-primary/20 dark:text-primary text-sm shadow-xs">
-                {activeTab === "core" ? "99.9%" : "100%"}
+                <Check className="h-5 w-5" />
               </div>
               <div>
                 <p className="font-bold text-foreground">
                   {activeTab === "core"
-                    ? "Akurasi Pembukuan & Uptime System"
-                    : "Standar Akuntansi & Compliance"}
+                    ? "Jurnal & laporan tersinkron"
+                    : "Alur anggaran terpantau per akun COA"}
                 </p>
                 <p className="text-[11px] text-muted-foreground">
-                  Tersinkronisasi otomatis secara real-time
+                  Data antar-modul mengikuti transaksi terakhir, tanpa rekap manual
                 </p>
               </div>
             </div>

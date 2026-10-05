@@ -4,9 +4,22 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
-import { getPayrollSubModule, payrollSubModules, type PayrollSubModuleDetail } from "@/lib/modules/payroll";
+import {
+  getPayrollSubModule,
+  payrollSubModules,
+  type PayrollSubModuleDetail,
+} from "@/lib/modules/payroll";
 import { getModuleIcon } from "@/lib/modules";
-import { ArrowLeft, Star, Check, ShieldCheck, Zap, Layers, Sparkles, HelpCircle } from "lucide-react";
+import {
+  ArrowLeft,
+  Star,
+  Check,
+  ShieldCheck,
+  Zap,
+  Layers,
+  Sparkles,
+  HelpCircle,
+} from "lucide-react";
 import { BusinessSolutionsSection } from "@/components/modules/BusinessSolutionsSection";
 import { ComparisonBeforeAfterSection } from "@/components/modules/ComparisonBeforeAfterSection";
 
@@ -35,15 +48,11 @@ export const Route = createFileRoute("/payroll-sub/$subId")({
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       name: `Siarpi ERP — Sub-Modul ${d.name}`,
-      operatingSystem: "Web, Windows, macOS, Android, iOS",
+      // Harga 99000 dan rating 4.9/1350 dihapus: keduanya tidak punya sumber.
+      // Payroll dihargai per modul dari katalog, jadi angka tetap di sini menyesatkan.
+      // `offers` masuk lagi setelah harga katalog tersedia di SSR.
+      operatingSystem: "Web, Windows, macOS",
       applicationCategory: "BusinessApplication",
-      offers: {
-        "@type": "Offer",
-        price: "99000",
-        priceCurrency: "IDR",
-        availability: "https://schema.org/InStock",
-      },
-      aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", ratingCount: "1350" },
       description: metaDesc,
     };
 
@@ -163,15 +172,16 @@ function PayrollSubModulePage() {
             <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
               {/* LEFT COLUMN: HERO HEADINGS & QUICK SUMMARY */}
               <div>
-                <Badge variant="outline" className="mb-4 rounded-full border-primary/30 bg-primary/10 px-4 py-1 text-primary font-semibold">
+                <Badge
+                  variant="outline"
+                  className="mb-4 rounded-full border-primary/30 bg-primary/10 px-4 py-1 text-primary font-semibold"
+                >
                   {d.category || "Payroll Management"}
                 </Badge>
                 <h1 className="font-display text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl text-foreground">
                   {d.name}
                 </h1>
-                <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                  {d.tagline}
-                </p>
+                <p className="mt-4 text-lg text-muted-foreground leading-relaxed">{d.tagline}</p>
 
                 {/* HIGHLIGHT BADGES */}
                 <div className="mt-6 flex flex-wrap gap-3">
@@ -190,7 +200,11 @@ function PayrollSubModulePage() {
                 </div>
 
                 <div className="mt-8 flex flex-col sm:flex-row items-center gap-4">
-                  <Button size="lg" asChild className="w-full sm:w-auto bg-gradient-primary text-primary-foreground font-semibold shadow-lg">
+                  <Button
+                    size="lg"
+                    asChild
+                    className="w-full sm:w-auto bg-gradient-primary text-primary-foreground font-semibold shadow-lg"
+                  >
                     <Link to="/onboarding">Coba Sub-Modul Ini Free</Link>
                   </Button>
                   <Button size="lg" variant="outline" asChild className="w-full sm:w-auto">
@@ -209,7 +223,9 @@ function PayrollSubModulePage() {
                       </div>
                       <div>
                         <h3 className="font-display text-lg font-bold">{d.name}</h3>
-                        <p className="text-xs text-muted-foreground">Siap Digunakan • Sub-Modul Payroll</p>
+                        <p className="text-xs text-muted-foreground">
+                          Siap Digunakan • Sub-Modul Payroll
+                        </p>
                       </div>
                     </div>
                     <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30 px-3 py-1 font-bold text-xs">
@@ -231,8 +247,13 @@ function PayrollSubModulePage() {
                     {/* SAMPLE STATS PREVIEW */}
                     <div className="grid grid-cols-2 gap-3">
                       {(d.sampleStats ?? []).slice(0, 2).map((st) => (
-                        <div key={st.label} className="rounded-xl border border-border/60 bg-background p-3">
-                          <p className="text-[11px] text-muted-foreground font-medium">{st.label}</p>
+                        <div
+                          key={st.label}
+                          className="rounded-xl border border-border/60 bg-background p-3"
+                        >
+                          <p className="text-[11px] text-muted-foreground font-medium">
+                            {st.label}
+                          </p>
                           <p className="text-base font-bold text-foreground mt-0.5">{st.value}</p>
                           <p className="text-[10px] text-emerald-600 font-semibold">{st.note}</p>
                         </div>
@@ -248,24 +269,33 @@ function PayrollSubModulePage() {
         {/* KEY BENEFITS CARDS */}
         <section className="container mx-auto px-4 py-16 md:px-6 md:py-24">
           <div className="mx-auto max-w-3xl text-center mb-12">
-            <Badge variant="outline" className="mb-4 rounded-full border-primary/30 bg-primary/5 px-4 py-1 text-primary font-semibold">
+            <Badge
+              variant="outline"
+              className="mb-4 rounded-full border-primary/30 bg-primary/5 px-4 py-1 text-primary font-semibold"
+            >
               Keunggulan Utama
             </Badge>
             <h2 className="font-display text-3xl font-bold md:text-5xl">
               Kenapa Pilih Siarpi ERP untuk {d.name}?
             </h2>
             <p className="mt-3 text-base text-muted-foreground">
-              Manfaat utama yang langsung dirasakan oleh tim penggajian, HR, dan manajemen perusahaan.
+              Manfaat utama yang langsung dirasakan oleh tim penggajian, HR, dan manajemen
+              perusahaan.
             </p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
             {(d?.keyBenefits ?? []).map((b, i) => (
-              <Card key={i} className="flex h-full flex-col items-center justify-center rounded-3xl border border-border/80 bg-card p-8 shadow-soft text-center hover:border-primary/50 hover:shadow-lg transition-all duration-300">
+              <Card
+                key={i}
+                className="flex h-full flex-col items-center justify-center rounded-3xl border border-border/80 bg-card p-8 shadow-soft text-center hover:border-primary/50 hover:shadow-lg transition-all duration-300"
+              >
                 <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-primary text-primary-foreground shadow-md">
                   <Check className="h-7 w-7 stroke-[3]" />
                 </div>
-                <p className="font-display text-base font-semibold text-foreground leading-relaxed">{b}</p>
+                <p className="font-display text-base font-semibold text-foreground leading-relaxed">
+                  {b}
+                </p>
               </Card>
             ))}
           </div>
@@ -275,17 +305,21 @@ function PayrollSubModulePage() {
         <section className="bg-muted/30 py-16 md:py-24 border-y border-border">
           <div className="container mx-auto px-4 md:px-6">
             <div className="mx-auto max-w-3xl text-center mb-12">
-              <Badge variant="outline" className="mb-4 rounded-full border-primary/30 bg-primary/5 px-4 py-1 text-primary font-semibold">
+              <Badge
+                variant="outline"
+                className="mb-4 rounded-full border-primary/30 bg-primary/5 px-4 py-1 text-primary font-semibold"
+              >
                 Fitur Unggulan
               </Badge>
-              <h2 className="font-display text-3xl font-bold md:text-5xl">
-                Fitur Kunci {d.name}
-              </h2>
+              <h2 className="font-display text-3xl font-bold md:text-5xl">Fitur Kunci {d.name}</h2>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
               {(d?.features ?? []).map((f) => (
-                <Card key={f.title} className="h-full rounded-2xl border border-border/80 bg-card p-6 md:p-8 shadow-soft">
+                <Card
+                  key={f.title}
+                  className="h-full rounded-2xl border border-border/80 bg-card p-6 md:p-8 shadow-soft"
+                >
                   <div className="flex items-center gap-3 mb-3">
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
                       <Sparkles className="h-4 w-4" />
@@ -302,7 +336,10 @@ function PayrollSubModulePage() {
         {/* WORKFLOW STEPS */}
         <section className="container mx-auto px-4 py-16 md:px-6 md:py-24">
           <div className="mx-auto max-w-3xl text-center mb-12">
-            <Badge variant="outline" className="mb-4 rounded-full border-primary/30 bg-primary/5 px-4 py-1 text-primary font-semibold">
+            <Badge
+              variant="outline"
+              className="mb-4 rounded-full border-primary/30 bg-primary/5 px-4 py-1 text-primary font-semibold"
+            >
               Alur Kerja
             </Badge>
             <h2 className="font-display text-3xl font-bold md:text-5xl">Tahapan Proses {d.name}</h2>
@@ -310,13 +347,18 @@ function PayrollSubModulePage() {
 
           <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-2 lg:grid-cols-4">
             {(d?.workflowSteps ?? []).map((step) => (
-              <div key={step.step} className="flex h-full flex-col justify-between rounded-2xl border border-border/80 bg-card p-6 shadow-soft">
+              <div
+                key={step.step}
+                className="flex h-full flex-col justify-between rounded-2xl border border-border/80 bg-card p-6 shadow-soft"
+              >
                 <div>
                   <div className="mb-3 font-display text-2xl font-bold text-primary">
                     {step.step}
                   </div>
                   <h3 className="font-display text-base font-bold text-foreground">{step.title}</h3>
-                  <p className="mt-2 text-xs md:text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
+                  <p className="mt-2 text-xs md:text-sm text-muted-foreground leading-relaxed">
+                    {step.desc}
+                  </p>
                 </div>
               </div>
             ))}
@@ -329,11 +371,18 @@ function PayrollSubModulePage() {
             <div className="grid gap-12 lg:grid-cols-2">
               {/* STATS */}
               <div>
-                <h3 className="font-display text-2xl font-bold mb-6 text-foreground">Metrik & Statistik {d.name}</h3>
+                <h3 className="font-display text-2xl font-bold mb-6 text-foreground">
+                  Metrik & Statistik {d.name}
+                </h3>
                 <div className="grid gap-4">
                   {(d?.sampleStats ?? []).map((s) => (
-                    <div key={s.label} className="rounded-2xl border border-border/80 bg-card p-5 shadow-2xs">
-                      <div className="font-display text-xs font-semibold text-muted-foreground uppercase">{s.label}</div>
+                    <div
+                      key={s.label}
+                      className="rounded-2xl border border-border/80 bg-card p-5 shadow-2xs"
+                    >
+                      <div className="font-display text-xs font-semibold text-muted-foreground uppercase">
+                        {s.label}
+                      </div>
                       <div className="text-2xl font-bold text-foreground mt-1">{s.value}</div>
                       <div className="text-xs text-emerald-600 font-medium mt-1">{s.note}</div>
                     </div>
@@ -343,18 +392,32 @@ function PayrollSubModulePage() {
 
               {/* SAMPLE ROWS */}
               <div>
-                <h3 className="font-display text-2xl font-bold mb-6 text-foreground">Contoh Data & Status Real-Time</h3>
+                <h3 className="font-display text-2xl font-bold mb-6 text-foreground">
+                  Contoh Data & Status Real-Time
+                </h3>
                 <div className="space-y-3">
                   {(d?.sampleRows ?? []).map((r) => (
-                    <Card key={r.code} className="rounded-2xl border border-border/80 bg-card p-5 shadow-2xs">
+                    <Card
+                      key={r.code}
+                      className="rounded-2xl border border-border/80 bg-card p-5 shadow-2xs"
+                    >
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="font-display font-bold text-foreground text-sm">{r.title}</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">{r.category} • {r.code}</div>
+                          <div className="font-display font-bold text-foreground text-sm">
+                            {r.title}
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-0.5">
+                            {r.category} • {r.code}
+                          </div>
                         </div>
                         <div className="text-right">
-                          <div className="font-display font-bold text-foreground text-sm">{r.amount}</div>
-                          <Badge variant="secondary" className="text-[10px] uppercase font-bold mt-1 bg-emerald-500/10 text-emerald-600">
+                          <div className="font-display font-bold text-foreground text-sm">
+                            {r.amount}
+                          </div>
+                          <Badge
+                            variant="secondary"
+                            className="text-[10px] uppercase font-bold mt-1 bg-emerald-500/10 text-emerald-600"
+                          >
                             {r.status}
                           </Badge>
                         </div>
@@ -370,7 +433,10 @@ function PayrollSubModulePage() {
         {/* FAQ */}
         <section className="container mx-auto px-4 py-16 md:px-6 md:py-24">
           <div className="mx-auto max-w-3xl text-center mb-12">
-            <Badge variant="outline" className="mb-4 rounded-full border-primary/30 bg-primary/5 px-4 py-1 text-primary font-semibold">
+            <Badge
+              variant="outline"
+              className="mb-4 rounded-full border-primary/30 bg-primary/5 px-4 py-1 text-primary font-semibold"
+            >
               FAQ
             </Badge>
             <h2 className="font-display text-3xl font-bold md:text-5xl">
@@ -380,7 +446,10 @@ function PayrollSubModulePage() {
 
           <div className="mx-auto max-w-3xl space-y-4">
             {(d?.faq ?? []).map((f, i) => (
-              <details key={i} className="group rounded-2xl border border-border/80 bg-card p-6 shadow-2xs transition-all">
+              <details
+                key={i}
+                className="group rounded-2xl border border-border/80 bg-card p-6 shadow-2xs transition-all"
+              >
                 <summary className="cursor-pointer font-display text-base font-bold text-foreground flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <HelpCircle className="h-5 w-5 text-primary" />
@@ -400,7 +469,9 @@ function PayrollSubModulePage() {
         {/* RELATED SECTION */}
         <section className="border-t border-border bg-muted/20 py-16 md:py-20">
           <div className="container mx-auto px-4 md:px-6">
-            <h3 className="font-display text-2xl font-bold mb-8 text-foreground">Sub-Modul Payroll Lainnya</h3>
+            <h3 className="font-display text-2xl font-bold mb-8 text-foreground">
+              Sub-Modul Payroll Lainnya
+            </h3>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {related.map((rm) => (
                 <Link key={rm.id} to={rm.to} params={rm.params}>

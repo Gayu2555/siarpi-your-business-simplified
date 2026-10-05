@@ -1,5 +1,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// auth-api.ts — typed client untuk POST /auth/register dan /auth/login
+// auth-api.ts — typed client untuk /auth/login, /auth/register, /auth/google,
+// /auth/send-otp, dan /auth/verify-otp
 // Mirror dari backend auth/handler.go (models.RegisterRequest, models.AuthResponse)
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -43,6 +44,59 @@ export async function registerUser(
   const { ok, data } = await apiFetch<AuthResponse>("/auth/register", {
     method: "POST",
     body: JSON.stringify(payload),
+  });
+  return { ok: ok && !!data?.success, data };
+}
+
+/**
+ * POST /auth/google — masuk (atau daftar otomatis) lewat Google Identity
+ * Services. `credential` adalah ID token yang dikembalikan tombol resmi
+ * Google (response.credential); backend memverifikasi tanda tangan +
+ * audience-nya ke Google, lalu menerbitkan JWT seperti login biasa.
+ * Kalau email belum terdaftar, backend membuat akun baru (sudah verified).
+ */
+export async function loginWithGoogle(
+  credential: string,
+): Promise<{ ok: boolean; data: AuthResponse | null }> {
+  const { ok, data } = await apiFetch<AuthResponse>("/auth/google", {
+    method: "POST",
+    body: JSON.stringify({ credential }),
+  });
+  return { ok: ok && !!data?.success, data };
+}
+
+// ── OTP registrasi ────────────────────────────────────────────────────────
+// Flow register: user isi email -> minta kode (sendRegisterOtp) -> masukkan
+// kode 6 digit (verifyRegisterOtp) -> baru boleh submit /auth/register.
+// Kode berlaku 5 menit, dan setelah verify SUKSES backend membolehkan
+// /auth/register untuk email itu selama 30 menit (gate di RegisterHandler
+// mengecek otp_codes.verified_at). Mirror dari models.OTPRequest /
+// models.OTPVerifyRequest / models.OTPResponse di backend.
+
+export interface OTPResponse {
+  success: boolean;
+  message: string;
+}
+
+/** POST /auth/send-otp — kirim kode OTP 6 digit ke email (berlaku 5 menit). */
+export async function sendRegisterOtp(
+  email: string,
+): Promise<{ ok: boolean; data: OTPResponse | null }> {
+  const { ok, data } = await apiFetch<OTPResponse>("/auth/send-otp", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+  return { ok: ok && !!data?.success, data };
+}
+
+/** POST /auth/verify-otp — verifikasi kode; syarat sebelum /auth/register. */
+export async function verifyRegisterOtp(
+  email: string,
+  otp: string,
+): Promise<{ ok: boolean; data: OTPResponse | null }> {
+  const { ok, data } = await apiFetch<OTPResponse>("/auth/verify-otp", {
+    method: "POST",
+    body: JSON.stringify({ email, otp }),
   });
   return { ok: ok && !!data?.success, data };
 }

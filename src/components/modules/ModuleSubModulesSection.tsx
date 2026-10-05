@@ -17,8 +17,21 @@ export function ModuleSubModulesSection({ moduleId, moduleName }: ModuleSubModul
   const normId = moduleId.toLowerCase();
   const [activeCategory, setActiveCategory] = useState("Semua");
   const carouselRef = useRef<HTMLDivElement>(null);
-
-  let items: any[] = [];
+  // Bentuk minimal yang dibaca komponen ini. Tipe lengkapnya ada di
+  // HrSubModuleDetail / PayrollSubModuleDetail / FinanceSubModule -- satu
+  // tipe struktural ini memegang ketiganya tanpa any.
+  interface SubModuleListItem {
+    id: string;
+    category: string;
+    name?: string;
+    tagline?: string;
+    description?: string;
+    longDescription?: string;
+    iconName?: string;
+    keyBenefits?: string[];
+    subFeatures?: string[];
+  }
+  let items: SubModuleListItem[] = [];
   let subRoutePrefix = "";
 
   if (normId === "hr" || normId === "human-resource") {
@@ -110,8 +123,8 @@ export function ModuleSubModulesSection({ moduleId, moduleName }: ModuleSubModul
         {/* Carousel Navigation Header */}
         <div className="mt-12 flex items-center justify-between px-2">
           <div className="text-xs font-semibold text-muted-foreground">
-            Menampilkan <span className="text-foreground font-bold">{filteredItems.length}</span> Sub-Modul{" "}
-            {activeCategory !== "Semua" ? `kategori "${activeCategory}"` : ""}
+            Menampilkan <span className="text-foreground font-bold">{filteredItems.length}</span>{" "}
+            Sub-Modul {activeCategory !== "Semua" ? `kategori "${activeCategory}"` : ""}
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -151,6 +164,9 @@ export function ModuleSubModulesSection({ moduleId, moduleName }: ModuleSubModul
                 transition={{ duration: 0.4, delay: i * 0.05 }}
                 className="snap-start shrink-0 w-[88vw] sm:w-[420px] lg:w-[460px]"
               >
+                {/* Rute dinamis $subId tidak bisa divalidasi statis oleh tipe
+                    Link, jadi cast di sini -- bukan any yang menular. */}
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 <Link to={targetLink as any} className="group block h-full">
                   <Card className="relative flex h-full flex-col justify-between rounded-3xl border border-border/80 bg-card/95 p-8 md:p-9 shadow-soft backdrop-blur-md transition-all duration-300 hover:border-primary/50 hover:shadow-2xl hover:-translate-y-1.5">
                     <div>

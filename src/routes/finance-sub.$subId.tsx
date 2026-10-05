@@ -51,19 +51,12 @@ export const Route = createFileRoute("/finance-sub/$subId")({
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       name: `Siarpi ERP — ${d.name}`,
-      operatingSystem: "Web, Windows, macOS, Linux, Android, iOS",
+      // Harga dan rating dihapus dari structured data: angka 99000 dan 4.9/1280
+      // tidak punya sumber (harga sub-modul mengikuti katalog modul induknya, dan
+      // AggregateRating butuh ulasan nyata on-page). `offers` dikembalikan begitu
+      // harga katalog ikut ter-render di SSR supaya nilainya benar-benar valid.
+      operatingSystem: "Web, Windows, macOS",
       applicationCategory: "BusinessApplication",
-      offers: {
-        "@type": "Offer",
-        price: "99000",
-        priceCurrency: "IDR",
-        availability: "https://schema.org/InStock",
-      },
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: "4.9",
-        ratingCount: "1280",
-      },
       description: metaDesc,
     };
 
@@ -328,8 +321,8 @@ function SubModuleDetailPage() {
               Bagaimana <span className="text-gradient-primary">{d.name}</span> Bekerja
             </h2>
             <p className="mt-3 text-base text-muted-foreground">
-              Proses otomatis yang terstruktur dari hulu ke hilir untuk memastikan efisiensi &
-              akurasi 100%.
+              Proses otomatis yang terstruktur dari hulu ke hilir, sehingga setiap langkah punya
+              jejak yang bisa ditelusuri.
             </p>
           </motion.div>
 

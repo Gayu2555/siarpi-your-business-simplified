@@ -18,12 +18,11 @@ import {
   Briefcase,
   Network,
 } from "lucide-react";
-import { ArrowLeft, ArrowRight, Check, Star, Quote } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { BusinessSolutionsSection } from "@/components/modules/BusinessSolutionsSection";
 import { ComparisonBeforeAfterSection } from "@/components/modules/ComparisonBeforeAfterSection";
 import { ModuleSubModulesSection } from "@/components/modules/ModuleSubModulesSection";
-
-
+import { ProductOfferSection } from "@/components/site/ProductOfferSection";
 
 const hrSubFeatures = [
   {
@@ -91,49 +90,27 @@ const hrSubFeatures = [
   },
 ];
 
-const testimonials = [
-  {
-    name: "Sari Wulandari",
-    role: "HR Manager",
-    company: "PT. TechInovasi Solusindo",
-    quote:
-      "Siarpi HR mengotomatisasi penggajian dan absensi kami. Proses lembur sekarang hanya butuh 2 menit!",
-    rating: 5,
-  },
-  {
-    name: "Andi Pratama",
-    role: "Finance & Admin Supervisor",
-    company: "CV. Mitra Distribusi",
-    quote:
-      "Integrasi payroll otomatis ke modul Finance sangat membantu. Tidak ada lagi selisih atau kesalahan hitung.",
-    rating: 5,
-  },
-];
+// Testimoni fiktif (nama & perusahaan karangan) dihapus -- diganti
+// ProductOfferSection yang menunjuk mekanisme produk yang bisa diverifikasi.
 
 export const Route = createFileRoute("/hr")({
   head: () => {
     const metaTitle = "Software Manajemen SDM & HR Terbaik Indonesia | Siarpi ERP";
-    const metaDesc = "Otomatiskan absensi karyawan, penggajian, cuti, shift kerja, dan reimbursement dengan software HR modern Siarpi ERP. Solusi komprehensif untuk perusahaan Indonesia.";
+    const metaDesc =
+      "Otomatiskan absensi karyawan, penggajian, cuti, shift kerja, dan reimbursement dengan software HR modern Siarpi ERP. Solusi komprehensif untuk perusahaan Indonesia.";
     const canonicalUrl = "https://siarpi.com/hr";
-    const keywords = "software hr Indonesia, sistem manajemen sdm, aplikasi absensi karyawan, sistem payroll otomatis, software cuti karyawan, aplikasi gaji online, sistem shift kerja, erp hr Indonesia";
+    const keywords =
+      "software hr Indonesia, sistem manajemen sdm, aplikasi absensi karyawan, sistem payroll otomatis, software cuti karyawan, aplikasi gaji online, sistem shift kerja, erp hr Indonesia";
 
     const jsonLd = {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       name: "Siarpi ERP — Modul Manajemen SDM & HR",
-      operatingSystem: "Web, Windows, macOS, Linux, Android, iOS",
+      // Harga 99000 dan rating 4.9/1540 dihapus: harga HR real berasal dari
+      // katalog modul (bukan angka tetap), dan AggregateRating butuh ulasan nyata
+      // on-page. `offers` masuk lagi setelah harga katalog ter-render di SSR.
+      operatingSystem: "Web, Windows, macOS",
       applicationCategory: "BusinessApplication",
-      offers: {
-        "@type": "Offer",
-        price: "99000",
-        priceCurrency: "IDR",
-        availability: "https://schema.org/InStock",
-      },
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: "4.9",
-        ratingCount: "1540",
-      },
     };
 
     return {
@@ -296,58 +273,8 @@ function HrLandingPage() {
         {/* COMPARISON SECTION */}
         <ComparisonBeforeAfterSection moduleName="HR" />
 
-        {/* TESTIMONIALS */}
-        <section className="bg-muted/30 py-20 md:py-28">
-          <div className="container mx-auto px-4 md:px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.5 }}
-              className="mx-auto max-w-2xl text-center"
-            >
-              <Badge variant="outline" className="mb-4 rounded-full">
-                Testimoni
-              </Badge>
-              <h2 className="font-display text-3xl font-bold md:text-5xl">
-                Dipercaya oleh perusahaan di seluruh Indonesia
-              </h2>
-            </motion.div>
-
-            <div className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-2">
-              {testimonials.map((t, i) => (
-                <motion.div
-                  key={t.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-60px" }}
-                  transition={{ duration: 0.4, delay: i * 0.1 }}
-                >
-                  <Card className="relative h-full rounded-2xl border-border p-8 shadow-soft">
-                    <Quote className="absolute right-6 top-6 h-8 w-8 text-primary/20" />
-                    <div className="flex gap-0.5">
-                      {Array.from({ length: t.rating }).map((_, idx) => (
-                        <Star key={idx} className="h-4 w-4 fill-primary text-primary" />
-                      ))}
-                    </div>
-                    <p className="mt-4 text-base italic text-foreground/90">"{t.quote}"</p>
-                    <div className="mt-6 flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-primary font-display font-bold text-primary-foreground">
-                        {t.name[0]}
-                      </div>
-                      <div>
-                        <div className="font-display text-sm font-semibold">{t.name}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {t.role} • {t.company}
-                        </div>
-                      </div>
-                    </div>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* PENAWARAN PRODUK — pengganti testimoni fiktif */}
+        <ProductOfferSection moduleName="HR" />
 
         {/* FAQ SECTION */}
         <section className="container mx-auto px-4 py-20 md:px-6 md:py-28">

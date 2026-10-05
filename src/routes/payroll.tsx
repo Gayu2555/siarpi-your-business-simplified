@@ -22,31 +22,26 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { BusinessSolutionsSection } from "@/components/modules/BusinessSolutionsSection";
 import { ComparisonBeforeAfterSection } from "@/components/modules/ComparisonBeforeAfterSection";
 import { ModuleSubModulesSection } from "@/components/modules/ModuleSubModulesSection";
+import { ProductOfferSection } from "@/components/site/ProductOfferSection";
 
 export const Route = createFileRoute("/payroll")({
   head: () => {
     const metaTitle = "Software Payroll & Penggajian Otomatis Indonesia | Siarpi ERP";
-    const metaDesc = "Otomatiskan perhitungan gaji karyawan, PPh21, BPJS, kasbon, dan slip gaji dengan software payroll modern Siarpi ERP. Integrasi otomatis ke modul Finance untuk journaling yang akurat.";
+    const metaDesc =
+      "Otomatiskan perhitungan gaji karyawan, PPh21, BPJS, kasbon, dan slip gaji dengan software payroll modern Siarpi ERP. Integrasi otomatis ke modul Finance untuk journaling yang akurat.";
     const canonicalUrl = "https://siarpi.com/payroll";
-    const keywords = "software payroll Indonesia, aplikasi gaji otomatis, sistem penggajian karyawan, software pph21 otomatis, aplikasi bpjs karyawan, slip gaji digital, sistem payroll erp indonesia, manajemen gaji online";
+    const keywords =
+      "software payroll Indonesia, aplikasi gaji otomatis, sistem penggajian karyawan, software pph21 otomatis, aplikasi bpjs karyawan, slip gaji digital, sistem payroll erp indonesia, manajemen gaji online";
 
     const jsonLd = {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       name: "Siarpi ERP — Modul Payroll & Penggajian",
-      operatingSystem: "Web, Windows, macOS, Linux, Android, iOS",
+      // Harga 99000 dan rating 4.9/1480 dihapus: harga Payroll real berasal dari
+      // katalog modul (bukan angka tetap), dan AggregateRating butuh ulasan nyata
+      // on-page. `offers` masuk lagi setelah harga katalog ter-render di SSR.
+      operatingSystem: "Web, Windows, macOS",
       applicationCategory: "BusinessApplication",
-      offers: {
-        "@type": "Offer",
-        price: "99000",
-        priceCurrency: "IDR",
-        availability: "https://schema.org/InStock",
-      },
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: "4.9",
-        ratingCount: "1480",
-      },
     };
 
     return {
@@ -137,26 +132,8 @@ const payrollFeatures = [
   },
 ];
 
-const testimonials = [
-  {
-    name: "Dewi Lestari",
-    role: "Finance Manager",
-    company: "PT. Global Manufacturing",
-    quote:
-      "Sistem payroll Siarpi mengurangi waktu kami dari 5 hari keh 2 jam. Benar-benar revolusioner!",
-    rating: 5,
-  },
-  {
-    name: "Rizky Firmansyah",
-    role: "CEO",
-    company: "CV. Sumber Rejeki Makmur",
-    quote:
-      "Integrasi PPh21 & BPJS ke Kementerian Keuangan serta penyusunan jurnal otomatis benar-benar andal.",
-    rating: 5,
-  },
-];
-
-
+// Testimoni fiktif (nama & perusahaan karangan) dihapus -- diganti
+// ProductOfferSection yang menunjuk mekanisme produk yang bisa diverifikasi.
 
 function PayrollLandingPage() {
   return (
@@ -186,7 +163,7 @@ function PayrollLandingPage() {
                   Payroll
                 </Badge>
                 <h1 className="font-display text-4xl font-bold md:text-5xl lg:text-6xl">
-                  Payroll Otomatis Tanpa Ribet & Akurat 100%
+                  Payroll Otomatis, Perhitungan Rapi Sampai Slip Gaji
                 </h1>
                 <p className="mt-6 max-w-2xl text-lg text-foreground/80">
                   Hitung gaji karyawan, termasuk tunjangan, lembur, PPh21, BPJS, dan kasbon — semua
@@ -245,7 +222,7 @@ function PayrollLandingPage() {
             {[
               {
                 icon: Calculator,
-                title: "Hitung Gaji 100% Otomatis",
+                title: "Hitung Gaji Otomatis",
                 desc: "Komputasi gaji pokok, tunjangan, lembur, potongan BPJS, PPh21, & kasbon akurat.",
               },
               {
@@ -290,63 +267,8 @@ function PayrollLandingPage() {
         {/* COMPARISON SECTION */}
         <ComparisonBeforeAfterSection moduleName="Payroll" />
 
-        {/* TESTIMONIALS */}
-        <section className="bg-muted/30 py-20 md:py-28">
-          <div className="container mx-auto px-4 md:px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.5 }}
-              className="mx-auto max-w-2xl text-center"
-            >
-              <Badge variant="outline" className="mb-4 rounded-full">
-                Testimoni
-              </Badge>
-              <h2 className="font-display text-3xl font-bold md:text-5xl">
-                Dipercaya oleh perusahaan di seluruh Indonesia
-              </h2>
-            </motion.div>
-
-            <div className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-2">
-              {testimonials.map((t, i) => (
-                <motion.div
-                  key={t.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-60px" }}
-                  transition={{ duration: 0.4, delay: i * 0.1 }}
-                >
-                  <Card className="relative h-full rounded-2xl border-border p-8 shadow-soft">
-                    <div className="flex gap-0.5">
-                      {Array.from({ length: t.rating }).map((_, idx) => (
-                        <svg
-                          key={idx}
-                          className="h-4 w-4 fill-primary text-primary"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M12 17.27L18.18 21l-1.68-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.5 4.73L5.82 21z" />
-                        </svg>
-                      ))}
-                    </div>
-                    <p className="mt-4 text-base italic text-foreground/90">"{t.quote}"</p>
-                    <div className="mt-6 flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-primary font-display font-bold text-primary-foreground">
-                        {t.name[0]}
-                      </div>
-                      <div>
-                        <div className="font-display text-sm font-semibold">{t.name}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {t.role} • {t.company}
-                        </div>
-                      </div>
-                    </div>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* PENAWARAN PRODUK — pengganti testimoni fiktif */}
+        <ProductOfferSection moduleName="Payroll" />
 
         {/* FAQ SECTION */}
         <section className="container mx-auto px-4 py-20 md:px-6 md:py-28">
