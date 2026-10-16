@@ -320,6 +320,21 @@ function LoginPage() {
       setGoogleLoading(false);
     }
   }
+  // Fallback saat tombol resmi Google tidak dirender (Client ID kosong atau
+  // script gsi/client gagal dimuat). Tombol SENGAJA tetap aktif -- tombol mati
+  // tidak memberi tahu apa-apa, sementara klik di sini menjelaskan masalahnya
+  // atau mencoba lagi:
+  //   - Client ID kosong -> error konfigurasi yang jelas (untuk admin).
+  //   - Script pernah gagal (offline/adblock) -> reset flag supaya div GIS
+  //     dirender ulang dan effect inject script lagi.
+  function handleGoogleFallbackClick() {
+    setError(null);
+    if (!GOOGLE_CLIENT_ID) {
+      setError("Login dengan Google belum dikonfigurasi di aplikasi ini. Hubungi administrator.");
+      return;
+    }
+    setGoogleScriptFailed(false);
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-gradient-subtle">
@@ -527,13 +542,24 @@ function LoginPage() {
                       <button
                         key={opt.id}
                         type="button"
-                        disabled={opt.soon}
-                        title={opt.soon ? "Metode ini belum tersedia" : undefined}
+                        // Google tidak pernah disabled: fallback tetap bisa
+                        // diklik dan menjelaskan masalahnya (lihat
+                        // handleGoogleFallbackClick). Metode lain yang memang
+                        // belum ada (soon) tetap disabled.
+                        disabled={opt.soon && opt.id !== "google"}
+                        onClick={opt.id === "google" ? handleGoogleFallbackClick : undefined}
+                        title={
+                          opt.id === "google"
+                            ? "Login dengan akun Google"
+                            : opt.soon
+                              ? "Metode ini belum tersedia"
+                              : undefined
+                        }
                         className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted/50 disabled:cursor-not-allowed disabled:bg-muted/30 disabled:text-muted-foreground disabled:hover:bg-muted/30"
                       >
                         <opt.icon className="h-4 w-4 text-muted-foreground" />
                         {opt.label}
-                        {opt.soon && (
+                        {opt.soon && opt.id !== "google" && (
                           <span className="ml-1 rounded-full border border-border bg-background px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                             Segera
                           </span>

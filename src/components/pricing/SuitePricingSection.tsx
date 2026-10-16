@@ -66,6 +66,10 @@ export function SuitePricingSection() {
         <div className="mt-10 space-y-14">
           {suites.map((suite) => {
             const suiteIcon = resolvePhosphorIcon(suite.icon);
+            // Guard defensif: respons API bisa mengirim `plans: null` untuk
+            // suite tanpa plan aktif (slice nil di Go -> JSON null), dan
+            // plans.length di bawah dulu bikin /modular crash.
+            const plans = suite.plans ?? [];
             return (
               <div key={suite.key}>
                 <div className="mb-5 flex items-center gap-3">
@@ -80,18 +84,24 @@ export function SuitePricingSection() {
                   </div>
                 </div>
 
+                {plans.length === 0 && (
+                  <p className="rounded-lg border border-border bg-muted/20 px-5 py-6 text-sm text-muted-foreground">
+                    Paket untuk suite ini belum tersedia. Susun modul satuan di bawah atau hubungi
+                    tim kami untuk penawaran.
+                  </p>
+                )}
+
                 <div
                   className={`grid gap-5 ${
-                    suite.plans.length === 1
+                    plans.length === 1
                       ? "max-w-sm"
-                      : suite.plans.length === 2
+                      : plans.length === 2
                         ? "max-w-3xl md:grid-cols-2"
                         : "lg:grid-cols-3"
                   }`}
                 >
-                  {suite.plans.map((plan, index) => {
-                    const featured =
-                      suite.plans.length > 1 && index === Math.floor(suite.plans.length / 2);
+                  {plans.map((plan, index) => {
+                    const featured = plans.length > 1 && index === Math.floor(plans.length / 2);
                     const unlimitedModules = plan.module_quota === -1 || plan.is_all_access;
                     const unlimitedSeats = plan.included_seats === -1;
 

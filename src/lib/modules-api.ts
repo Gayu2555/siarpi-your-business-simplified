@@ -72,11 +72,21 @@ export interface SuiteWithPlans extends ProductSuite {
   modules: ApiModule[] | null;
 }
 
+/**
+ * Bentuk mentah respons GET /public/suites. Slice Go yang kosong bisa
+ * ter-marshal jadi `null` (bukan `[]`), jadi semua field array di sini sengaja
+ * nullable dan dinormalisasi oleh fetchSuites() sebelum sampai ke komponen.
+ */
+interface ApiSuiteRaw extends ProductSuite {
+  plans: SubscriptionPlan[] | null;
+  modules: ApiModule[] | null;
+}
+
 // ── API calls ────────────────────────────────────────────────────────────────
 
 /** GET /public/modules — katalog modul berbayar yang tersedia (is_listed=true) */
 export async function fetchCatalogModules(): Promise<ApiModule[]> {
-  const { ok, data } = await apiFetch<{ success: boolean; modules: ApiModule[] }>(
+  const { ok, data } = await apiFetch<{ success: boolean; modules: ApiModule[] | null }>(
     "/public/modules",
     { auth: false, signal: AbortSignal.timeout(PUBLIC_CATALOG_TIMEOUT_MS) },
   );
@@ -86,13 +96,18 @@ export async function fetchCatalogModules(): Promise<ApiModule[]> {
 
 /** GET /public/suites — semua suite beserta plan & modul (untuk pricing page) */
 export async function fetchSuites(): Promise<SuiteWithPlans[]> {
-  const { ok, data } = await apiFetch<{ success: boolean; suites: SuiteWithPlans[] }>(
+  const { ok, data } = await apiFetch<{ success: boolean; suites: ApiSuiteRaw[] | null }>(
     "/public/suites",
     { auth: false, signal: AbortSignal.timeout(PUBLIC_CATALOG_TIMEOUT_MS) },
   );
   if (!ok || !data?.success) return [];
   return (data.suites ?? []).map((suite) => ({
     ...suite,
+    // Suite tanpa plan aktif mengirim `plans: null`, dan SuitePricingSection
+    // membaca plans.length saat render -> seluruh halaman /modular crash
+    // ("Cannot read properties of null (reading 'length')"). Normalisasi di
+    // sumber data supaya tipe SuiteWithPlans.plans selalu jujur.
+    plans: suite.plans ?? [],
     modules: suite.modules?.filter((module) => isReleasedModule(module.key)) ?? null,
   }));
 }
