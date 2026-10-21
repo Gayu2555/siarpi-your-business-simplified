@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// blog-api.ts — klien untuk Blog CMS (MongoDB Atlas).
+// blog-api.ts — klien untuk Blog CMS (MongoDB).
 // Mirror dari backend blog/models.go & blog/handlers.go.
 //
 // Hanya endpoint PUBLIK yang dipakai di sini:

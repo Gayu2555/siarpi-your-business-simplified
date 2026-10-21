@@ -104,7 +104,22 @@ export function SuitePricingSection() {
                     const featured = plans.length > 1 && index === Math.floor(plans.length / 2);
                     const unlimitedModules = plan.module_quota === -1 || plan.is_all_access;
                     const unlimitedSeats = plan.included_seats === -1;
-
+                    // Modul yang BENERAN termasuk di plan ini: whitelist
+                    // backend (plan.module_keys), dicocokkan ke modul suite
+                    // untuk namanya. Key yang tidak ketemu (mis. lintas suite)
+                    // tampil apa adanya daripada hilang diam-diam.
+                    const includedModules = (plan.module_keys ?? [])
+                      .map((key) => suite.modules?.find((m) => m.key === key) ?? { key, name: key })
+                      .filter((m, i, arr) => arr.findIndex((x) => x.key === m.key) === i);
+                    // Aturan tampil (lihat modul engine di modules/service.go):
+                    // - unlimited (all-access/kuota -1): semua modul suite.
+                    // - sisanya: hitungan = ISI checklist (plan.module_keys),
+                    //   bukan angka kuota. Kuota sebagai jatah hitung sudah
+                    //   dihapus dari engine -- satu-satunya angka jujur adalah
+                    //   yang dicentang.
+                    const quotaCountText = unlimitedModules
+                      ? null
+                      : `${includedModules.length} modul pilihan`;
                     return (
                       <motion.div
                         key={plan.key}
@@ -149,9 +164,7 @@ export function SuitePricingSection() {
                           <ul className="mt-5 flex-1 space-y-3">
                             <li className="flex gap-2 text-sm">
                               <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                              {unlimitedModules
-                                ? "Semua modul dalam suite"
-                                : `${plan.module_quota} modul pilihan`}
+                              {unlimitedModules ? "Semua modul dalam suite" : quotaCountText}
                             </li>
                             <li className="flex gap-2 text-sm">
                               <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
@@ -166,15 +179,17 @@ export function SuitePricingSection() {
                                 )}
                               </span>
                             </li>
-                            {(suite.modules ?? []).map((module) => (
-                              <li
-                                key={module.key}
-                                className="flex gap-2 text-sm text-muted-foreground"
-                              >
-                                <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                                {module.name}
-                              </li>
-                            ))}
+                            {(unlimitedModules ? (suite.modules ?? []) : includedModules).map(
+                              (module) => (
+                                <li
+                                  key={module.key}
+                                  className="flex gap-2 text-sm text-muted-foreground"
+                                >
+                                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                                  {module.name}
+                                </li>
+                              ),
+                            )}
                           </ul>
 
                           <Button

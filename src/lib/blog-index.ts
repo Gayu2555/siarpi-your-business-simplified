@@ -4,7 +4,7 @@
 //   1. articlesRegistry (lib/articles.ts) — artikel bawaan terstruktur,
 //      formatnya terstruktur (section/callout/FAQ) dan sudah punya nilai SEO
 //      di URL /artikel/{slug}. Sengaja TIDAK dimigrasikan.
-//   2. Blog CMS di MongoDB Atlas — artikel Markdown yang ditulis lewat
+//   2. Blog CMS di MongoDB — artikel Markdown yang ditulis lewat
 //      dashboard admin.
 //
 // Keduanya hidup di path yang sama (/artikel/{slug}) supaya cuma ada satu

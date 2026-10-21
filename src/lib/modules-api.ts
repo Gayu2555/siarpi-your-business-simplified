@@ -55,6 +55,12 @@ export interface SubscriptionPlan {
   module_quota: number;
   is_all_access: boolean;
   is_active: boolean;
+  /**
+   * Whitelist modul plan ini (plan_modules). Selalu array (backend menjamin
+   * [] bukan null). Dipakai kartu pricing supaya checklist = modul yang
+   * BENERAN termasuk, bukan seluruh modul suite.
+   */
+  module_keys: string[];
 }
 
 export interface ProductSuite {
