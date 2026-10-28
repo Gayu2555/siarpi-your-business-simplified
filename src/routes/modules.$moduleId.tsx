@@ -26,8 +26,22 @@ import { ModuleMockupPreview } from "@/components/modules/ModuleMockupPreview";
 import { FinanceSubModulesCarousel } from "@/components/modules/FinanceSubModulesCarousel";
 import { ModuleSubModulesSection } from "@/components/modules/ModuleSubModulesSection";
 import { ModuleFeaturesSection } from "@/components/modules/ModuleFeaturesSection";
+import { ModuleFeatureShowcase } from "@/components/modules/ModuleFeatureShowcase";
 import { BusinessSolutionsSection } from "@/components/modules/BusinessSolutionsSection";
 import { ComparisonBeforeAfterSection } from "@/components/modules/ComparisonBeforeAfterSection";
+
+// Kartu "Modul lainnya" di bagian bawah halaman. `price` bisa `null` dan itu
+// SENGAJA: satu-satunya sumber harga yang benar adalah katalog publik
+// (diubah dari Platform Admin). Angka di registry statis cuma fallback untuk
+// nama/ikon — kalau dipakai sebagai harga, kartu bisa pamer angka basi
+// (contoh nyata: HR ditulis 49.000 padahal katalog 289.000).
+type RelatedModule = {
+  id: string;
+  name: string;
+  iconName: string;
+  description: string;
+  price: number | null;
+};
 
 export const Route = createFileRoute("/modules/$moduleId")({
   head: ({ params }) => {
@@ -94,19 +108,37 @@ export const Route = createFileRoute("/modules/$moduleId")({
     };
   },
   loader: async ({ params }) => {
-    let apiMod: ApiModule | undefined;
+    let catalog: ApiModule[] = [];
     try {
-      const catalog = await fetchCatalogModules();
-      apiMod = catalog.find(
-        (x) => x.key === params.moduleId || x.key === params.moduleId.toLowerCase(),
-      );
+      catalog = await fetchCatalogModules();
     } catch {
-      // Fallback silently if API is offline
+      // Katalog offline -> related tetap dirender, hanya tanpa angka harga
     }
+    const catalogByKey = new Map(
+      catalog.map((x) => [x.key.trim().toLowerCase(), x] as const),
+    );
+    const apiMod = catalogByKey.get(params.moduleId.trim().toLowerCase());
 
     const m = modules.find((x) => x.id === params.moduleId);
     const d = moduleDetails[params.moduleId];
     if (!m || !d) throw notFound();
+
+    // HARGA modul tetangga diambil dari katalog live; nama/ikon/deskripsi tetap
+    // dari registry supaya tampilan kartu tidak berubah diam-diam -- cuma angkanya
+    // yang ikut harga asli.
+    const related: RelatedModule[] = modules
+      .filter((x) => x.id !== m.id)
+      .slice(0, 4)
+      .map((rm) => {
+        const api = catalogByKey.get(rm.id.trim().toLowerCase());
+        return {
+          id: rm.id,
+          name: rm.name,
+          iconName: rm.iconName,
+          description: rm.description,
+          price: api ? api.price : null,
+        };
+      });
 
     return {
       module: {
@@ -117,6 +149,7 @@ export const Route = createFileRoute("/modules/$moduleId")({
         price: apiMod?.price ?? m.price,
       },
       detail: d,
+      related,
     };
   },
   notFoundComponent: () => (
@@ -141,7 +174,7 @@ export const Route = createFileRoute("/modules/$moduleId")({
 });
 
 function ModulePage() {
-  const { module: m, detail: d } = Route.useLoaderData() as unknown as {
+  const { module: m, detail: d, related } = Route.useLoaderData() as unknown as {
     module: {
       id: string;
       name: string;
@@ -150,6 +183,7 @@ function ModulePage() {
       price: number;
     };
     detail: ModuleDetail;
+    related: RelatedModule[];
   };
 
   const renderIcon = (iconName: string, className = "h-7 w-7") => {
@@ -160,8 +194,6 @@ function ModulePage() {
     const IconComp = getModuleIcon(iconName);
     return <IconComp className={className} />;
   };
-
-  const related = modules.filter((x) => x.id !== m.id).slice(0, 4);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -186,8 +218,14 @@ function ModulePage() {
           </div>
         </section>
 
-        {/* FEATURES SECTION */}
-        <ModuleFeaturesSection moduleName={m.name} features={d.features} />
+        {/* FEATURES SECTION — showcase kartu besar kalau datanya lengkap
+            (setiap fitur punya bullets + category), kalau tidak tetap grid lama
+            supaya sembilan modul lainnya tidak berubah. */}
+        {d.features.some((f) => (f.bullets?.length ?? 0) > 0) ? (
+          <ModuleFeatureShowcase moduleName={m.name} features={d.features} />
+        ) : (
+          <ModuleFeaturesSection moduleName={m.name} features={d.features} />
+        )}
 
         {/* BUSINESS SOLUTIONS SECTION (Corporate Solusi Aspek Operasional & Keuangan) */}
         <BusinessSolutionsSection />
@@ -256,30 +294,37 @@ function ModulePage() {
             </div>
 
             <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {related.map((rm) => {
-                const RelIcon = getModuleIcon(rm.iconName);
-                return (
-                  <Link key={rm.id} to="/modules/$moduleId" params={{ moduleId: rm.id }}>
-                    <Card className="flex h-full flex-col justify-between rounded-xl border-border p-5 transition-all hover:border-primary/50 hover:shadow-card">
-                      <div>
-                        <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground">
-                          <RelIcon className="h-5 w-5" />
-                        </div>
-                        <h4 className="font-display font-semibold">{rm.name}</h4>
-                        <p className="mt-1 text-xs text-muted-foreground">{rm.description}</p>
+              {related.map((rm) => (
+                <Link key={rm.id} to="/modules/$moduleId" params={{ moduleId: rm.id }}>
+                  <Card className="flex h-full flex-col justify-between rounded-xl border-border p-5 transition-all hover:border-primary/50 hover:shadow-card">
+                    <div>
+                      <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground">
+                        {renderIcon(rm.iconName, "h-5 w-5")}
                       </div>
-                      <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-3">
+                      <h4 className="font-display font-semibold">{rm.name}</h4>
+                      <p className="mt-1 text-xs text-muted-foreground">{rm.description}</p>
+                    </div>
+                    <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-3">
+                      {rm.price === null ? (
+                        // Katalog sedang tidak bisa dibaca -> jangan karang harga.
+                        <span className="text-xs font-medium text-muted-foreground">
+                          Lihat harga
+                        </span>
+                      ) : (
                         <span className="font-display text-xs font-bold">
                           {formatIDR(rm.price)}
+                          <span className="ml-0.5 text-[10px] font-medium text-muted-foreground">
+                            /bln
+                          </span>
                         </span>
-                        <span className="inline-flex items-center text-xs font-medium text-primary">
-                          Detail <ArrowRight className="ml-1 h-3 w-3" />
-                        </span>
-                      </div>
-                    </Card>
-                  </Link>
-                );
-              })}
+                      )}
+                      <span className="inline-flex items-center text-xs font-medium text-primary">
+                        Detail <ArrowRight className="ml-1 h-3 w-3" />
+                      </span>
+                    </div>
+                  </Card>
+                </Link>
+              ))}
             </div>
           </div>
         </section>

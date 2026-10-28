@@ -22,13 +22,17 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import {
+  BookOpen,
+  CalendarDots,
   ChartBar,
   ChartLine,
+  Chats,
   Columns,
   Crown,
   Cube,
   Factory,
   Fingerprint,
+  GearSix,
   IdentificationBadge,
   Megaphone,
   Money,
@@ -50,13 +54,17 @@ const WEIGHT_SUFFIXES: PhosphorWeight[] = ["fill", "bold", "light", "duotone", "
 // benar-benar ada di katalog, ditambah ikon yang di-hardcode di frontend
 // (mis. "i-ph-package-fill" di routes/checkout.tsx).
 const PHOSPHOR_ICONS: Record<string, PhosphorIcon> = {
+  BookOpen,
+  CalendarDots,
   ChartBar,
   ChartLine,
+  Chats,
   Columns,
   Crown,
   Cube,
   Factory,
   Fingerprint,
+  GearSix,
   IdentificationBadge,
   Megaphone,
   Money,

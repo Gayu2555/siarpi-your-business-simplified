@@ -319,9 +319,8 @@ const caseStudies = [
   },
 ];
 
-// Kanal yang benar-benar diaktifkan backend saat ini: QRIS lewat Midtrans
-// (GATEWAY_QRIS) dan Virtual Account lewat DOKU (DOKU_VA_METHODS). Daftar
-// lengkap selalu mengikuti konfigurasi dan dirender di halaman pembayaran.
+// Kanal yang benar-benar tersedia melalui Midtrans: QRIS dan Virtual Account.
+// Daftar lengkapnya dirender di halaman pembayaran.
 const payments = [
   { iconName: "QrCode", label: "QRIS" },
   { iconName: "CreditCard", label: "Virtual Account Bank" },

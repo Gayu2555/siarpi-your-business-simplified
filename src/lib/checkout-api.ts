@@ -23,12 +23,11 @@ export interface Checkout {
   expires_at: string;
   paid_at?: string;
   created_at: string;
-  /** Gateway aktif saat checkout dibuat: midtrans | mayar | doku. */
+  /** Gateway untuk checkout aktif: selalu Midtrans. */
   payment_gateway?: string;
   /**
-   * Metode yang boleh dipilih user. Kosong/tidak ada = backend tidak
-   * membatasi, tampilkan semua. Dipakai untuk menyembunyikan tombol yang
-   * pasti ditolak -- mis. QRIS saat gateway DOKU yang hanya mendukung VA.
+   * Batas metode tambahan dari backend. Kosong/tidak ada = tampilkan daftar
+   * kanal Midtrans yang memang didukung UI.
    */
   payment_methods?: string[];
 }

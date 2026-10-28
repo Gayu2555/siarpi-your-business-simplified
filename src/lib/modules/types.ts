@@ -1,4 +1,15 @@
-export type Feature = { title: string; desc: string };
+// `bullets` + `category` + `iconName` OPSIONAL dan memicu tampilan showcase
+// (carousel kartu besar seperti sub-modul HR) di halaman modul: kalau sebuah
+// modul mengisi `bullets` untuk fitur-fiturnya, ModuleFeaturesSection mengganti
+// grid biasa dengan kartu bergaya itu. Fitur tanpa bullets tetap tampil sebagai
+// kartu grid kecil, jadi modul lain tidak ikut berubah.
+export type Feature = {
+  title: string;
+  desc: string;
+  category?: string;
+  iconName?: string;
+  bullets?: string[];
+};
 export type Testimonial = {
   name: string;
   role: string;

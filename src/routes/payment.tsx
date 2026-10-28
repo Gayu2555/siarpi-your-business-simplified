@@ -12,7 +12,6 @@ import {
   chargePayment,
   getPaymentStatus,
   resolveStatus,
-  hostedPaymentLink,
   SUCCESS_STATUSES,
   FAILED_STATUSES,
   type ChargeResponse,
@@ -58,16 +57,12 @@ const methods: {
 }[] = [
   { id: "qris", label: "QRIS", icon: QrCode, group: "instant" },
   { id: "gopay", label: "GoPay", icon: Smartphone, group: "instant" },
-  { id: "bca", label: "BCA Virtual Account", icon: Building2, group: "va" },
-  { id: "mandiri", label: "Mandiri Virtual Account", icon: Building2, group: "va" },
+  { id: "bsi", label: "BSI Virtual Account", icon: Building2, group: "va" },
+  { id: "cimb", label: "CIMB Virtual Account", icon: Building2, group: "va" },
   { id: "bni", label: "BNI Virtual Account", icon: Building2, group: "va" },
   { id: "bri", label: "BRI Virtual Account", icon: Building2, group: "va" },
+  { id: "mandiri", label: "Mandiri Virtual Account", icon: Building2, group: "va" },
   { id: "permata", label: "Permata Virtual Account", icon: Building2, group: "va" },
-  { id: "cimb", label: "CIMB Virtual Account", icon: Building2, group: "va" },
-  { id: "danamon", label: "Danamon Virtual Account", icon: Building2, group: "va" },
-  { id: "maybank", label: "Maybank Virtual Account", icon: Building2, group: "va" },
-  { id: "bsm", label: "Bank Sahabat Sampoerna Virtual Account", icon: Building2, group: "va" },
-  { id: "doku", label: "DOKU Virtual Account", icon: Building2, group: "va" },
 ];
 
 type Phase = "select" | "processing" | "awaiting" | "success" | "failed";
@@ -86,17 +81,9 @@ function PaymentPage() {
 
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Mayar = hosted page tanpa detail inline. Midtrans QRIS/GoPay punya
-  // deeplink_url juga, tapi selalu bareng qr_code_url, jadi helper-nya
-  // hanya mengembalikan link untuk Mayar.
-  const hostedLink = hostedPaymentLink(chargeResult);
-
-  // Backend yang menentukan metode mana yang benar-benar bisa diproses.
-  // DOKU Direct API hanya bisa membuat Virtual Account, jadi QRIS/GoPay tidak
-  // punya endpoint dan akan ditolak 400 kalau tetap ditampilkan.
-  //
-  // payment_methods kosong = backend tidak membatasi (Midtrans/Mayar), jadi
-  // semua metode ditampilkan seperti sebelumnya.
+  // Daftar ini mengikuti kanal aktif di dashboard Midtrans. BSI diproses
+  // melalui Snap; kanal lain tetap memakai Core API. payment_methods kosong
+  // berarti seluruh kanal aktif di atas boleh dipilih.
   const allowedMethods = checkout?.payment_methods;
   const visibleMethods = allowedMethods?.length
     ? methods.filter((m) => allowedMethods.includes(m.id))
@@ -133,10 +120,8 @@ function PaymentPage() {
       const { ok, data } = await getPaymentStatus(orderId);
       if (!ok) return;
 
-      // resolveStatus (bukan data.data?.transaction_status) karena branch
-      // Mayar di backend mengembalikan payment_status di root — akses langsung
-      // ke .data.transaction_status selalu undefined di provider itu, jadi
-      // pollingnya diam-diam tidak pernah berhenti.
+      // resolveStatus membaca status Midtrans dari data.transaction_status
+      // maupun ringkasan payment_status di root response.
       const status = resolveStatus(data);
       if (!status) return;
 
@@ -357,15 +342,15 @@ function PaymentPage() {
                 </div>
               )}
 
-              {/* ── AWAITING (QR / VA / hosted page) ────────────────── */}
+              {/* ── AWAITING (QR / VA / Snap BSI) ──────────────────── */}
               {phase === "awaiting" && chargeResult && (
                 <div className="text-center">
                   <Badge variant="secondary" className="rounded-full">
                     Menunggu Pembayaran
                   </Badge>
                   <h1 className="mt-4 font-display text-xl font-bold">
-                    {hostedLink
-                      ? "Selesaikan Pembayaran"
+                    {chargeResult.redirect_url
+                      ? "Selesaikan pembayaran BSI"
                       : chargeResult.qr_code_url
                         ? "Scan QR Code"
                         : chargeResult.bill_key
@@ -373,25 +358,18 @@ function PaymentPage() {
                           : "Transfer ke Virtual Account"}
                   </h1>
 
-                  {/* Mayar tidak pernah mengirim VA/QR -- dia hanya memberi
-                      satu hosted page. Tanpa blok ini, seluruh kartu di bawah
-                      ini kosong: judulnya tetap bilang "Transfer ke Virtual
-                      Account" padahal tidak ada nomor untuk ditransfer, dan
-                      tidak ada jalan untuk membayar sama sekali. */}
-                  {hostedLink && (
-                    <div className="mt-6 rounded-2xl border border-border bg-muted/40 p-6">
+                  {chargeResult.redirect_url && (
+                    <div className="mt-6 rounded-2xl border border-border bg-muted/40 p-5">
                       <p className="text-sm text-muted-foreground">
-                        Kamu akan diarahkan ke halaman pembayaran untuk menyelesaikan transaksi.
-                        Jangan tutup tab ini sebelum pembayaran dikonfirmasi.
+                        Pembayaran BSI dilanjutkan melalui halaman aman Midtrans.
                       </p>
-                      <Button
-                        asChild
-                        size="lg"
-                        className="mt-5 w-full bg-gradient-primary text-primary-foreground shadow-soft hover:shadow-glow"
-                      >
-                        <a href={hostedLink} target="_blank" rel="noopener noreferrer">
-                          Buka Halaman Pembayaran
-                          <ExternalLink className="ml-2 h-4 w-4" />
+                      <Button asChild className="mt-4 w-full">
+                        <a
+                          href={chargeResult.redirect_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Buka Pembayaran BSI <ExternalLink className="ml-2 h-4 w-4" />
                         </a>
                       </Button>
                     </div>
@@ -443,15 +421,13 @@ function PaymentPage() {
 
                   <div className="mt-6 flex items-center justify-center gap-2 text-sm text-muted-foreground">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    {hostedLink
-                      ? "Menunggu pembayaran di halaman gateway..."
+                    {chargeResult.redirect_url
+                      ? "Menunggu pembayaran di halaman Midtrans..."
                       : "Menunggu konfirmasi pembayaran..."}
                   </div>
 
                   <p className="mt-2 text-xs text-muted-foreground">
-                    {hostedLink
-                      ? "Halaman ini tetap terbuka dan akan otomatis diperbarui setelah pembayaran terkonfirmasi. Kalau sudah membayar, kembali ke tab ini."
-                      : "Halaman ini akan otomatis update setelah pembayaran terkonfirmasi."}
+                    Halaman ini akan otomatis update setelah pembayaran terkonfirmasi.
                   </p>
                 </div>
               )}

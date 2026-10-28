@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// payment-api.ts — typed client untuk Midtrans Core API endpoints
+// payment-api.ts — typed client untuk endpoint pembayaran Midtrans
 // Mirror dari backend payments/core_handler.go
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -8,16 +8,11 @@ import { apiFetch } from "@/lib/api";
 export type PaymentMethod =
   | "qris"
   | "gopay"
-  | "shopeepay"
-  | "bca"
+  | "bsi"
   | "bni"
   | "bri"
   | "cimb"
   | "permata"
-  | "danamon"
-  | "maybank"
-  | "bsm"
-  | "doku"
   | "mandiri";
 
 export interface ChargeRequest {
@@ -40,6 +35,8 @@ export interface ChargeResponse {
   // QRIS / GoPay
   qr_code_url?: string;
   deeplink_url?: string;
+  // Midtrans Snap untuk BSI VA
+  redirect_url?: string;
   // Bank transfer VA
   bank?: string;
   va_number?: string;
@@ -55,48 +52,20 @@ export interface StatusResponse {
     transaction_status?: string;
     [key: string]: unknown;
   };
-  // Mayar: branch status di CoreHandler.go mengembalikan payment_status di
-  // root, bukan di data. Tanpa field ini polling di payment.tsx diam-diam
-  // selalu bail di `if (!ok || !data?.data?.transaction_status) return`.
+  // Midtrans juga mengirim ringkasan status internal di root selain detail
+  // gateway di data. Polling membaca keduanya lewat resolveStatus.
   payment_status?: string;
 }
 
 /**
- * Status endpoint punya dua bentuk tergantung provider:
- *   - Midtrans → `{ success, data: { transaction_status } }`
- *   - Mayar    → `{ success, payment_status }`
- * Polling harus baca keduanya, kalau tidak payment kedua provider tidak akan
- * pernah terdeteksi sukses.
+ * Samakan dua bentuk response status Midtrans menjadi satu string lowercase.
+ * Detail transaksi tersedia di data.transaction_status; status internal juga
+ * tersedia di payment_status pada root response.
  */
 export function resolveStatus(resp: StatusResponse | null | undefined): string | null {
   if (!resp) return null;
   const raw = resp.data?.transaction_status ?? resp.payment_status;
   return typeof raw === "string" && raw.trim() ? raw.trim().toLowerCase() : null;
-}
-
-/**
- * Detail pembayaran yang bisa ditampilkan langsung di halaman (QR / VA /
- * biller). Kalau semuanya kosong tapi ada deeplink, itu berarti gateway
- * menawarkan lewat hosted page — lihat hostedPaymentLink.
- */
-export function hasInlinePaymentDetails(r: ChargeResponse | null): boolean {
-  if (!r) return false;
-  return Boolean(r.qr_code_url || r.va_number || (r.bill_key && r.biller_code));
-}
-
-/**
- * Link ke hosted payment page gateway. Hanya dipakai kalau TIDAK ada detail
- * inline: Mayar selalu mengembalikan `link` dan tidak pernah mengirim VA/QR.
- *
- * Midtrans juga mengisi deeplink_url, TAPI selalu berpasangan dengan
- * qr_code_url (lihat CoreHandler.go: case gopay/qris yang set keduanya),
- * jadi syarat "deeplink ada, detail inline tidak ada" hanya cocok untuk
- * Mayar — tidak akan salah_sortir QRIS/GoPay milik Midtrans.
- */
-export function hostedPaymentLink(r: ChargeResponse | null): string | null {
-  if (!r?.deeplink_url) return null;
-  if (hasInlinePaymentDetails(r)) return null;
-  return r.deeplink_url;
 }
 
 /** POST /payments/charge */
@@ -126,15 +95,9 @@ export async function getPaymentStatus(
 export const MIDTRANS_SUCCESS_STATUSES = ["settlement", "capture"];
 
 /**
- * Status INTERNAL yang kita tulis sendiri ke payment_transactions: selalu
- * "paid", ditulis webhook provider mana pun (MayarCallback.go, DokuCallback.go,
- * Callback.go via resolveStatus yang memetakan settlement/capture -> paid).
- * Branch non-Midtrans di CoreHandler.go GetStatus membaca kolom status dari
- * DB, jadi "paid" harus dikenali supaya polling berhenti dengan benar.
- *
- * CATATAN: tidak ada status internal "settled" -- itu hanya ada di sisi
- * gateway DOKU ("SETTLED", dokuStatusIsPaid di CancelHandler.go) dan tidak
- * pernah ditulis ke database. Jangan ditambahkan ke sini.
+ * Status INTERNAL yang ditulis webhook Midtrans ke payment_transactions:
+ * settlement/capture dipetakan menjadi "paid". Nilai ini dikenali selain
+ * status mentah Midtrans supaya polling berhenti dengan benar.
  */
 export const INTERNAL_SUCCESS_STATUSES = ["paid"];
 

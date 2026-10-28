@@ -18,6 +18,7 @@ import {
   type CreateCompanyRequest,
 } from "@/lib/company-api";
 import { useEffect } from "react";
+import { fetchCatalogModules } from "@/lib/modules-api";
 import { createCheckout } from "@/lib/checkout-api";
 import { startFreeTrial } from "@/lib/trial-api";
 import {
@@ -57,41 +58,47 @@ const businessTypes = [
 ];
 
 // Plain data — tidak menyimpan React components agar aman untuk SSR serialization
+//
+// ANGKA di bawah HANYA bootstrap sebelum respons katalog pertama datang (field
+// `price` ikut dipakai menghitung "Estimasi setelah trial" di step 3). Sumber
+// harga yang sebenarnya adalah GET /public/modules -- admin mengubah harga dari
+// Platform Admin dan nilai statis di sini tidak ikut berubah, makanya selalu
+// di-override oleh catalogPrices di OnboardingPage.
 const modules = [
   {
     id: "hr",
     name: "HR",
     description: "Manajemen karyawan & rekrutmen",
     icon: "i-ph-users-fill",
-    price: 49000,
+    price: 289000,
   },
   {
     id: "payroll",
     name: "Payroll",
     description: "Gaji otomatis & pajak",
     icon: "i-ph-money-fill",
-    price: 79000,
+    price: 189000,
   },
   {
     id: "finance",
     name: "Finance",
     description: "Akuntansi & laporan keuangan",
     icon: "i-ph-chart-bar-fill",
-    price: 99000,
+    price: 389000,
   },
   {
     id: "inventory",
     name: "Inventory",
     description: "Stok barang real-time",
     icon: "i-ph-cube-fill",
-    price: 69000,
+    price: 189000,
   },
   {
     id: "crm",
     name: "CRM",
     description: "Kelola pelanggan & leads",
     icon: "i-ph-megaphone-fill",
-    price: 69000,
+    price: 189000,
   },
   {
     id: "absensi",
@@ -167,6 +174,10 @@ function OnboardingPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const submitting = submitMode !== null;
 
+  // Harga live dari katalog publik. "Estimasi setelah trial" adalah angka uang
+  // yang dilihat calon pelanggan, jadi tidak boleh bergantung pada angka statis.
+  const [catalogPrices, setCatalogPrices] = useState<Record<string, number>>({});
+
   useEffect(() => {
     getOnboardingStatus()
       .then(({ ok, data }) => {
@@ -188,10 +199,31 @@ function OnboardingPage() {
   const totalSteps = 3;
   const progress = (step / totalSteps) * 100;
 
-  const totalPrice = selectedModules.reduce((sum, id) => {
-    const m = modules.find((x) => x.id === id);
-    return sum + (m?.price ?? 0);
-  }, 0);
+  useEffect(() => {
+    let cancelled = false;
+    fetchCatalogModules()
+      .then((list) => {
+        if (cancelled || list.length === 0) return;
+        const map: Record<string, number> = {};
+        list.forEach((x) => {
+          map[x.key.trim().toLowerCase()] = x.price;
+        });
+        setCatalogPrices(map);
+      })
+      .catch(() => {
+        // Katalog tidak terbaca -> tetap pakai bootstrap, jangan sampai step 3 kosong
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const priceOf = (id: string) =>
+    catalogPrices[id.trim().toLowerCase()] ??
+    modules.find((x) => x.id === id)?.price ??
+    0;
+
+  const totalPrice = selectedModules.reduce((sum, id) => sum + priceOf(id), 0);
 
   const recommendedPlan =
     totalPrice > 500000 ? "Enterprise" : totalPrice > 200000 ? "Pro" : "Basic";

@@ -56,6 +56,16 @@ export interface SubscriptionPlan {
   is_all_access: boolean;
   is_active: boolean;
   /**
+   * Jatah KARYAWAN yang diberikan bundle ini.
+   * `null` = bundle tidak memberi jatah karyawan (bukan "jatah 0").
+   * `-1` = tanpa batas.
+   * Untuk suite ber-scope "employee" (Siarpi Talents) jatah karyawan sudah
+   * tercermin di `included_seats`, jadi jangan dijumlahkan dua kali.
+   */
+  included_employees: number | null;
+  /** Harga menambah satu karyawan. 0 = admin belum menetapkan harga ini. */
+  price_per_employee: number;
+  /**
    * Whitelist modul plan ini (plan_modules). Selalu array (backend menjamin
    * [] bukan null). Dipakai kartu pricing supaya checklist = modul yang
    * BENERAN termasuk, bukan seluruh modul suite.
@@ -71,6 +81,12 @@ export interface ProductSuite {
   color: string;
   is_active: boolean;
   sort_order: number;
+  /**
+   * "user" atau "employee". Suite Siarpi Talents ber-scope "employee"
+   * (kursinya = data karyawan), suite Business/Commerce ber-scope "user".
+   * Kartu pricing memakainya supaya label "user"/"karyawan" jujur.
+   */
+  seat_scope: string;
 }
 
 export interface SuiteWithPlans extends ProductSuite {
@@ -94,7 +110,12 @@ interface ApiSuiteRaw extends ProductSuite {
 export async function fetchCatalogModules(): Promise<ApiModule[]> {
   const { ok, data } = await apiFetch<{ success: boolean; modules: ApiModule[] | null }>(
     "/public/modules",
-    { auth: false, signal: AbortSignal.timeout(PUBLIC_CATALOG_TIMEOUT_MS) },
+    {
+      auth: false,
+      signal: AbortSignal.timeout(PUBLIC_CATALOG_TIMEOUT_MS),
+      // Data katalog live (harga, status). Jangan ambil dari cache browser.
+      cache: "no-store",
+    },
   );
   if (!ok || !data?.success) return [];
   return (data.modules ?? []).filter((module) => isReleasedModule(module.key));
@@ -104,7 +125,13 @@ export async function fetchCatalogModules(): Promise<ApiModule[]> {
 export async function fetchSuites(): Promise<SuiteWithPlans[]> {
   const { ok, data } = await apiFetch<{ success: boolean; suites: ApiSuiteRaw[] | null }>(
     "/public/suites",
-    { auth: false, signal: AbortSignal.timeout(PUBLIC_CATALOG_TIMEOUT_MS) },
+    {
+      auth: false,
+      signal: AbortSignal.timeout(PUBLIC_CATALOG_TIMEOUT_MS),
+      // Bundle & tier diubah dari Platform Admin. Tanpa no-store, response lama
+      // bisa dipakai lagi dan landing page nampilin kuota/harga yang udah basi.
+      cache: "no-store",
+    },
   );
   if (!ok || !data?.success) return [];
   return (data.suites ?? []).map((suite) => ({

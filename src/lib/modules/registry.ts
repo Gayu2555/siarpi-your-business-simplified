@@ -9,6 +9,26 @@ import {
   Factory,
   ShoppingBag,
   ContactRound,
+  // Ikon khusus kartu fitur di halaman modul (ModuleFeatureShowcase). Ditambah
+  // ke ICON_MAP yang sama supaya `iconName` di data tetap plain string --
+  // array `modules` & objek moduleDetails ikut di-serialize lewat SSR loader,
+  // komponen React tidak boleh masuk ke sana (lihat catatan di atas).
+  Activity,
+  ArrowLeftRight,
+  BadgeCheck,
+  Boxes,
+  Calculator,
+  CalendarDays,
+  ClipboardList,
+  Cog,
+  GitBranch,
+  PackageCheck,
+  PackagePlus,
+  Search,
+  Trash2,
+  TrendingUp,
+  Truck,
+  Undo2,
   type LucideIcon,
 } from "lucide-react";
 
@@ -34,57 +54,77 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   Factory,
   ShoppingBag,
   ContactRound,
+  Activity,
+  ArrowLeftRight,
+  BadgeCheck,
+  Boxes,
+  Calculator,
+  CalendarDays,
+  ClipboardList,
+  Cog,
+  GitBranch,
+  PackageCheck,
+  PackagePlus,
+  Search,
+  Trash2,
+  TrendingUp,
+  Truck,
+  Undo2,
 };
 
+// `price` di bawah adalah BOOTSTRAP saja (nilai per 27/10, diambil dari
+// GET /public/modules). Harga asli dipegang katalog & diubah dari Platform
+// Admin, jadi halaman yang menampilkan angka uang WAJIB meng-override nilai ini
+// dengan data katalog (lihat modules.$moduleId.tsx loader & onboarding.tsx).
 export const modules = [
   {
     id: "hr",
     name: "HR",
     iconName: "Users",
     description: "Manajemen karyawan & rekrutmen",
-    price: 49000,
+    price: 289000,
   },
   {
     id: "payroll",
     name: "Payroll",
     iconName: "Wallet",
     description: "Gaji otomatis & pajak",
-    price: 79000,
+    price: 189000,
   },
   {
     id: "finance",
     name: "Finance & Akuntansi",
     iconName: "LineChart",
     description: "Akuntansi ganda, jurnal, kas/bank, pajak, aset & kurs BI",
-    price: 99000,
+    price: 389000,
   },
   {
     id: "inventory",
     name: "Inventory",
     iconName: "Package",
     description: "Stok barang real-time",
-    price: 69000,
+    price: 189000,
   },
   {
     id: "procurement",
     name: "Procurement",
     iconName: "ShoppingBag",
     description: "Pengadaan, tender, PO, dan vendor",
-    price: 59000,
+    price: 189000,
   },
   {
     id: "production",
     name: "Production",
     iconName: "Factory",
-    description: "BOM, pesanan produksi, dan HPP",
-    price: 59000,
+    description: "BoM bertingkat, HPP otomatis, subkontrak, dan OEE",
+    price: 189000,
   },
   {
     id: "crm",
     name: "CRM",
     iconName: "HeartHandshake",
     description: "Kelola pelanggan & leads",
-    price: 69000,
+    price: 189000,
   },
   {
     id: "absensi",
@@ -105,7 +145,7 @@ export const modules = [
     name: "Employee Portal",
     iconName: "ContactRound",
     description: "Layanan mandiri untuk karyawan",
-    price: 29000,
+    price: 59000,
   },
 ] as const;
 
