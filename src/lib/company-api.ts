@@ -116,6 +116,13 @@ export function generateCompanyCode(name: string): string {
 export interface OnboardingStatus {
   success: boolean;
   has_company: boolean;
+  /**
+   * Data perusahaan masih aktif (tidak disuspend dari platform admin).
+   * Field ini absen saat backend lama belum mengirimnya — pemakai harus
+   * mengecek dengan `=== false` supaya rollout bertahap tidak ikut
+   * memblokir pembayaran yang selama ini jalan.
+   */
+  company_is_active?: boolean;
   has_active_modules: boolean;
   has_pending_checkout: boolean;
   pending_checkout_id: string;

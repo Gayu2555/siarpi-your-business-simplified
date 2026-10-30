@@ -90,12 +90,22 @@ function CheckoutPage() {
 
       <main className="container mx-auto flex-1 px-4 py-10 md:px-6 md:py-16">
         <div className="mx-auto max-w-2xl">
-          <Link
-            to="/onboarding"
-            className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" /> Ubah pilihan modul
-          </Link>
+          {checkout.plan ? (
+            <Link
+              to="/modular"
+              hash="paket"
+              className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4" /> Kembali ke pilihan paket
+            </Link>
+          ) : (
+            <Link
+              to="/onboarding"
+              className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4" /> Ubah pilihan modul
+            </Link>
+          )}
 
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -103,18 +113,54 @@ function CheckoutPage() {
             transition={{ duration: 0.4 }}
           >
             <Card className="rounded-3xl border-border p-8 shadow-card md:p-10">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Badge variant="secondary" className="rounded-full">
                   Checkout #{checkout.id}
                 </Badge>
+                {checkout.plan && (
+                  <Badge className="rounded-full bg-gradient-primary text-primary-foreground">
+                    Paket {checkout.plan.name}
+                  </Badge>
+                )}
               </div>
               <h1 className="mt-4 font-display text-2xl font-bold md:text-3xl">
-                Tinjau pesanan Anda
+                {checkout.plan ? "Tinjau paket Anda" : "Tinjau pesanan Anda"}
               </h1>
               <p className="mt-2 text-sm text-muted-foreground">
                 {user ? `Untuk akun ${user.email}. ` : ""}
-                Pastikan modul yang dipilih sudah sesuai sebelum lanjut ke pembayaran.
+                {checkout.plan
+                  ? "Harga paket dan seluruh modul yang termasuk sudah dikunci pada pesanan ini."
+                  : "Pastikan modul yang dipilih sudah sesuai sebelum lanjut ke pembayaran."}
               </p>
+
+              {checkout.plan && (
+                <div className="mt-6 rounded-2xl border border-primary/30 bg-primary/[0.04] px-5 py-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                        Paket bulanan
+                      </div>
+                      <div className="mt-1 font-display text-xl font-bold">
+                        {checkout.plan.name}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-display text-2xl font-bold text-primary">
+                        {formatIDR(checkout.plan.base_price)}
+                      </div>
+                      <div className="text-xs text-muted-foreground">/bulan</div>
+                    </div>
+                  </div>
+                  <div className="mt-3 text-xs text-muted-foreground">
+                    Termasuk{" "}
+                    {checkout.plan.included_seats === -1
+                      ? "user tanpa batas"
+                      : `${checkout.plan.included_seats} user`}
+                    {typeof checkout.plan.included_employees === "number" &&
+                      ` dan ${checkout.plan.included_employees === -1 ? "karyawan tanpa batas" : `${checkout.plan.included_employees} karyawan`}`}
+                  </div>
+                </div>
+              )}
 
               <div className="mt-8 space-y-3">
                 {checkout.items.map((item) => {
@@ -130,7 +176,11 @@ function CheckoutPage() {
                         </div>
                         <span className="text-sm font-medium">{item.module_name}</span>
                       </div>
-                      <span className="text-sm font-semibold">{formatIDR(item.price)}/bln</span>
+                      <span className="text-sm font-semibold">
+                        {checkout.plan || item.included_in_plan
+                          ? "Termasuk"
+                          : `${formatIDR(item.price)}/bln`}
+                      </span>
                     </div>
                   );
                 })}
@@ -141,8 +191,19 @@ function CheckoutPage() {
                   <span>Subtotal</span>
                   <span>{formatIDR(checkout.subtotal)}</span>
                 </div>
+                {typeof checkout.plan?.module_credit === "number" &&
+                  checkout.plan.module_credit > 0 && (
+                    <div className="flex items-center justify-between text-sm text-emerald-600">
+                      <span>Kredit modul yang sudah dimiliki</span>
+                      <span>-{formatIDR(checkout.plan.module_credit)}</span>
+                    </div>
+                  )}
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <span>Biaya layanan</span>
+                  <span>{formatIDR(checkout.service_fee ?? 0)}</span>
+                </div>
                 <div className="flex items-center justify-between text-lg font-bold">
-                  <span>Total per bulan</span>
+                  <span>Total dibayar</span>
                   <span className="font-display text-2xl text-primary">
                     {formatIDR(checkout.total)}
                   </span>
@@ -151,7 +212,9 @@ function CheckoutPage() {
 
               <div className="mt-6 flex items-center gap-2 rounded-xl bg-muted/50 p-3 text-xs text-muted-foreground">
                 <ShieldCheck className="h-4 w-4 shrink-0 text-primary" />
-                Modul baru aktif otomatis begitu pembayaran dikonfirmasi.
+                {checkout.plan
+                  ? "Paket dan seluruh modulnya aktif otomatis begitu pembayaran dikonfirmasi."
+                  : "Modul baru aktif otomatis begitu pembayaran dikonfirmasi."}
               </div>
 
               <Button

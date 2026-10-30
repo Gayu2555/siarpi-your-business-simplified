@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { ArrowRight, Check, ChevronDown, Crown, Loader2, RefreshCw, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { fetchSuites, type ApiModule, type SuiteWithPlans } from "@/lib/modules-api";
+import { savePlanIntent } from "@/lib/checkout-api";
+import { isAuthenticated } from "@/lib/auth";
 import { getModulePricingFeatures } from "@/lib/modules/pricing-feature-highlights";
 import { resolvePhosphorIcon } from "@/lib/icon-resolver";
 import { formatIDR } from "@/lib/utils";
@@ -162,6 +164,7 @@ function ModuleFeatureRow({ module }: { module: PricingModule }) {
 }
 
 export function SuitePricingSection() {
+  const navigate = useNavigate();
   const [suites, setSuites] = useState<SuiteWithPlans[]>([]);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
@@ -203,6 +206,22 @@ export function SuitePricingSection() {
     document.addEventListener("visibilitychange", onVisibilityChange);
     return () => document.removeEventListener("visibilitychange", onVisibilityChange);
   }, [loadSuites]);
+
+  // Langsung ke checkout paket. Login hanya diminta kalau memang belum punya
+  // sesi; pilihan paket disimpan supaya redirect login tidak kehilangan
+  // konteks. User tanpa company tetap membuat company dulu di onboarding,
+  // lalu onboarding langsung membuat checkout paket ini (tanpa pilih modul).
+  const startPlanCheckout = (suiteKey: string, planKey: string, planName: string) => {
+    savePlanIntent({ suite_key: suiteKey, plan_key: planKey, plan_name: planName });
+    if (!isAuthenticated()) {
+      void navigate({ to: "/login", search: { redirect: "/plan-checkout" } });
+      return;
+    }
+    void navigate({
+      to: "/plan-checkout",
+      search: { suite: suiteKey, plan: planKey, name: planName },
+    });
+  };
 
   return (
     <section id="paket" className="mt-16 scroll-mt-24 border-t border-border pt-16">
@@ -384,13 +403,14 @@ export function SuitePricingSection() {
                           </ul>
 
                           <Button
-                            asChild
+                            type="button"
+                            onClick={() => startPlanCheckout(suite.key, plan.key, plan.name)}
                             variant={featured ? "default" : "outline"}
                             className={
                               featured ? "mt-7 bg-gradient-primary text-primary-foreground" : "mt-7"
                             }
                           >
-                            <Link to="/onboarding">Pilih {plan.name}</Link>
+                            Pilih {plan.name}
                           </Button>
                         </Card>
                       </motion.div>

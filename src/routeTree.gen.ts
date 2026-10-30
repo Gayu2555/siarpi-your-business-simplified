@@ -15,6 +15,7 @@ import { Route as StudiKasusRouteImport } from './routes/studi-kasus'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as PlanCheckoutRouteImport } from './routes/plan-checkout'
 import { Route as PayrollRouteImport } from './routes/payroll'
 import { Route as PaymentRouteImport } from './routes/payment'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
@@ -61,6 +62,11 @@ const RoadmapRoute = RoadmapRouteImport.update({
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlanCheckoutRoute = PlanCheckoutRouteImport.update({
+  id: '/plan-checkout',
+  path: '/plan-checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PayrollRoute = PayrollRouteImport.update({
@@ -162,6 +168,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/payment': typeof PaymentRoute
   '/payroll': typeof PayrollRoute
+  '/plan-checkout': typeof PlanCheckoutRoute
   '/register': typeof RegisterRoute
   '/roadmap': typeof RoadmapRoute
   '/settings': typeof SettingsRoute
@@ -187,6 +194,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/payment': typeof PaymentRoute
   '/payroll': typeof PayrollRoute
+  '/plan-checkout': typeof PlanCheckoutRoute
   '/register': typeof RegisterRoute
   '/roadmap': typeof RoadmapRoute
   '/settings': typeof SettingsRoute
@@ -213,6 +221,7 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/payment': typeof PaymentRoute
   '/payroll': typeof PayrollRoute
+  '/plan-checkout': typeof PlanCheckoutRoute
   '/register': typeof RegisterRoute
   '/roadmap': typeof RoadmapRoute
   '/settings': typeof SettingsRoute
@@ -240,6 +249,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/payment'
     | '/payroll'
+    | '/plan-checkout'
     | '/register'
     | '/roadmap'
     | '/settings'
@@ -265,6 +275,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/payment'
     | '/payroll'
+    | '/plan-checkout'
     | '/register'
     | '/roadmap'
     | '/settings'
@@ -290,6 +301,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/payment'
     | '/payroll'
+    | '/plan-checkout'
     | '/register'
     | '/roadmap'
     | '/settings'
@@ -316,6 +328,7 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   PaymentRoute: typeof PaymentRoute
   PayrollRoute: typeof PayrollRoute
+  PlanCheckoutRoute: typeof PlanCheckoutRoute
   RegisterRoute: typeof RegisterRoute
   RoadmapRoute: typeof RoadmapRoute
   SettingsRoute: typeof SettingsRoute
@@ -371,6 +384,13 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plan-checkout': {
+      id: '/plan-checkout'
+      path: '/plan-checkout'
+      fullPath: '/plan-checkout'
+      preLoaderRoute: typeof PlanCheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/payroll': {
@@ -508,6 +528,7 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   PaymentRoute: PaymentRoute,
   PayrollRoute: PayrollRoute,
+  PlanCheckoutRoute: PlanCheckoutRoute,
   RegisterRoute: RegisterRoute,
   RoadmapRoute: RoadmapRoute,
   SettingsRoute: SettingsRoute,

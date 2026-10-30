@@ -2,6 +2,14 @@ import { redirect } from "@tanstack/react-router";
 import { isAuthenticated } from "./auth";
 import { getOnboardingStatus } from "./company-api";
 
+/** Guard untuk halaman yang butuh login tetapi belum butuh company. */
+export function guardAuthenticatedRoute(currentPath: string) {
+  if (typeof window === "undefined") return;
+  if (!isAuthenticated()) {
+    throw redirect({ to: "/login", search: { redirect: currentPath } });
+  }
+}
+
 export async function guardOnboardingRoute(
   currentPath: "/onboarding" | "/checkout" | "/payment" | "/dashboard",
   searchId?: string,
@@ -28,7 +36,17 @@ export async function guardOnboardingRoute(
     return;
   }
 
-  // 2. Sudah punya perusahaan
+  // 2. Punya perusahaan tetapi data-nya tidak aktif (misal disuspend dari
+  //    platform admin) -> pembayaran tidak boleh jalan. Checkout & payment
+  //    dilempar ke gerbang plan-checkout yang menampilkan penjelasan plus
+  //    kontak support; dashboard tetap boleh dibuka.
+  if (data.company_is_active === false) {
+    if (currentPath === "/checkout" || currentPath === "/payment") {
+      throw redirect({ to: "/plan-checkout" });
+    }
+  }
+
+  // 3. Sudah punya perusahaan
   // - Dashboard selalu boleh diakses
   if (currentPath === "/dashboard") {
     return;

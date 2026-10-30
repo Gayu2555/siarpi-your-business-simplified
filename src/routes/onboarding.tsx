@@ -1,5 +1,5 @@
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, redirect, useNavigate, useSearch } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -19,7 +19,7 @@ import {
 } from "@/lib/company-api";
 import { useEffect } from "react";
 import { fetchCatalogModules } from "@/lib/modules-api";
-import { createCheckout } from "@/lib/checkout-api";
+import { clearPlanIntent, createCheckout } from "@/lib/checkout-api";
 import { startFreeTrial } from "@/lib/trial-api";
 import {
   Building2,
@@ -35,8 +35,27 @@ import {
 } from "lucide-react";
 
 import { guardOnboardingRoute } from "@/lib/onboarding-guard";
+import { optionalSearchString } from "@/lib/search-params";
+
+type OnboardingSearch = {
+  plan_suite?: string;
+  plan_key?: string;
+  plan_name?: string;
+};
+
+function validateOnboardingSearch(search: Record<string, unknown>): OnboardingSearch {
+  const suite = optionalSearchString(search.plan_suite);
+  const plan = optionalSearchString(search.plan_key);
+  const name = optionalSearchString(search.plan_name);
+  return {
+    ...(suite ? { plan_suite: suite } : {}),
+    ...(plan ? { plan_key: plan } : {}),
+    ...(name ? { plan_name: name } : {}),
+  };
+}
 
 export const Route = createFileRoute("/onboarding")({
+  validateSearch: validateOnboardingSearch,
   beforeLoad: async () => {
     await guardOnboardingRoute("/onboarding");
   },
@@ -137,6 +156,18 @@ const industries = [
 
 function OnboardingPage() {
   const navigate = useNavigate();
+  const search = useSearch({ from: "/onboarding" });
+  const planIntent = useMemo(
+    () =>
+      search.plan_suite && search.plan_key
+        ? {
+            suite_key: search.plan_suite,
+            plan_key: search.plan_key,
+            plan_name: search.plan_name ?? search.plan_key,
+          }
+        : null,
+    [search.plan_suite, search.plan_key, search.plan_name],
+  );
   const [step, setStep] = useState(1);
   const [loadingStatus, setLoadingStatus] = useState(true);
   const [existingCompanyId, setExistingCompanyId] = useState<string | null>(null);
@@ -170,7 +201,7 @@ function OnboardingPage() {
   });
 
   // Submit state
-  const [submitMode, setSubmitMode] = useState<"trial" | "checkout" | null>(null);
+  const [submitMode, setSubmitMode] = useState<"trial" | "checkout" | "plan" | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const submitting = submitMode !== null;
 
@@ -184,6 +215,20 @@ function OnboardingPage() {
         if (ok && data) {
           if (data.has_company && data.company_id) {
             setExistingCompanyId(data.company_id);
+            if (planIntent) {
+              // User sudah punya company: jangan lewati pemilihan modul,
+              // langsung minta halaman checkout membuat pesanan paket.
+              void navigate({
+                to: "/plan-checkout",
+                search: {
+                  suite: planIntent.suite_key,
+                  plan: planIntent.plan_key,
+                  name: planIntent.plan_name,
+                },
+                replace: true,
+              });
+              return;
+            }
             setStep(2); // Langsung lompat ke step 2 jika sudah ada perusahaan
           }
         }
@@ -194,9 +239,11 @@ function OnboardingPage() {
       .finally(() => {
         setLoadingStatus(false);
       });
-  }, []);
+  }, [navigate, planIntent]);
 
-  const totalSteps = 3;
+  // Checkout paket tidak perlu step pilih modul/rekomendasi: setelah profil
+  // perusahaan tersimpan, langsung dibuat checkout paket yang dipilih.
+  const totalSteps = planIntent ? 1 : 3;
   const progress = (step / totalSteps) * 100;
 
   useEffect(() => {
@@ -219,9 +266,7 @@ function OnboardingPage() {
   }, []);
 
   const priceOf = (id: string) =>
-    catalogPrices[id.trim().toLowerCase()] ??
-    modules.find((x) => x.id === id)?.price ??
-    0;
+    catalogPrices[id.trim().toLowerCase()] ?? modules.find((x) => x.id === id)?.price ?? 0;
 
   const totalPrice = selectedModules.reduce((sum, id) => sum + priceOf(id), 0);
 
@@ -287,6 +332,33 @@ function OnboardingPage() {
         throw new Error(result.message ?? "Trial tidak dapat diaktifkan. Coba lagi.");
       }
       navigate({ to: "/dashboard" });
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "Terjadi kesalahan tidak terduga.");
+    } finally {
+      setSubmitMode(null);
+    }
+  }
+
+  async function handlePlanCheckout() {
+    if (!planIntent) return;
+    setSubmitError(null);
+    setSubmitMode("plan");
+
+    try {
+      const { companyId, user } = await ensureCompany();
+      const { ok: checkoutOk, data: checkoutData } = await createCheckout({
+        company_id: companyId,
+        user_id: user.id,
+        suite_key: planIntent.suite_key,
+        plan_key: planIntent.plan_key,
+      });
+
+      if (!checkoutOk || !checkoutData?.checkout) {
+        throw new Error(checkoutData?.message ?? "Gagal membuat checkout paket. Coba lagi.");
+      }
+
+      clearPlanIntent();
+      navigate({ to: "/checkout", search: { id: checkoutData.checkout.id } });
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Terjadi kesalahan tidak terduga.");
     } finally {
@@ -371,6 +443,21 @@ function OnboardingPage() {
                     <p className="mt-2 text-muted-foreground">
                       Informasi dasar untuk setup akun perusahaan Anda.
                     </p>
+
+                    {planIntent && (
+                      <div className="mt-5 rounded-2xl border border-primary/30 bg-primary/[0.04] px-5 py-4">
+                        <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                          Paket dipilih
+                        </div>
+                        <div className="mt-1 font-display text-lg font-bold">
+                          {planIntent.plan_name}
+                        </div>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          Setelah profil perusahaan tersimpan, Anda langsung diarahkan ke pembayaran
+                          paket ini tanpa memilih modul lagi.
+                        </p>
+                      </div>
+                    )}
 
                     <div className="mt-8 space-y-6">
                       <div className="space-y-2">
@@ -578,6 +665,12 @@ function OnboardingPage() {
               </motion.div>
             </AnimatePresence>
 
+            {submitError && planIntent && (
+              <div className="mt-4 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+                {submitError}
+              </div>
+            )}
+
             {/* Nav */}
             <div className="mt-10 flex items-center justify-between">
               <Button
@@ -587,7 +680,20 @@ function OnboardingPage() {
               >
                 <ArrowLeft className="mr-1 h-4 w-4" /> Kembali
               </Button>
-              {step < totalSteps ? (
+              {planIntent ? (
+                <Button
+                  onClick={handlePlanCheckout}
+                  disabled={!canNext || submitting}
+                  className="bg-gradient-primary text-primary-foreground shadow-soft hover:shadow-glow"
+                >
+                  {submitMode === "plan" ? (
+                    <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                  ) : (
+                    <ShieldCheck className="mr-1 h-4 w-4" />
+                  )}
+                  Lanjut ke pembayaran paket
+                </Button>
+              ) : step < totalSteps ? (
                 <Button
                   onClick={next}
                   disabled={!canNext}
