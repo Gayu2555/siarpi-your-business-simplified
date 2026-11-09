@@ -78,6 +78,25 @@ function RootShell({ children }: { children: React.ReactNode }) {
   return (
     <html lang="id">
       <head>
+        {/* Google Tag Manager -- diletakkan sedekat mungkin dengan tag <head>
+            pembuka (rekomendasi resmi Google) supaya tag container capturing
+            tidak kelewatan. Sama seperti gtag & Clarity, snippet ini hanya
+            dimuat di build production supaya development lokal tidak ikut
+            mengirim data ke container. */}
+        {import.meta.env.PROD && (
+          <>
+            <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-MWGNT5TV" />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                `,
+              }}
+            />
+          </>
+        )}
         <HeadContent />
         <meta name="msvalidate.01" content="16C5717F3121D840BD0162D3962EBD7F" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -130,6 +149,20 @@ function RootShell({ children }: { children: React.ReactNode }) {
         )}
       </head>
       <body>
+        {/* Fallback GTM untuk pengunjung yang mematikan JavaScript -- iframe
+            ini tidak dieksekusi script, jadi tetap aman dipaketkan sebagai
+            fallback namun tidak menambah beban saat JS aktif. */}
+        {import.meta.env.PROD && (
+          <noscript>
+            <iframe
+              src="https://www.googletagmanager.com/ns.html?id=GTM-MWGNT5TV"
+              title="Google Tag Manager"
+              height="0"
+              width="0"
+              style={{ display: "none", visibility: "hidden" }}
+            />
+          </noscript>
+        )}
         {children}
         <Scripts />
       </body>
